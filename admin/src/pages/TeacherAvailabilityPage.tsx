@@ -1,0 +1,766 @@
+import { useEffect, useMemo, useState } from 'react';
+import { AdminLayout } from '@/components/layout/AdminLayout';
+import { Button } from '@/components/ui/button';
+import { Plus, Calendar, Clock, Trash2, Edit, BookOpen, Languages } from 'lucide-react';
+import { AvailabilityAPI, TeacherProgramJoinAPI, ApiAvailability, ApiTeacherProgram, ApiProgram } from '@/lib/api';
+import { useToast } from '@/hooks/use-toast';
+import { getLanguageValue } from '@/lib/languageHelper';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
+import { useConfirmDialog } from '@/hooks/use-confirm-dialog';
+import { useRole } from '@/contexts/RoleContext';
+import { useNavigate } from 'react-router-dom';
+import { format, startOfWeek, endOfWeek, addDays, isSameDay, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, isSameMonth } from 'date-fns';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { getAllTimezones, getUserTimezone } from '@/utils/timezoneData';
+
+const TeacherAvailabilityPage = () => {
+  const { currentRole } = useRole();
+  const navigate = useNavigate();
+  const [teacherPrograms, setTeacherPrograms] = useState<ApiTeacherProgram[]>([]);
+  const [Programs, setPrograms] = useState<ApiProgram[]>([]);
+  const [availabilities, setAvailabilities] = useState<ApiAvailability[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedProgramId, setSelectedProgramId] = useState<string>('');
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [viewMode, setViewMode] = useState<'calendar' | 'list'>('calendar');
+  const [timezones] = useState(() => getAllTimezones());
+  const [timezoneOpen, setTimezoneOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    date: '',
+    startTime: '',
+    endTime: '',
+    duration: 50,
+    timezone: getUserTimezone(),
+  });
+  const { toast } = useToast();
+  const { confirm, ConfirmDialog } = useConfirmDialog();
+
+  useEffect(() => {
+    if (currentRole !== 'teacher') {
+      navigate('/');
+      return;
+    }
+    loadData();
+  }, [currentRole]);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const ProgramsData = await TeacherProgramJoinAPI.getMyPrograms('approved');
+      setTeacherPrograms(ProgramsData.teacherPrograms || []);
+      
+      // Get unique Programs (not Program+language combinations)
+      const uniquePrograms = Array.from(
+        new Map(
+          ProgramsData.teacherPrograms
+            .filter(tc => typeof tc.ProgramId !== 'string')
+            .map(tc => {
+              const Program = tc.ProgramId as ApiProgram;
+              return [Program._id, Program];
+            })
+        ).values()
+      );
+      setPrograms(uniquePrograms);
+      if (uniquePrograms.length > 0) {
+        setSelectedProgramId(uniquePrograms[0]._id);
+        loadAvailability(uniquePrograms[0]._id);
+      }
+    } catch (err: any) {
+      toast({ title: 'Failed to load data', description: err?.message, variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadAvailability = async (ProgramId: string) => {
+    try {
+      const data = await AvailabilityAPI.getMyAvailability({ ProgramId });
+      setAvailabilities(data.availabilities || []);
+    } catch (err: any) {
+      toast({ title: 'Failed to load availability', description: err?.message, variant: 'destructive' });
+    }
+  };
+
+  const handleOpenDialog = (date?: Date) => {
+    if (!selectedProgramId) {
+      toast({ title: 'Please select a Program first', variant: 'destructive' });
+      return;
+    }
+    const dateToUse = date || selectedDate;
+    setFormData({
+      date: format(dateToUse, 'yyyy-MM-dd'),
+      startTime: '',
+      endTime: '',
+      duration: 50,
+      timezone: getUserTimezone(),
+    });
+    setDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setFormData({
+      date: '',
+      startTime: '',
+      endTime: '',
+      duration: 50,
+      timezone: getUserTimezone(),
+    });
+  };
+
+  // Calculate teacher price for selected duration
+  const selectedTeacherProgram = useMemo(() => {
+    if (!selectedProgramId) return null;
+    return (
+      teacherPrograms.find(
+        (tc) => typeof tc.ProgramId !== 'string' && tc.ProgramId._id === selectedProgramId
+      ) || null
+    );
+  }, [selectedProgramId, teacherPrograms]);
+
+  const calculatePricePreview = () => {
+    if (!selectedProgramId || !formData.duration) return null;
+    
+    if (!selectedTeacherProgram) return null;
+    
+    const durationInHours = formData.duration / 60;
+    const teacherPricePerHour = selectedTeacherProgram.pricing?.teacherPrice || 0;
+    const teacherPriceForSession = teacherPricePerHour * durationInHours;
+
+    return {
+      price: parseFloat(teacherPriceForSession.toFixed(2)),
+      currency: selectedTeacherProgram.pricing?.teacherCurrency || 'USD',
+    };
+  };
+
+  const pricePreview = calculatePricePreview();
+
+  const getSlotTeacherPriceLabel = (slot: ApiAvailability) => {
+    const baseAmountUSD = slot?.pricing?.baseAmountUSD;
+    if (typeof baseAmountUSD !== 'number') return '';
+    if (selectedTeacherProgram?.pricing?.exchangeRateAtCreation && selectedTeacherProgram?.pricing?.teacherCurrency) {
+      const amount = baseAmountUSD * selectedTeacherProgram.pricing.exchangeRateAtCreation;
+      return `${selectedTeacherProgram.pricing.teacherCurrency} ${amount.toFixed(2)}`;
+    }
+    return `USD ${baseAmountUSD.toFixed(2)}`;
+  };
+
+  const addMinutesToTime = (time: string, minutesToAdd: number) => {
+    // time: "HH:mm"
+    const [hh, mm] = time.split(':').map((v) => parseInt(v, 10));
+    if (!Number.isFinite(hh) || !Number.isFinite(mm) || !Number.isFinite(minutesToAdd)) return '';
+    const total = hh * 60 + mm + minutesToAdd;
+    const normalized = ((total % (24 * 60)) + (24 * 60)) % (24 * 60);
+    const newH = Math.floor(normalized / 60);
+    const newM = normalized % 60;
+    return `${String(newH).padStart(2, '0')}:${String(newM).padStart(2, '0')}`;
+  };
+
+  // Keep endTime in sync with startTime + duration
+  useEffect(() => {
+    if (!formData.startTime || !formData.duration) {
+      if (formData.endTime) {
+        setFormData((prev) => ({ ...prev, endTime: '' }));
+      }
+      return;
+    }
+    const computedEndTime = addMinutesToTime(formData.startTime, formData.duration);
+    if (computedEndTime && computedEndTime !== formData.endTime) {
+      setFormData((prev) => ({ ...prev, endTime: computedEndTime }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [formData.startTime, formData.duration]);
+
+  const handleSubmit = async () => {
+    const computedEndTime =
+      formData.startTime && formData.duration ? addMinutesToTime(formData.startTime, formData.duration) : '';
+
+    if (!selectedProgramId || !formData.date || !formData.startTime || !computedEndTime) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please fill in all required fields',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      await AvailabilityAPI.create({
+        ProgramId: selectedProgramId,
+        date: formData.date,
+        startTime: formData.startTime,
+        endTime: computedEndTime,
+        duration: formData.duration,
+        timezone: formData.timezone,
+      });
+      toast({ title: 'Availability slot created successfully' });
+      handleCloseDialog();
+      loadAvailability(selectedProgramId);
+    } catch (err: any) {
+      toast({ title: 'Creation failed', description: err?.message, variant: 'destructive' });
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    const confirmed = await confirm({
+      title: 'Delete Availability Slot',
+      description: 'Are you sure you want to delete this availability slot?',
+      confirmText: 'Delete',
+      cancelText: 'Cancel',
+      variant: 'destructive',
+    });
+    if (!confirmed) return;
+    try {
+      await AvailabilityAPI.delete(id);
+      toast({ title: 'Slot deleted successfully' });
+      loadAvailability(selectedProgramId);
+    } catch (err: any) {
+      toast({ title: 'Delete failed', description: err?.message, variant: 'destructive' });
+    }
+  };
+
+  const getProgramName = (Program: ApiTeacherProgram['ProgramId']) => {
+    if (typeof Program === 'string') return 'Unknown';
+    return getLanguageValue(Program.name) || 'Unknown';
+  };
+
+  const getLanguageNames = (languages: ApiTeacherProgram['languageIds']) => {
+    if (!Array.isArray(languages)) return 'Unknown';
+    return languages.map(lang => {
+      if (typeof lang === 'string') return 'Unknown';
+      return getLanguageValue(lang.name) || lang.code || 'Unknown';
+    }).join(', ');
+  };
+
+  const statusStyles: Record<string, string> = {
+    available: 'bg-success/20 text-success border-success/30',
+    booked: 'bg-primary/20 text-primary border-primary/30',
+    blocked: 'bg-muted text-muted-foreground border-muted',
+    cancelled: 'bg-destructive/20 text-destructive border-destructive/30',
+  };
+
+  // Group availabilities by date
+  const groupedByDate = availabilities.reduce((acc, slot) => {
+    const dateKey = format(new Date(slot.date), 'yyyy-MM-dd');
+    if (!acc[dateKey]) {
+      acc[dateKey] = [];
+    }
+    acc[dateKey].push(slot);
+    return acc;
+  }, {} as Record<string, ApiAvailability[]>);
+
+  const monthStart = startOfMonth(selectedDate);
+  const monthEnd = endOfMonth(selectedDate);
+  const calendarStart = startOfWeek(monthStart, { weekStartsOn: 1 });
+  const calendarEnd = endOfWeek(monthEnd, { weekStartsOn: 1 });
+  const calendarDates = eachDayOfInterval({ start: calendarStart, end: calendarEnd });
+
+  const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+  const getSlotsForDate = (date: Date) => {
+    const dateKey = format(date, 'yyyy-MM-dd');
+    return groupedByDate[dateKey] || [];
+  };
+
+  const selectedProgram = Programs.find((c) => c._id === selectedProgramId);
+
+  const getDisplayLanguageName = (lang: any): string => {
+    if (!lang) return 'Unknown';
+    if (typeof lang === 'string') return lang;
+
+    if (typeof lang.name === 'string' && lang.name.trim()) return lang.name;
+    if (typeof lang.nativeName === 'string' && lang.nativeName.trim()) return lang.nativeName;
+
+    const nameFromObj = getLanguageValue(lang.name);
+    if (nameFromObj) return nameFromObj;
+
+    return (lang.code || 'Unknown') as string;
+  };
+
+  return (
+    <AdminLayout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-fade-in">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">Manage Availability</h1>
+            <p className="mt-1 text-muted-foreground">
+              Set your available time slots for each Program. Availability slots are shared across all languages for a Program.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button variant="outline" onClick={() => navigate('/teacher/my-Programs')}>
+              <BookOpen className="h-4 w-4 mr-2" />
+              My Programs
+            </Button>
+            <Button onClick={() => handleOpenDialog()} disabled={!selectedProgramId}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Time Slot
+            </Button>
+          </div>
+        </div>
+
+        {/* Program Selector */}
+        {!loading && Programs.length > 0 && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Select Program</CardTitle>
+              <CardDescription>
+                Availability slots are shared across all languages for the selected Program
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Select
+                value={selectedProgramId}
+                onValueChange={(value) => {
+                  setSelectedProgramId(value);
+                  loadAvailability(value);
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {Programs.map((Program) => {
+                    // Get all languages for this Program from joined teacherPrograms
+                    const ProgramLanguages = teacherPrograms
+                      .filter((tc) => typeof tc.ProgramId !== 'string' && tc.ProgramId._id === Program._id)
+                      .flatMap((tc) => {
+                        const langs =
+                          Array.isArray((tc as any).languages) && (tc as any).languages.length > 0
+                            ? (tc as any).languages
+                            : Array.isArray(tc.languageIds)
+                              ? tc.languageIds
+                              : [];
+                        return langs.map((l: any) => getDisplayLanguageName(l));
+                      });
+                    const uniqueLanguages = Array.from(new Set(ProgramLanguages));
+
+                    return (
+                      <SelectItem key={Program._id} value={Program._id}>
+                        <div className="flex items-center gap-2">
+                          <BookOpen className="h-4 w-4" />
+                          <span className="font-medium">{getLanguageValue(Program.name)}</span>
+                          {uniqueLanguages.length > 0 && (
+                            <Badge variant="outline" className="ml-2">
+                              {uniqueLanguages.length} language{uniqueLanguages.length > 1 ? 's' : ''}
+                            </Badge>
+                          )}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+              {selectedProgramId && (
+                <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+                  <div className="flex flex-col gap-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="h-4 w-4 text-primary" />
+                      <span className="font-semibold text-foreground">Program:</span>
+                      <span className="text-muted-foreground">
+                        {Programs.find(c => c._id === selectedProgramId) ? getLanguageValue(Programs.find(c => c._id === selectedProgramId)!.name) : 'Unknown'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Languages className="h-4 w-4 text-primary" />
+                      <span className="font-semibold text-foreground">Languages:</span>
+                      <div className="flex items-center gap-1 flex-wrap">
+                        {teacherPrograms
+                          .filter((tc) => typeof tc.ProgramId !== 'string' && tc.ProgramId._id === selectedProgramId)
+                          .flatMap((tc) => {
+                            const langs =
+                              Array.isArray((tc as any).languages) && (tc as any).languages.length > 0
+                                ? (tc as any).languages
+                                : Array.isArray(tc.languageIds)
+                                  ? tc.languageIds
+                                  : [];
+                            return langs.map((l: any) => getDisplayLanguageName(l));
+                          })
+                          .filter((v, i, a) => a.indexOf(v) === i)
+                          .map((lang, idx) => (
+                            <Badge key={idx} variant="secondary" className="text-xs">
+                              {lang}
+                            </Badge>
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {!loading && Programs.length === 0 && (
+          <Card>
+            <CardContent className="py-12 text-center">
+              <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground mb-4">No approved Programs found</p>
+              <p className="text-sm text-muted-foreground mb-4">
+                Join a Program and wait for admin approval to set availability
+              </p>
+              <Button onClick={() => navigate('/teacher/join-Program')}>
+                <Plus className="h-4 w-4 mr-2" />
+                Join a Program
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Availability View */}
+        {!loading && selectedProgramId && (
+          <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as 'calendar' | 'list')}>
+            <TabsList>
+              <TabsTrigger value="calendar">Calendar View</TabsTrigger>
+              <TabsTrigger value="list">List View</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="calendar" className="space-y-4">
+              {/* Week Navigation */}
+              <Card>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedDate(addMonths(selectedDate, -1))}
+                      >
+                        Previous Month
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedDate(new Date())}
+                      >
+                        Today
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSelectedDate(addMonths(selectedDate, 1))}
+                      >
+                        Next Month
+                      </Button>
+                    </div>
+                    <span className="text-xl font-bold">
+                      {format(selectedDate, 'MMMM yyyy')}
+                    </span>
+                  </div>
+
+                  {/* Day Names Header */}
+                  <div className="grid grid-cols-7 gap-2 mb-2">
+                    {dayNames.map((day) => (
+                      <div key={day} className="text-center text-sm font-semibold text-muted-foreground uppercase">
+                        {day}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Month Grid */}
+                  <div className="grid grid-cols-7 gap-2">
+                    {calendarDates.map((date) => {
+                      const slots = getSlotsForDate(date);
+                      const isToday = isSameDay(date, new Date());
+                      const isCurrentMonth = isSameMonth(date, monthStart);
+                      return (
+                        <div
+                          key={date.toISOString()}
+                          className={cn(
+                            'border rounded-lg p-2 min-h-[100px] flex flex-col group',
+                            isToday && 'border-primary shadow-sm bg-primary/5',
+                            !isCurrentMonth && 'opacity-40 bg-muted/20'
+                          )}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className={cn(
+                              'text-sm font-medium h-6 w-6 flex items-center justify-center rounded-full',
+                              isToday && 'bg-primary text-primary-foreground',
+                              !isCurrentMonth && 'text-muted-foreground'
+                            )}>
+                              {format(date, 'd')}
+                            </span>
+                            {slots.length > 0 && (
+                              <Badge variant="secondary" className="h-4 px-1 text-[10px]">
+                                {slots.length}
+                              </Badge>
+                            )}
+                          </div>
+
+                          <div className="flex-1 overflow-y-auto space-y-1 max-h-[80px] scrollbar-hide">
+                            {slots.map((slot) => (
+                              <div
+                                key={slot._id}
+                                className={cn(
+                                  'text-[10px] p-0.5 rounded border leading-tight truncate',
+                                  statusStyles[slot.status] || 'bg-muted'
+                                )}
+                              >
+                                {slot.startTime}
+                              </div>
+                            ))}
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="w-full h-5 mt-1 text-[10px] opacity-0 group-hover:opacity-100 hover:bg-primary/10 transition-opacity"
+                            onClick={() => handleOpenDialog(date)}
+                          >
+                            <Plus className="h-2 w-2" />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="list" className="space-y-4">
+              {availabilities.length === 0 ? (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground mb-4">No availability slots set</p>
+                    <Button onClick={() => handleOpenDialog()}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add First Slot
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 animate-slide-up">
+                  {availabilities
+                    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                    .map((slot) => (
+                      <Card key={slot._id} className="hover:shadow-lg transition-shadow">
+                        <CardHeader>
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <CardTitle className="text-lg">
+                                {format(new Date(slot.date), 'EEE, MMM d, yyyy')}
+                              </CardTitle>
+                              <div className="flex items-center gap-2 mt-2">
+                                <Clock className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-sm text-muted-foreground">
+                                  {slot.startTime} - {slot.endTime}
+                                </span>
+                              </div>
+                            </div>
+                            <Badge
+                              variant="outline"
+                              className={cn('border capitalize', statusStyles[slot.status] || 'bg-muted')}
+                            >
+                              {slot.status}
+                            </Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Duration:</span>
+                              <span className="font-medium">{slot.duration} mins</span>
+                            </div>
+                            {slot?.pricing?.baseAmountUSD !== undefined && (
+                              <div className="flex items-center justify-between text-sm">
+                                <span className="text-muted-foreground">Price:</span>
+                                <span className="font-semibold text-primary">{getSlotTeacherPriceLabel(slot)}</span>
+                              </div>
+                            )}
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-muted-foreground">Timezone:</span>
+                              <span className="font-medium">{slot.timezone}</span>
+                            </div>
+                            {slot.status === 'available' && (
+                              <div className="flex gap-2 mt-4">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="flex-1"
+                                  onClick={() => handleDelete(slot._id)}
+                                >
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        )}
+      </div>
+
+      {/* Add Availability Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add Availability Slot</DialogTitle>
+            <DialogDescription>
+              Set a time slot when you're available for this Program-language combination.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="date">Date *</Label>
+              <Input
+                id="date"
+                type="date"
+                value={formData.date}
+                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                min={format(new Date(), 'yyyy-MM-dd')}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="duration">Duration (minutes)</Label>
+              <Select
+                value={formData.duration.toString()}
+                onValueChange={(value) => setFormData({ ...formData, duration: parseInt(value) })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="25">25 minutes</SelectItem>
+                  <SelectItem value="50">50 minutes</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="startTime">Start Time *</Label>
+                <Input
+                  id="startTime"
+                  type="time"
+                  value={formData.startTime}
+                  onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="endTime">End Time</Label>
+                <Input id="endTime" type="time" value={formData.endTime} readOnly disabled />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="timezone">Timezone</Label>
+              <Popover open={timezoneOpen} onOpenChange={setTimezoneOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={timezoneOpen}
+                    className="w-full justify-between"
+                  >
+                    <span>
+                      {formData.timezone
+                        ? timezones.find((tz) => tz.value === formData.timezone)?.label || formData.timezone
+                        : 'Select timezone...'}
+                    </span>
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Search timezone..." />
+                    <CommandList>
+                      <CommandEmpty>No timezone found.</CommandEmpty>
+                      <CommandGroup>
+                        {timezones.map((tz) => (
+                          <CommandItem
+                            key={tz.value}
+                            value={`${tz.value} ${tz.label}`}
+                            onSelect={() => {
+                              setFormData({ ...formData, timezone: tz.value });
+                              setTimezoneOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                'mr-2 h-4 w-4',
+                                formData.timezone === tz.value ? 'opacity-100' : 'opacity-0'
+                              )}
+                            />
+                            <span>{tz.label}</span>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            {/* Price Preview - Teacher Price Only */}
+            {pricePreview && (
+              <div className="p-4 bg-muted/50 rounded-lg border-2 border-muted">
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Your Price ({formData.duration} min)</p>
+                  <p className="text-lg font-semibold text-primary mt-1">
+                    {pricePreview.currency} {pricePreview.price.toFixed(2)}
+                  </p>
+                </div>
+                <p className="text-xs text-muted-foreground mt-3 pt-2 border-t border-border/50">
+                  This is your price for this {formData.duration}-minute session.
+                </p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleCloseDialog}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit} disabled={!formData.date || !formData.startTime}>
+              Create Slot
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      <ConfirmDialog />
+    </AdminLayout>
+  );
+};
+
+export default TeacherAvailabilityPage;
