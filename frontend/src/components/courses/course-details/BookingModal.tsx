@@ -1,0 +1,474 @@
+import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { TeacherProgram } from '../../../services/programService';
+import { useCurrency } from '../../../hooks/useCurrency';
+
+interface AvailabilitySlot {
+  _id: string;
+  date: string;
+  startTime: string;
+  endTime: string;
+  duration: number;
+  pricing?: { baseAmountUSD: number; baseCurrency: 'USD' };
+  // Derived convenience fields (USD base) – display only
+  price?: number;
+  currency?: string;
+  timezone: string;
+  displayTimezone?: string;
+}
+
+interface BookingModalProps {
+  teacher: TeacherProgram;
+  programId: string;
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (bookingData: any) => void;
+}
+
+const BookingModal = ({ teacher, programId, isOpen, onClose, onConfirm }: BookingModalProps) => {
+  const { t } = useTranslation();
+  const { currency: selectedCurrency, convertAndFormatPrice } = useCurrency();
+  const [selectedDuration, setSelectedDuration] = useState<number>(50);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
+  const [availabilities, setAvailabilities] = useState<AvailabilitySlot[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [studentTimezone, setStudentTimezone] = useState<string>('UTC');
+  const [currentWeek, setCurrentWeek] = useState<Date>(new Date());
+
+  useEffect(() => {
+    if (isOpen) {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      setStudentTimezone(tz);
+      loadAvailability(tz);
+    }
+  }, [isOpen, teacher, programId, selectedDate, selectedDuration]);
+
+  const loadAvailability = async (tzOverride?: string) => {
+    if (!teacher || !programId) return;
+    try {
+      setLoading(true);
+      const teacherId = typeof teacher.teacherId === 'object' ? teacher.teacherId._id : '';
+      const startDate = new Date(selectedDate);
+      startDate.setDate(startDate.getDate() - 7);
+      const endDate = new Date(selectedDate);
+      endDate.setDate(endDate.getDate() + 30);
+      const tz = tzOverride || studentTimezone;
+
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+      const response = await fetch(
+        `${API_BASE_URL}/public/courses/availability?courseId=${programId}&teacherId=${teacherId}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&studentTimezone=${encodeURIComponent(tz)}`
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch availability');
+      }
+
+      const data = await response.json();
+      const normalized: AvailabilitySlot[] = (data.availabilities || []).map((av: any) => ({
+        ...av,
+        price:
+          typeof av?.price === 'number'
+            ? av.price
+            : typeof av?.pricing?.baseAmountUSD === 'number'
+              ? av.pricing.baseAmountUSD
+              : undefined,
+        currency: typeof av?.currency === 'string' ? av.currency : 'USD',
+      }));
+      const filtered = normalized.filter((av: AvailabilitySlot) => av.duration === selectedDuration);
+      setAvailabilities(filtered);
+    } catch (err) {
+      console.error('Failed to load availability:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  void convertAndFormatPrice; // loaded for currency rates; price formatting is handled elsewhere in this modal
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  };
+
+  const formatFullDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  const formatTime = (timeString: string) => {
+    const [hours, minutes] = timeString.split(':');
+    return `${hours.padStart(2, '0')}:${minutes}`;
+  };
+
+  const getWeekDates = () => {
+    const dates: Date[] = [];
+    const startDate = new Date(currentWeek);
+    startDate.setHours(0, 0, 0, 0);
+
+    // Start from currentWeek and show next 7 days
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startDate);
+      date.setDate(startDate.getDate() + i);
+      dates.push(date);
+    }
+    return dates;
+  };
+
+  const getSlotsForDate = (date: Date) => {
+    // Normalize both dates to YYYY-MM-DD format for comparison
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+
+    const filtered = availabilities.filter((av) => {
+      const avDate = new Date(av.date);
+      const avYear = avDate.getUTCFullYear();
+      const avMonth = String(avDate.getUTCMonth() + 1).padStart(2, '0');
+      const avDay = String(avDate.getUTCDate()).padStart(2, '0');
+      const avDateStr = `${avYear}-${avMonth}-${avDay}`;
+
+      return avDateStr === dateStr;
+    });
+
+    return filtered;
+  };
+
+  const getTimeIcon = (timeGroup: string) => {
+    switch (timeGroup) {
+      case 'Morning':
+        return '🌅';
+      case 'Afternoon':
+        return '☀️';
+      case 'Evening':
+        return '🌙';
+      default:
+        return '🕐';
+    }
+  };
+
+  const groupSlotsByTime = (slots: AvailabilitySlot[]) => {
+    const groups: { [key: string]: AvailabilitySlot[] } = {};
+    slots.forEach((slot) => {
+      const hour = parseInt(slot.startTime.split(':')[0], 10);
+      let group = 'Evening';
+      if (hour < 12) group = 'Morning';
+      else if (hour < 17) group = 'Afternoon';
+      if (!groups[group]) groups[group] = [];
+      groups[group].push(slot);
+    });
+    return groups;
+  };
+
+  const handleConfirm = () => {
+    if (!selectedSlot) return;
+
+    // Extract teacher information
+    const teacherObj = typeof teacher.teacherId === 'object' ? teacher.teacherId : null;
+    const teacherId = teacherObj?._id || '';
+    const teacherName = teacherObj?.name || '';
+
+    // Get program information from teacher object if available
+    const programObj = typeof teacher.ProgramId === 'object' ? teacher.ProgramId : null;
+    // Safely handle both string and object types for name/description
+    const programName = typeof programObj?.name === 'object'
+      ? (programObj.name as any)?.en || ''
+      : programObj?.name || '';
+    const programDescription = typeof programObj?.description === 'object'
+      ? (programObj.description as any)?.en || ''
+      : programObj?.description || '';
+
+    onConfirm({
+      availabilityId: selectedSlot._id,
+      teacherProgramId: teacher._id,
+      teacherId,
+      programId,
+      duration: selectedDuration,
+      date: selectedSlot.date,
+      startTime: selectedSlot.startTime,
+      endTime: selectedSlot.endTime,
+      selectedCurrency,
+      timezone: studentTimezone,
+      // Additional info for checkout page display
+      teacherName,
+      teacherPhoto: teacher.teacherProfile?.photo || '',
+      teacherRating: teacher.teacherProfile?.rating || 0,
+      teacherReviews: teacher.teacherProfile?.totalReviews || 0,
+      teacherStudents: teacher.teacherProfile?.totalStudents || 0,
+      teacherLessons: (teacher.teacherProfile as any)?.totalLessons || 0,
+      teacherYearsTeaching: (teacher.teacherProfile as any)?.yearsTeaching || 0,
+      programName,
+      programDescription,
+    });
+  };
+
+  const teacherName = typeof teacher.teacherId === 'object' ? teacher.teacherId.name : '';
+  const teacherPhoto = teacher.teacherProfile?.photo || '';
+
+  if (!isOpen) return null;
+
+  const weekDates = getWeekDates();
+  const selectedDateSlots = getSlotsForDate(selectedDate);
+  const groupedSlots = groupSlotsByTime(selectedDateSlots);
+
+  return (
+    <div
+      className="modal fade show"
+      style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }}
+      onClick={onClose}
+    >
+      <div
+        className="modal-dialog modal-dialog-centered modal-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="modal-content" style={{ borderRadius: '16px', border: 'none' }}>
+          <div className="modal-header border-0 pb-0" style={{ padding: '24px 24px 16px' }}>
+            <div className="d-flex align-items-center gap-3">
+              {teacherPhoto ? (
+                <img
+                  src={teacherPhoto}
+                  alt={teacherName}
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                    border: '2px solid #f0f0f0',
+                  }}
+                />
+              ) : (
+                <div
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    borderRadius: '50%',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#fff',
+                    fontSize: '20px',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  {teacherName.charAt(0).toUpperCase()}
+                </div>
+              )}
+              <div>
+                <h5 className="modal-title mb-1 fw-bold" style={{ fontSize: '20px' }}>{t('common.book_trial_lesson')}</h5>
+                <p className="text-muted small mb-0">{t('common.to_discuss_level')}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="btn-close"
+              onClick={onClose}
+              aria-label="Close"
+              style={{ fontSize: '18px' }}
+            ></button>
+          </div>
+          <div className="modal-body" style={{ padding: '24px' }}>
+            <div className="mb-4">
+              <label className="form-label fw-semibold mb-2">{t('common.lesson_duration')}</label>
+              <div className="d-flex gap-2">
+                <button
+                  className={`btn ${selectedDuration === 25 ? 'btn-neon-primary' : 'btn-outline-secondary'}`}
+                  onClick={() => {
+                    setSelectedDuration(25);
+                    setSelectedSlot(null);
+                  }}
+                  style={{
+                    borderRadius: '8px',
+                    padding: '10px 20px',
+                    backgroundColor: selectedDuration === 25 ? 'var(--neon-purple)' : 'transparent',
+                    borderColor: selectedDuration === 25 ? 'var(--neon-purple)' : '#ddd',
+                    color: selectedDuration === 25 ? '#fff' : '#000',
+                  }}
+                >
+                  25 {t('common.mins')}
+                </button>
+                <button
+                  className={`btn ${selectedDuration === 50 ? 'btn-neon-primary' : 'btn-outline-secondary'}`}
+                  onClick={() => {
+                    setSelectedDuration(50);
+                    setSelectedSlot(null);
+                  }}
+                  style={{
+                    borderRadius: '8px',
+                    padding: '10px 20px',
+                    backgroundColor: selectedDuration === 50 ? 'var(--neon-purple)' : 'transparent',
+                    borderColor: selectedDuration === 50 ? 'var(--neon-purple)' : '#ddd',
+                    color: selectedDuration === 50 ? '#fff' : '#000',
+                  }}
+                >
+                  50 {t('common.mins')}
+                </button>
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <div className="d-flex align-items-center justify-content-between mb-2">
+                <label className="form-label fw-semibold mb-0">{t('common.select_date')}</label>
+                <div className="d-flex gap-2">
+                  <button
+                    className="btn btn-sm btn-outline-secondary"
+                    onClick={() => {
+                      const newWeek = new Date(currentWeek);
+                      newWeek.setDate(newWeek.getDate() - 7);
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      // Only allow navigation if new week is not in the past
+                      if (newWeek >= today) {
+                        setCurrentWeek(newWeek);
+                      }
+                    }}
+                    disabled={(() => {
+                      const prevWeek = new Date(currentWeek);
+                      prevWeek.setDate(prevWeek.getDate() - 7);
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return prevWeek < today;
+                    })()}
+                  >
+                    <i className="fas fa-chevron-left"></i>
+                  </button>
+                  <button
+                    className="btn btn-sm btn-outline-secondary"
+                    onClick={() => {
+                      const newWeek = new Date(currentWeek);
+                      newWeek.setDate(newWeek.getDate() + 7);
+                      setCurrentWeek(newWeek);
+                    }}
+                  >
+                    <i className="fas fa-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+              <div className="d-flex gap-2 flex-wrap">
+                {weekDates.map((date, idx) => {
+                  const isSelected = date.toDateString() === selectedDate.toDateString();
+                  const slotsCount = getSlotsForDate(date).length;
+                  return (
+                    <button
+                      key={idx}
+                      className={`btn ${isSelected ? 'btn-neon-primary' : 'btn-outline-secondary'}`}
+                      onClick={() => {
+                        setSelectedDate(date);
+                        setSelectedSlot(null);
+                      }}
+                      style={{
+                        flex: '1',
+                        minWidth: '80px',
+                        borderRadius: '8px',
+                        padding: '8px',
+                        backgroundColor: isSelected ? 'var(--neon-purple)' : 'transparent',
+                        borderColor: isSelected ? 'var(--neon-purple)' : '#ddd',
+                        color: isSelected ? '#fff' : '#000',
+                      }}
+                    >
+                      <div className="small">{formatDate(date).split(' ')[0]}</div>
+                      <div className="fw-bold">{date.getDate()}</div>
+                      <div className="small" style={{ fontSize: '10px', marginTop: '2px' }}>
+                        {slotsCount} {slotsCount === 1 ? 'slot' : 'slots'}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mb-3">
+              <p className="text-muted small mb-2">
+                {t('common.in_your_timezone')} {studentTimezone} ({new Date().toLocaleTimeString('en-US', { timeZone: studentTimezone, timeZoneName: 'short' }).split(' ').pop() || ''})
+              </p>
+              <p className="text-muted small mb-0">
+                {formatFullDate(selectedDate)}
+              </p>
+            </div>
+
+            {loading ? (
+              <div className="text-center py-4">
+                <div className="spinner-border text-primary" role="status">
+                  <span className="visually-hidden">{t('common.loading')}</span>
+                </div>
+              </div>
+            ) : selectedDateSlots.length === 0 ? (
+              <div className="text-center py-4">
+                <p className="text-muted">{t('common.no_slots_available')}</p>
+              </div>
+            ) : (
+              <div className="mb-4">
+                {Object.entries(groupedSlots).map(([group, slots]) => (
+                  <div key={group} className="mb-3">
+                    <h6 className="fw-semibold mb-2">
+                      <span style={{ fontSize: '18px', marginRight: '8px' }}>{getTimeIcon(group)}</span>
+                      {group}
+                    </h6>
+                    <div className="d-flex flex-wrap gap-2">
+                      {slots.map((slot) => {
+                        const isSelected = selectedSlot?._id === slot._id;
+                        return (
+                          <button
+                            key={slot._id}
+                            className={`btn ${isSelected ? 'btn-neon-primary' : 'btn-neon-outline'}`}
+                            onClick={() => setSelectedSlot(slot)}
+                            style={{
+                              borderRadius: '8px',
+                              padding: '8px 16px',
+                              backgroundColor: isSelected ? 'var(--neon-purple)' : 'transparent',
+                              borderColor: 'var(--neon-purple)',
+                              color: isSelected ? '#fff' : 'var(--neon-purple)',
+                            }}
+                          >
+                            {formatTime(slot.startTime)}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="modal-footer border-0" style={{ padding: '16px 24px 24px' }}>
+            <button
+              type="button"
+              className="btn"
+              onClick={onClose}
+              style={{
+                borderRadius: '8px',
+                padding: '12px 24px',
+                border: '1px solid #ddd',
+                backgroundColor: '#fff',
+                color: '#000',
+                marginRight: '12px',
+              }}
+            >
+              {t('common.cancel')}
+            </button>
+            <button
+              type="button"
+              className="btn"
+              onClick={handleConfirm}
+              disabled={!selectedSlot}
+              style={{
+                borderRadius: '8px',
+                backgroundColor: selectedSlot ? 'var(--neon-purple)' : '#ccc',
+                borderColor: selectedSlot ? 'var(--neon-purple)' : '#ccc',
+                padding: '12px 32px',
+                fontWeight: '600',
+                color: '#fff',
+                cursor: selectedSlot ? 'pointer' : 'not-allowed',
+              }}
+            >
+              {t('common.continue')}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BookingModal;
+
+

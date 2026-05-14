@@ -1,0 +1,896 @@
+{
+  "common": {
+    "login": "Login",
+    "Member_registration": "Member Registration",
+    "Member_login": "Member Login",
+    "Dance Coach_login": "Dance Coach Login",
+    "Dance Coach_registration": "Dance Coach Registration",
+    "Member": "Member",
+    "Dance Coach": "Dance Coach",
+    "create_Dance Coach_account": "Create Your Dance Coach Account",
+    "logout": "Logout",
+    "profile": "Profile",
+    "reviews": "reviews",
+    "buy_now": "Buy Now",
+    "price": "Price",
+    "language": "Language",
+    "currency": "Currency",
+    "english": "English",
+    "hindi": "Hindi",
+    "select_language": "Select Language",
+    "select_currency": "Select Currency",
+    "welcome_back": "Welcome back!",
+    "are_you_sure": "Are you sure?",
+    "actions": "Actions",
+    "login_description": "Welcome back! Please enter your credentials below to access your account and continue your learning journey.",
+    "login_visual_title": "Shape Your Future",
+    "login_visual_desc": "Access world-class learning and expert mentorship in just one click.",
+    "registration_visual_title": "Start Your Journey",
+    "registration_visual_desc": "Join a global community of learners and educators today.",
+    "continue_with_google": "Continue with Google",
+    "or": "or",
+    "email": "Email",
+    "password": "Password",
+    "remember_me": "Remember me",
+    "forgot_password": "Forgot Password?",
+    "sign_in": "Sign In",
+    "dont_have_account": "Don't have an account?",
+    "sign_up": "Sign Up",
+    "create_account": "Create Your Account",
+    "registration_description": "Create your account today and join a global community of dedicated learners and expert mentors.",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "confirm_password": "Confirm Password",
+    "already_have_account": "Already have an account?",
+    "registration_success": "Registration successful",
+    "login_success": "Login successful",
+    "create_tutor_account": "Create Your Tutor Account",
+    "tutor_registration": "Tutor Registration",
+    "registration_success_pending": "Registration successful. Please wait for admin approval.",
+    "otp_sent": "OTP has been sent to your email. Please check and enter it.",
+    "login_failed": "Login failed",
+    "signing_in": "Signing In...",
+    "signing_up": "Signing Up...",
+    "password_must_match": "Password must match",
+    "registration_failed": "Registration failed",
+    "my_account": "My Account",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "home": "Home",
+    "categories": "Categories",
+    "popular": "Popular",
+    "also_speaks": "Also speaks",
+    "all_languages": "All Languages",
+    "type_to_search": "Type to search...",
+    "Dance Style_list": {
+      "development": "Development",
+      "design": "Design",
+      "marketing": "Marketing",
+      "business": "Business",
+      "data_science": "Data Science",
+      "wellness_fitness": "Wellness & Fitness"
+    },
+    "about_us": "About Us",
+    "blog": "Blog",
+    "events": "Events",
+    "contact_us": "Contact Us",
+    "explore": "Explore",
+    "community": "Community",
+    "our_values": "Our Values",
+    "our_advisory_board": "Our Advisory Board",
+    "our_partners": "Our Partners",
+    "work_at_gdp": "Work at GDP Academy",
+    "quizlet_plus": "GDP Plus",
+    "become_teacher": "Become Dance Coach",
+    "become_a_Member": "Become a Member",
+    "search_Programs_placeholder": "Search for Program...",
+    "trending_categories": "Trending Styles",
+    "top_Dance Style_we_have": "Top Dance Styles We Have",
+    "Dance Style_description": "Find the perfect dance style tailored to your artistic goals and interests.",
+    "top_class_Programs": "Top Premium Programs",
+    "best_exciting_class_experience": "Get The Best Artistic Session Experience With us",
+    "loading": "Loading...",
+    "error_loading_data": "Error loading data",
+    "Programs": "Programs",
+    "age": "Age",
+    "time": "Time",
+    "years": "Years",
+    "all_Programs": "All Programs",
+    "enroll_now": "Enroll Now",
+    "reviews": "Reviews",
+    "reviews_count": "({{count}} Reviews)",
+    "by": "By",
+    "flexible": "Flexible",
+    "no_Programs_found": "No Programs found",
+    "Program_not_found": "Program not found",
+    "show_more": "Show More +",
+    "show_less": "Show Less -",
+    "learn_more": "Learn more",
+    "book_session": "Book session",
+    "showing_results": "Showing {{start}}-{{end}} of {{total}} Results",
+    "sort_by": "Sort By",
+    "default_sorting": "Default sorting",
+    "sort_by_popularity": "Sort by popularity",
+    "sort_by_price": "Sort by price",
+    "sort_by_rating": "Sort by rating",
+    "overview": "Overview",
+    "curriculum": "Curriculum",
+    "teachers": "Dance Coaches",
+    "available_teachers": "Available Dance Coaches",
+    "select_teacher_to_book": "Select a teacher to book a session",
+    "no_teachers_available": "No teachers available for this Program",
+    "professional": "Professional",
+    "super_tutor": "Super Tutor",
+    "speaks": "Speaks",
+    "Members": "Members",
+    "experience": "experience",
+    "available_slots": "Available Slots",
+    "video_url_not_supported": "Video URL is not supported",
+    "proficiency": {
+      "native": "Native",
+      "proficient": "Proficient",
+      "advanced": "Advanced",
+      "upper_intermediate": "Upper Intermediate",
+      "intermediate": "Intermediate",
+      "elementary": "Elementary",
+      "beginner": "Beginner"
+    },
+    "view_full_schedule": "View full schedule",
+    "cancel_session": "Cancel Session",
+    "join_session": "Join Session",
+    "join_button": "Join Now",
+    "send_message": "Send message",
+    "watch_intro": "Watch introduction video",
+    "to_help_you_succeed": "to help you succeed",
+    "search_by_name": "Search by name or keyword",
+    "price_per_session": "Price per Session",
+    "any_country": "Any country",
+    "im_available": "I'm available",
+    "has_availability": "Has availability",
+    "sort_by_top_picks": "Sort by: Our top picks",
+    "sort_by_price_low": "Sort by: Price (Low to High)",
+    "sort_by_price_high": "Sort by: Price (High to Low)",
+    "sort_by_popular": "Sort by: Popular",
+    "no_teachers_found": "No coaches found matching your criteria",
+    "no_video_available": "No introduction video available",
+    "see_teacher_profile": "See coach's profile",
+    "to_discuss_level": "To discuss your level and learning plan",
+    "session_duration": "Session duration",
+    "mins": "mins",
+    "select_date": "Select date",
+    "slots": "slots",
+    "in_your_timezone": "In your timezone",
+    "no_slots_available": "No slots available for this date",
+    "price_breakdown": "Price breakdown",
+    "teacher_price": "Dance Coach price",
+    "platform_margin": "Platform margin",
+    "meeting_platform_cost": "Meeting platform cost",
+    "total": "Total",
+    "cancel": "Cancel",
+    "continue": "Continue",
+    "select_program": "Select Program",
+    "hour": "hour",
+    "banner_title_prefix": "Beyond Limits — Train Any Program From Dance Coaches",
+    "banner_title_highlight": "Worldwide",
+    "banner_description": "Every dance journey is unique. We’re here to mentor you every step of the way.",
+    "start_free_trial": "Start Trial",
+    "banner_features": "Dance, Perform & Grow Artistically",
+    "about_subtitle": "More About Us",
+    "about_title_1": "Thousands of",
+    "about_title_highlight": "Programs",
+    "about_title_2": "Perform Styles in Your Own Way",
+    "about_description": "One platform. Multiple Programs. Mentored by world-class coaches — so training feels elite, natural, and effective.",
+    "about_list_1": "Elite Dance Coaches",
+    "about_list_2": "Same Program, multiple styles",
+    "about_list_3": "Train anytime, anywhere",
+    "enrolled_members": "Elite Members",
+    "newsletter_title_1": "Want to stay",
+    "newsletter_title_highlight_1": "informed",
+    "newsletter_title_2": "about",
+    "newsletter_title_3": "new",
+    "newsletter_title_highlight_2": "Programs & workshops?",
+    "newsletter_placeholder": "Type your e-mail",
+    "subscribe_now": "Subscribe Now",
+    "curved_circle_text": "Dance * Art * can * Make * Change *",
+    "newsletter_ready_to_learn": "Ready to dance?",
+    "newsletter_desc": "Sign up for our newsletter and get dance tips and special offers directly to your inbox.",
+    "newsletter_placeholder_email": "Enter your email address",
+    "newsletter_subscribe": "Subscribe",
+    "newsletter_terms": "By subscribing, you agree to our Terms of Service and Privacy Policy.",
+    "newsletter_error_email": "Please enter a valid email address.",
+    "dance_style_title": "Explore Dance Styles",
+    "dance_style_subtitle": "Find expert coaches across diverse dance styles and interests.",
+    "view_programs": "View Programs",
+    "explore_all_styles": "Explore All Styles",
+    "expert_coach": "Expert Coach",
+    "experienced_educator": "Experienced coach dedicated to student success.",
+    "experienced_educator_specializing_in": "Experienced coach specializing in {{program}}."
+  },
+  "home": {
+    "one": {
+      "hero": {
+        "title": "Unlock your potential with the best tutors",
+        "description": "Prepare to achieve your goals with private Classes from professional language tutors.",
+        "trustpilot_rating": "4.8 on Trustpilot",
+        "trustpilot_reviews": "(Over 100k reviews)",
+        "experienced_tutors_count": "32,000+",
+        "experienced_tutors_label": "Experienced Tutors"
+      },
+      "tutors": {
+        "sub_title": "TOP RATED MENTORS",
+        "title_start": "Meet our",
+        "title_end": "top tutors",
+        "description": "Learn from the best. Our highest-rated tutors are ready to help you achieve your goals with personalized guidance.",
+        "view_all": "View All Programs",
+        "finding_tutors": "Finding the best tutors for you...",
+        "per_Class": "/Class",
+        "Members": "Members",
+        "verified": "Verified"
+      }
+    },
+    "how_it_works": {
+      "subtitle": "How It Works",
+      "title": "How Learning Works on Our Platform",
+      "description": "Learn skills, languages, and professional Programs in the language you're most comfortable with. Our platform is designed to make learning simple, flexible, and accessible for everyone — anytime, anywhere.",
+      "step1_title": "Choose Your Skill",
+      "step1_description": "Pick from languages, creative skills, professional Programs, wellness, and more — all in one place.",
+      "step2_title": "Select Your Language",
+      "step2_description": "Learn in Hindi, English, or your preferred regional language for better understanding.",
+      "step3_title": "Learn at Your Pace",
+      "step3_description": "Access online, offline, live, or recorded classes — learn when it suits you.",
+      "step4_title": "Track Your Growth",
+      "step4_description": "Monitor progress, access learning materials, and earn certificates as you grow."
+    },
+    "counter": {
+      "active_Members": "Active Members",
+      "experienced_tutors": "Experienced tutors",
+      "Programs": "Programs",
+      "tutor_nationalities": "Tutor nationalities"
+    },
+    "faq": {
+      "subtitle": "Faq's",
+      "title": "Build Skills with Trusted Global Mentors",
+      "description": "Expert-led Programs designed to help you grow faster and smarter.",
+      "questions": {
+        "q1": "Why should I choose Edunyte for learning?",
+        "a1": "Because Edunyte offers flexible, skill-based Programs taught by expert Dance Coaches in multiple languages.",
+        "q2": "Can I learn skills in my local language?",
+        "a2": "Yes, Programs are available in Hindi, English, and other regional languages for easy understanding.",
+        "q3": "Are the Programs taught by certified experts?",
+        "a3": "Absolutely. All Programs are delivered by verified and experienced professionals.",
+        "q4": "Is Edunyte affordable for Members?",
+        "a4": "Yes, Edunyte provides high-quality education at Member-friendly and affordable prices."
+      }
+    },
+    "features": {
+      "subtitle": "How Your Learning Journey Begins",
+      "title": "Take the First Step Toward Skills",
+      "description": "A simple learning experience that brings Members and mentors together to learn, track progress, and succeed.",
+      "home_2_header": {
+        "subtitle": "Our Top Features",
+        "title": "Achieve Your Goal With Edunyte",
+        "description": "Edunyte helps you reach your personal and professional goals through clear paths, expert guidance, and proven results."
+      },
+      "items": {
+        "home_1": {
+          "1": {
+            "title": "Guided by Skilled Professionals",
+            "desc": "Get hands-on training from experienced professionals."
+          },
+          "2": {
+            "title": "Skills Without Boundaries",
+            "desc": "Explore skills beyond limits and borders."
+          },
+          "3": {
+            "title": "Earn Online Certification",
+            "desc": "Complete Programs and earn career-ready certifications."
+          },
+          "4": {
+            "title": "E-mail Marketing",
+            "desc": "Curated strategies and practical Classes to help you reach the right audience effectively."
+          }
+        },
+        "home_2": {
+          "1": {
+            "title": "Expert Tutors",
+            "desc": "Learn from certified industry experts with years of real-world professional experience."
+          },
+          "2": {
+            "title": "Effective Programs",
+            "desc": "Access high-quality curriculum designed to deliver measurable learning outcomes."
+          },
+          "3": {
+            "title": "Earn Certificate",
+            "desc": "Earn globally recognized certifications to boost your professional career and profile."
+          }
+        }
+      }
+    },
+    "join_section": {
+      "join_as_Dance Coach_title": "Join as an Dance Coach",
+      "join_as_Dance Coach_description": "As a simple example, learning begins with effort, consistency, and the right guidance.",
+      "join_as_Member_title": "Join as a Member",
+      "join_as_Member_description": "Join learners from around the world and grow together through live and online learning.",
+      "apply_now": "Apply Now"
+    },
+    "blog": {
+      "subtitle": "News & Blogs",
+      "title": "Our Latest News Feed",
+      "description": "Stay updated with the latest educational trends, platform updates, and expert insights.",
+      "items": {
+        "home_1": {
+          "1": {
+            "tag": "Marketing",
+            "title": "How To Become Ridiculously Self-Aware In 20 Minutes"
+          },
+          "2": {
+            "tag": "Members",
+            "title": "Get Started With UI Design With Tips To Speed"
+          },
+          "3": {
+            "tag": "Science",
+            "title": "Make Your Own Expanding Contracting Content"
+          },
+          "4": {
+            "tag": "Agency",
+            "title": "What we are capable to usually discovered"
+          }
+        }
+      }
+    }
+  },
+  "about_page": {
+    "hero": {
+      "title": "Where Artists Learn Better & Dance Coaches Grow Stronger",
+      "description": "GDP Academy is a premium arts platform built to bring dancers and coaches together in one cinematic ecosystem. We believe artistic growth works best when it’s personal, expressive, and human-led.",
+      "button": "Join the GDP Community"
+    },
+    "breadcrumb": {
+      "title": "Our Legacy",
+      "subtitle": "About Us"
+    },
+    "purpose": {
+      "subtitle": "Our Philosophy",
+      "title": "Artistry that works for real performers",
+      "description": "We are shaping the future of dance with artistic goals, technical support, and premium results.",
+      "cards": {
+        "Member_confidence": {
+          "title": "Artist Confidence",
+          "description": "Help dancers perform with confidence and clarity through personalized attention and verified coaches."
+        },
+        "teacher_support": {
+          "title": "Dance Coach Support",
+          "description": "Support coaches with opportunities, tools, and creative freedom to focus on what they do best: coaching."
+        },
+        "trusted_environment": {
+          "title": "Premium Environment",
+          "description": "Create a high-end training environment driven by quality, artistry, and technical mastery."
+        }
+      }
+    },
+    "platform": {
+      "title": "One Stage for Everyone",
+      "description": "Whether you’re here to train, coach, or perform — GDP Academy welcomes you.",
+      "tabs": {
+        "teachers": {
+          "name": "coaches",
+          "badge": "Coach",
+          "title": "Coach With Freedom. Lead With Artistry. Inspire With Impact.",
+          "text": "Dance Coaches are the heart of GDP. We empower artists by giving them a platform where their mastery is valued and their vision matters. Whether you’re an elite professional or a passionate coach, GDP offers the creative freedom, support, and respect you deserve. We provide flexible coaching schedules, access to dedicated dancers, premium earnings, and long-term artistic growth."
+        },
+        "Members": {
+          "name": "Members",
+          "badge": "Train",
+          "title": "Train Smarter. Perform Better. Succeed Artistically.",
+          "text": "GDP is designed around dancers — your rhythm, your goals, your artistry. We connect performers with world-class coaches who focus on mastery, not just steps. Whether you’re refining technique, preparing for performance, or building a portfolio, GDP ensures training feels elite, cinematic, and effective with tailored programs and expert coaches."
+        },
+        "values": {
+          "name": "Our Values",
+          "badge": "Values",
+          "title": "Our Core Values",
+          "list": {
+            "1": "<strong>Artist-First Training</strong> – Every dancer deserves personal mentorship.",
+            "2": "<strong>Coach Empowerment</strong> – Elite coaching deserves premium support.",
+            "3": "<strong>Artistic Integrity</strong> – Precision and expression at every step.",
+            "4": "<strong>Vibrant Growth</strong> – Continuous evolution for every artist."
+          }
+        }
+      },
+      "join_link": "Join as a {{role}}"
+    },
+    "numbers": {
+      "title": "GDP by numbers",
+      "description": "We’re proud to be a leading premium dance academy in the global arts market.",
+      "items": {
+        "tutors": {
+          "label": "Coaches",
+          "desc": "from 150 countries, teaching 50+ dance styles and specialized techniques."
+        },
+        "enrolled": "Joined by 10k+ Members",
+        "satisfaction": "Elite Satisfaction Rate",
+        "companies": {
+          "label": "Studios",
+          "desc": "trust us to upskill their performers with our premium masterclasses."
+        },
+        "global_hubs": {
+          "label": "Global Studios",
+          "desc": "in Mumbai, New York, London, and Paris."
+        },
+        "employees": {
+          "label": "Artists",
+          "desc": "united by one mission: to power artistic excellence."
+        }
+      }
+    },
+    "story": {
+      "title": "Building the Future of Dance",
+      "subtitle": "GDP is more than an academy — it’s a vibrant community of artists and coaches.",
+      "p1": "GDP Academy is a modern arts platform built to bring dancers and coaches together in one meaningful artistic ecosystem. We believe artistry works best when it’s personal, technical, and human-led.",
+      "p2": "Whether you’re here to train, coach, or perform — GDP Academy welcomes you. Success at GDP is built together.",
+      "box_title": "How GDP Works",
+      "list": {
+        "1": "Dancers choose programs and styles",
+        "2": "Dance Coaches bring mastery and guidance",
+        "3": "Artistry happens through structured, cinematic sessions",
+        "4": "Progress is tracked, supported, and celebrated"
+      }
+    },
+    "testimonials": {
+      "subtitle": "Our Performers",
+      "title": "What Dancers Say About GDP Academy",
+      "description": "Hear from our community of artists who have transformed their craft with GDP.",
+      "items": {
+        "1": {
+          "name": "Wade Warren",
+          "desc": "GDP has completely changed the way I move. The coaches are cinematic and the artistry is exactly what I needed."
+        },
+        "2": {
+          "name": "Jenny Wilson",
+          "desc": "I was able to improve my technical mastery significantly in just 3 months. Highly recommended for any serious artist."
+        },
+        "3": {
+          "name": "Guy Hawkin",
+          "desc": "The best platform for premium dance training. The interface is elite and the quality of coaching is top-notch."
+        }
+      }
+    },
+    "roles": {
+      "teacher": "Dance Coach",
+      "Member": "Member"
+    }
+  },
+  "become_coach_page": {
+    "breadcrumb_title": "Become a Dance Coach",
+    "hero": {
+      "title": "Train it right, perform it bright, and step onto a global stage with GDP Academy.",
+      "cta": "Create a coach profile now"
+    },
+    "steps": {
+      "1": {
+        "title": "Sign up",
+        "desc": "to create your coach profile"
+      },
+      "2": {
+        "title": "Get approved",
+        "desc": "by our artistic team in 5 business days"
+      },
+      "3": {
+        "title": "Start earning",
+        "desc": "by coaching Members all over the world!"
+      }
+    },
+    "features": {
+      "1": {
+        "title": "Set your own rate",
+        "desc": "Choose your hourly rate and change it anytime. On average, Dance Coaches charge 25-50 USD per hour."
+      },
+      "2": {
+        "title": "Coach anytime, anywhere",
+        "desc": "Decide when and how many hours you want to mentor. No minimum time commitment or fixed schedule. Lead your own studio!"
+      },
+      "3": {
+        "title": "Grow professionally",
+        "desc": "Once you sign up and complete your application, you can be approved and start coaching in as little as three days."
+      }
+    },
+    "global": {
+      "title": "Inspire Minds. Lead Globally. Grow With Us.",
+      "desc_p1": "At GDP Academy, we believe great coaches create great artists.",
+      "desc_p2": "If you’re passionate about coaching and want to make a real impact, GDP Academy is hiring artists across multiple styles and levels.",
+      "list": {
+        "1": "Mentor Members from anywhere",
+        "2": "Flexible coaching hours",
+        "3": "Premium pay structure",
+        "4": "Dedicated artistic support",
+        "5": "Growth opportunities & artistic development",
+        "6": "Respect, recognition & professional environment"
+      },
+      "cta": "Create a coach profile now"
+    },
+    "testimonial": {
+      "quote": "GDP Academy allowed me to make a living through my passion!",
+      "name": "Krista A.",
+      "role": "Modern Dance Coach",
+      "cta": "Create a coach profile now"
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": {
+        "1": {
+          "question": "What kind of coaches does GDP Academy look for?",
+          "answer": "We look for passionate artists who have elite technical mastery and are masters of their craft. While certifications are a plus, technical excellence and coaching ability are mandatory."
+        },
+        "2": {
+          "question": "What styles can I coach?",
+          "answer": "You can coach over 50 styles including Classical, Contemporary, Urban, Hobbies, and Performance Art. If your style is not listed, you can suggest it during registration."
+        },
+        "3": {
+          "question": "How do I become an online coach at GDP Academy?",
+          "answer": "The process is simple: Sign up, create your profile, upload a cinematic intro video, and submit for review. Our team approves profiles within 3-5 business days."
+        },
+        "4": {
+          "question": "How can I get my profile approved quickly?",
+          "answer": "Ensure your profile is cinematic with high-quality artistic photos, a well-written bio, and a clear performance intro. Verify your mastery to speed up the process."
+        },
+        "5": {
+          "question": "Why should I coach on GDP Academy?",
+          "answer": "GDP offers elite flexibility to set your own rates and schedule, access to a global member base, secure payments, and a premium artistic community."
+        },
+        "6": {
+          "question": "What equipment do I need to coach on GDP Academy?",
+          "answer": "You need a laptop with a stable connection, a high-quality camera, and a professional space with proper lighting and sound."
+        },
+        "7": {
+          "question": "Is it free to create a coach profile on GDP Academy?",
+          "answer": "Yes, creating a profile and getting listed is free. We only charge a small platform commission on the sessions you coach."
+        },
+        "8": {
+          "question": "How much can I earn on GDP Academy?",
+          "answer": "You set your own hourly rate. Earnings depend on your rate and the number of hours you mentor. Elite coaches earn significantly by building a strong member following."
+        }
+      }
+    },
+    "final_cta": {
+      "title": "Get paid to coach online",
+      "desc": "Connect with thousands of artists around the world and mentor from your studio",
+      "button": "Create a coach profile now"
+    }
+  },
+  "contact": {
+    "breadcrumb_title": "Contact With Us",
+    "breadcrumb_subtitle": "Contact",
+    "info": {
+      "Member_support": {
+        "title": "Member Support",
+        "text": "Need help with Programs or account?",
+        "email": "support@garimadance.com",
+        "hours": "Mon – Fri, 9AM - 6PM (IST)"
+      },
+      "teacher_support": {
+        "title": "Dance Coach Support",
+        "text": "Joining questions or onboarding?",
+        "email": "careers@garimadance.com",
+        "hours": "Mon – Fri, 9AM - 6PM (IST)"
+      },
+      "partnerships": {
+        "title": "Partnerships",
+        "text": "Business opportunities?",
+        "email": "partnerships@garimadance.com"
+      }
+    },
+    "form": {
+      "title": "Send Us Message",
+      "text": "Your email address will not be published. Required fields are marked *",
+      "name": "Full Name *",
+      "email": "Email Address *",
+      "phone": "Phone Number (Optional)",
+      "role_placeholder": "I am a...",
+      "role_Member": "Member",
+      "role_teacher": "Dance Coach",
+      "role_partner": "Partner",
+      "message": "Message *",
+      "submit": "Submit Message",
+      "success": "Message sent successfully"
+    }
+  },
+  "Dance Coach": {
+    "breadcrumb_title": "Our Dance Coaches",
+    "breadcrumb_subtitle": "Dance Coaches",
+    "ratings": "Ratings",
+    "designations": {
+      "digital_marketing": "Digital Marketing",
+      "web_development": "Web Development",
+      "ux_design_lead": "UX Design Lead",
+      "web_design": "Web Design",
+      "ronald_s_staton": "Ronald S. Staton",
+      "barbara_d_rice": "Barbara D. Rice"
+    }
+  },
+  "inner_Programs": {
+    "items": {
+      "1": {
+        "title": "Learning JavaScript With Imagination"
+      },
+      "2": {
+        "title": "The Complete Graphic Design for Beginners"
+      },
+      "3": {
+        "title": "Learning Digital Marketing on Facebook"
+      },
+      "4": {
+        "title": "Financial Analyst Training & Investing Program"
+      },
+      "5": {
+        "title": "Data Analysis & Visualization Masterclass"
+      }
+    }
+  },
+  "events": {
+    "breadcrumb_title": "All Events",
+    "breadcrumb_subtitle": "Events",
+    "details": {
+      "tag": "Development",
+      "reviews": "({{count}} Reviews)",
+      "title": "How To Become Ridiculously Self-Aware In 20 Minutes",
+      "by": "By",
+      "author": "David Millar",
+      "location": "Location: Washington DC, MI 2726",
+      "Members": "2,250 Members",
+      "overview_title": "Event Overview",
+      "overview_desc": "Dorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis.dolor sit amet, consectetur adipiscing elited do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "learn_title": "What you'll learn in this event?",
+      "learn_desc": "Dorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan.",
+      "elements_title": "Four major elements that we offer for this event",
+      "elements": {
+        "1": "Work with color & Gradients & Grids",
+        "2": "All the useful shortcuts",
+        "3": "Be able to create Flyers, Brochures, Advertisements",
+        "4": "How to work with Images & Text"
+      },
+      "bottom_desc": "Morem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan.Dorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magn."
+    },
+    "sidebar": {
+      "fee_label": "Event Fee",
+      "fee": "",
+      "info_title": "Event Information:",
+      "date": "Date",
+      "date_val": "26/08/2024",
+      "time": "Start Time",
+      "time_val": "10.00am",
+      "topics": "Topics",
+      "quizzes": "Quizzes",
+      "cert": "Certifications",
+      "yes": "Yes",
+      "seat": "Total Seat",
+      "payment_title": "Secure Payment:",
+      "share_title": "Share this Program:",
+      "join_btn": "Join This Event",
+      "map_title": "Map"
+    },
+    "items": {
+      "1": {
+        "title": "The Accessible Target Sizes Cheatsheet",
+        "location": "United Kingdom",
+        "date": "25 June, 2024"
+      },
+      "2": {
+        "title": "Aewe Creating Futures Through Technology",
+        "location": "Tokyo Japan",
+        "date": "25 June, 2024"
+      },
+      "3": {
+        "title": "Exactly How Technology Can Make Reading",
+        "location": "Colorado",
+        "date": "25 June, 2024"
+      },
+      "4": {
+        "title": "Learning JavaScript With Imagination",
+        "location": "Alexander City",
+        "date": "25 June, 2024"
+      },
+      "5": {
+        "title": "Make Your Magnificent May 2023 Edition",
+        "location": "Alaska",
+        "date": "25 June, 2024"
+      },
+      "6": {
+        "title": "Accessible Target Sizes Cheatsheet",
+        "location": "Estes Park",
+        "date": "25 June, 2024"
+      },
+      "7": {
+        "title": "Color mechanics that he came up with during",
+        "location": "Walsenburg",
+        "date": "25 June, 2024"
+      },
+      "8": {
+        "title": "How To Design Effective User Onboarding",
+        "date": "25 June, 2024"
+      }
+    },
+    "home_2_subtitle": "Upcoming Events",
+    "home_2_title": "Join Our Community and Grow Together",
+    "home_2_desc": "Stay connected with our global community through live workshops, webinars, and networking events designed to accelerate your learning journey.",
+    "see_all_events": "See All Events",
+    "items_h2": {
+      "1": {
+        "title": "The Accessible Target Sizes Cheatsheet",
+        "location": "United Kingdom"
+      },
+      "2": {
+        "title": "Exactly How Technology Can Make Reading",
+        "location": "Tokyo Japan"
+      },
+      "3": {
+        "title": "Building Futures Through Technology",
+        "location": "New York"
+      }
+    }
+  },
+  "footer": {
+    "mobile_app": "GDP App",
+    "description_1": "GDP Academy is a premium dance ecosystem connecting ambitious dancers with world-class coaches. We believe in movement that is cinematic, expressive, and driven by technical excellence.",
+    "address": "GDP Studio, Arts District, Global Hub",
+    "phone": "+1 (800) GDP-DANCE",
+    "useful_links": "Our Ecosystem",
+    "links": {
+      "values": "Core Philosophy",
+      "advisory": "Creative Board",
+      "partners": "Global Partners",
+      "become_partner": "Studio Collabs",
+      "work": "Join our Mission",
+      "quizlet": "Premium Training"
+    },
+    "our_company": "Quick Links",
+    "company_links": {
+      "about": "Our Legacy",
+      "contact": "Contact Support",
+      "become_teacher": "Coach at GDP",
+      "become_Member": "Start Dancing",
+      "blog": "Insights & News",
+      "events": "Live Sessions"
+    },
+    "get_in_touch": "Connectivity",
+    "description_2": "Connecting the next generation of global artists through movement.",
+    "copyright": "© 2026 Garima Dance Production. Empowering Global Artists.",
+    "terms": "Usage Terms",
+    "privacy": "Privacy Charter"
+  },
+  "error": {
+    "title": "ERROR PAGE!",
+    "message": "Sorry! This Page is Not Available!",
+    "button": "Go To Home Page"
+  },
+  "dashboard": {
+    "welcome": "Welcome",
+    "dashboard": "Dashboard",
+    "Member": "Member",
+    "wishlist": "Wishlist",
+    "order_history": "Order History",
+    "profile_settings": "Profile Settings",
+    "logout": "Logout",
+    "sessions_booked": "Sessions Booked",
+    "completed": "Completed",
+    "book_session": "Book A Session",
+    "my_dashboard": "My Dashboard",
+    "total_sessions": "Total Sessions",
+    "upcoming": "Upcoming",
+    "next_session": "Next Session",
+    "join_session": "Join Session",
+    "my_lessons": "My Sessions",
+    "list": "List",
+    "calendar": "Calendar",
+    "no_upcoming_lessons": "No upcoming sessions found",
+    "no_completed_lessons": "No completed sessions found",
+    "browse_programs": "Browse Programs",
+    "enrolled_programs": "Enrolled Programs",
+    "active_programs": "Active Programs",
+    "completed_programs": "Completed Programs",
+    "my_programs": "My Programs",
+    "publish": "Publish",
+    "pending": "Pending",
+    "draft": "Draft",
+    "complete": "Complete",
+    "my_profile": "My Profile",
+    "registration_date": "Registration Date",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "username": "Username",
+    "email": "Email",
+    "phone_number": "Phone Number",
+    "skill_occupation": "Skill/Occupation",
+    "biography": "Biography",
+    "settings": "Settings",
+    "social_share": "Social Share",
+    "current_password": "Current Password",
+    "new_password": "New Password",
+    "confirm_password": "Confirm Password",
+    "update_password": "Update Password",
+    "update_profile": "Update Profile",
+    "phone": "Phone",
+    "skill": "Skill/Occupation",
+    "facebook": "Facebook",
+    "twitter": "Twitter",
+    "linkedin": "Linkedin",
+    "website": "Website",
+    "github": "Github",
+    "full_name": "Full Name",
+    "country": "Country",
+    "state": "State",
+    "city": "City",
+    "timezone": "Timezone",
+    "select_country": "Select Country",
+    "select_state": "Select State",
+    "select_city": "Select City",
+    "select_timezone": "Select Timezone",
+    "update_info": "Update Info",
+    "update_success": "Profile updated successfully",
+    "update_error": "Failed to update profile",
+    "update_error_generic": "An error occurred while updating profile",
+    "booking_history": "Booking History",
+    "booking_id": "Booking ID",
+    "program_name": "Program Name",
+    "date": "Date",
+    "teacher": "Dance Coach",
+    "members": "Members",
+    "price": "Price",
+    "payment_status": "Payment Status",
+    "status": "Status",
+    "scheduled": "Scheduled",
+    "no_bookings_found": "No bookings found",
+    "my_wishlist": "My Wishlist",
+    "wishlist_empty": "Your wishlist is empty",
+    "remove_from_wishlist": "Remove from wishlist",
+    "uncategorized": "Uncategorized",
+    "reviews": "Reviews",
+    "feedback": "Feedback",
+    "edit": "Edit",
+    "delete": "Delete",
+    "cancel_warning": "Sessions cannot be cancelled within 24 hours.",
+    "reschedule_warning": "Sessions cannot be rescheduled within 24 hours.",
+    "booking_cancelled_prompt": "You won't be able to revert this!",
+    "booking_cancelled_success": "Session cancelled successfully.",
+    "action_failed": "Action failed",
+    "share_link": "Share Link",
+    "reschedule": "Reschedule",
+    "no_cancelled_lessons": "No cancelled sessions found",
+    "cancelled_tab": "Cancelled",
+    "status_cancelled": "Cancelled",
+    "status_completed": "Completed"
+  },
+
+  "checkout": {
+    "title": "Checkout",
+    "choose_payment_method": "Choose payment method",
+    "your_coach": "Your Dance Coach",
+    "coach": "Dance Coach",
+    "reviews": "reviews",
+    "trial_session_details": "Trial Session details",
+    "time_based_on_location": "Time based on your location",
+    "free_cancellation_policy": "Free cancellation with 24h notice",
+    "number_of_members": "Number of Members",
+    "members_attending": "Members attending this Session",
+    "group_session_note": "Price calculated for {{count}} Members",
+    "checkout_info": "Checkout Info",
+    "min_session": "min Session",
+    "members_lowercase": "members",
+    "per_member": "Per Member",
+    "processing_fee": "Processing Fee",
+    "total": "Total",
+    "calculating": "Calculating...",
+    "loading": "Loading...",
+    "preparing_checkout": "Preparing checkout...",
+    "securing_booking": "Securing your booking...",
+    "book_and_pay": "Book and pay",
+    "processing": "Processing...",
+    "payment_failed": "Payment failed, please try again",
+    "missing_booking_details": "Missing booking details. Please go back and select a slot.",
+    "failed_to_start": "Failed to start checkout process",
+    "missing_client_secret": "Unable to initialize payment gateway",
+    "ssl_encrypted": "SSL Encrypted & Secure",
+    "secure_payment_info": "Your payment info is processed securely. We do not store credit card details.",
+    "refund_policy_link": "Refund Policy",
+    "online_payment": "Online Payment",
+    "free_class": "Free Class"
+  }
+}

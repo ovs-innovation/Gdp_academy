@@ -1,0 +1,712 @@
+/* ============================================
+   ELITE DANCE ACADEMY — STUDENT DASHBOARD
+   Premium Dark Theme with Glassmorphism
+   ============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Krona+One&display=swap');
+
+:root {
+  --dash-bg: #09090f;
+  --dash-card: rgba(255, 255, 255, 0.04);
+  --dash-card-hover: rgba(255, 255, 255, 0.07);
+  --dash-border: rgba(255, 255, 255, 0.08);
+  --dash-border-glow: rgba(99, 75, 250, 0.25);
+  --dash-primary: #634BFA;
+  --dash-accent: #1EFFE4;
+  --dash-gradient: linear-gradient(135deg, #634BFA 0%, #1EFFE4 100%);
+  --dash-text: #ffffff;
+  --dash-text-dim: #8a8a9a;
+  --dash-text-muted: #555566;
+  --dash-sidebar-w: 240px;
+  --dash-radius: 18px;
+  --dash-radius-sm: 12px;
+  --dash-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ==================== LAYOUT ==================== */
+.gdp-dashboard {
+  display: flex;
+  min-height: 100vh;
+  background: var(--dash-bg);
+  font-family: 'Montserrat', sans-serif;
+  color: var(--dash-text);
+}
+
+/* ==================== SIDEBAR ==================== */
+.gdp-sidebar {
+  width: var(--dash-sidebar-w);
+  min-height: 100vh;
+  background: rgba(12, 12, 20, 0.95);
+  border-right: 1px solid var(--dash-border);
+  padding: 30px 16px;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+}
+
+.dash-logo-container {
+  display: flex;
+  align-items: center;
+  gap: 0px; /* Gap completely removed */
+  text-decoration: none;
+}
+.dash-site-logo {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+}
+.dash-site-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  font-family: 'Krona One', sans-serif;
+  margin-left: -8px; /* Increased negative margin */
+}
+.dash-site-text span {
+  font-size: 7.5px;
+  font-weight: 400; /* Reduced */
+  color: #9969C7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.gdp-sidebar__nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+}
+
+.gdp-sidebar__item {
+  margin-bottom: 4px;
+}
+
+.gdp-sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 16px;
+  border-radius: var(--dash-radius-sm);
+  color: var(--dash-text-dim);
+  font-size: 14px;
+  font-weight: 500;
+  transition: var(--dash-transition);
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.gdp-sidebar__link:hover {
+  color: var(--dash-text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.gdp-sidebar__link.active {
+  background: linear-gradient(135deg, rgba(99, 75, 250, 0.15) 0%, rgba(30, 255, 228, 0.08) 100%);
+  color: var(--dash-accent);
+  border-color: rgba(30, 255, 228, 0.15);
+  font-weight: 600;
+}
+
+.gdp-sidebar__link.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--dash-gradient);
+  border-radius: 0 4px 4px 0;
+}
+
+.gdp-sidebar__link i {
+  width: 20px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.gdp-sidebar__link.active i {
+  color: var(--dash-accent);
+}
+
+.gdp-sidebar__link.logout-link {
+  color: #ff4757;
+}
+.gdp-sidebar__link.logout-link:hover {
+  background: rgba(255, 71, 87, 0.08);
+  color: #ff6b7a;
+}
+
+/* Premium CTA Card */
+.gdp-sidebar__premium {
+  background: linear-gradient(135deg, rgba(99, 75, 250, 0.2) 0%, rgba(30, 255, 228, 0.1) 100%);
+  border: 1px solid rgba(99, 75, 250, 0.3);
+  border-radius: var(--dash-radius);
+  padding: 20px 16px;
+  margin-top: auto;
+  text-align: center;
+}
+
+.gdp-sidebar__premium-badge {
+  background: var(--dash-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.gdp-sidebar__premium p {
+  font-size: 12px;
+  color: var(--dash-text-dim);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.gdp-sidebar__premium-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--dash-gradient);
+  color: #000;
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 10px 22px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: var(--dash-transition);
+}
+
+.gdp-sidebar__premium-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(99, 75, 250, 0.4);
+}
+
+/* ==================== MAIN CONTENT ==================== */
+.gdp-main {
+  flex: 1;
+  margin-left: var(--dash-sidebar-w);
+  padding: 40px 50px 60px;
+  max-width: calc(100% - var(--dash-sidebar-w));
+}
+
+.gdp-main__header {
+  margin-bottom: 35px;
+}
+
+.gdp-main__title {
+  font-family: 'Krona One', sans-serif;
+  font-size: 26px;
+  margin-bottom: 6px;
+}
+
+.gdp-main__subtitle {
+  color: var(--dash-text-dim);
+  font-size: 14px;
+}
+
+/* ==================== PROFILE CARD ==================== */
+.gdp-profile-card {
+  background: var(--dash-card);
+  border: 1px solid var(--dash-border);
+  border-radius: var(--dash-radius);
+  padding: 35px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 30px;
+  transition: var(--dash-transition);
+}
+
+.gdp-profile-card:hover {
+  border-color: var(--dash-border-glow);
+}
+
+.gdp-profile__avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.gdp-profile__avatar {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--dash-primary);
+  box-shadow: 0 0 25px rgba(99, 75, 250, 0.2);
+}
+
+.gdp-profile__avatar-upload {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 32px;
+  height: 32px;
+  background: var(--dash-primary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 3px solid var(--dash-bg);
+  transition: var(--dash-transition);
+}
+
+.gdp-profile__avatar-upload:hover {
+  transform: scale(1.1);
+  background: #7c6aff;
+}
+
+.gdp-profile__avatar-upload i {
+  font-size: 12px;
+  color: white;
+}
+
+.gdp-profile__info h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.gdp-profile__tagline {
+  color: var(--dash-accent);
+  font-size: 13px;
+  font-weight: 500;
+  font-style: italic;
+  margin-bottom: 8px;
+}
+
+.gdp-profile__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.gdp-profile__meta span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--dash-text-dim);
+  font-size: 13px;
+}
+
+.gdp-profile__meta i {
+  width: 16px;
+  color: var(--dash-text-muted);
+  font-size: 13px;
+}
+
+/* ==================== PROGRESS SECTION ==================== */
+.gdp-progress {
+  background: var(--dash-card);
+  border: 1px solid var(--dash-border);
+  border-radius: var(--dash-radius);
+  padding: 30px 35px;
+  margin-bottom: 30px;
+}
+
+.gdp-progress__title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+.gdp-progress__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.gdp-progress__stat {
+  text-align: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--dash-radius-sm);
+  border: 1px solid var(--dash-border);
+  transition: var(--dash-transition);
+}
+
+.gdp-progress__stat:hover {
+  border-color: var(--dash-border-glow);
+  transform: translateY(-3px);
+}
+
+.gdp-progress__stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 14px;
+  font-size: 18px;
+}
+
+.gdp-progress__stat:nth-child(1) .gdp-progress__stat-icon {
+  background: rgba(99, 75, 250, 0.12);
+  color: var(--dash-primary);
+}
+.gdp-progress__stat:nth-child(2) .gdp-progress__stat-icon {
+  background: rgba(30, 255, 228, 0.1);
+  color: var(--dash-accent);
+}
+.gdp-progress__stat:nth-child(3) .gdp-progress__stat-icon {
+  background: rgba(168, 85, 247, 0.12);
+  color: #a855f7;
+}
+
+.gdp-progress__stat h3 {
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.gdp-progress__stat p {
+  color: var(--dash-text-dim);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+/* Streak Badge */
+.gdp-streak {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--dash-border);
+  border-radius: var(--dash-radius-sm);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.gdp-streak__left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.gdp-streak__icon {
+  font-size: 22px;
+}
+
+.gdp-streak__left h6 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.gdp-streak__left p {
+  font-size: 12px;
+  color: var(--dash-text-dim);
+  margin: 0;
+}
+
+.gdp-streak__badge {
+  text-align: center;
+  color: var(--dash-accent);
+}
+
+.gdp-streak__badge h4 {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.gdp-streak__badge p {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  color: var(--dash-text-dim);
+}
+
+/* ==================== MY COURSES ==================== */
+.gdp-courses {
+  background: var(--dash-card);
+  border: 1px solid var(--dash-border);
+  border-radius: var(--dash-radius);
+  padding: 30px 35px;
+  margin-bottom: 30px;
+}
+
+.gdp-courses__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.gdp-courses__header h5 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.gdp-courses__header a {
+  color: var(--dash-accent);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: var(--dash-transition);
+}
+
+.gdp-courses__header a:hover {
+  color: #4fffed;
+}
+
+.gdp-course-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--dash-border);
+}
+
+.gdp-course-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.gdp-course-item__thumb {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(99, 75, 250, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gdp-course-item__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.gdp-course-item__thumb i {
+  font-size: 22px;
+  color: var(--dash-primary);
+}
+
+.gdp-course-item__info {
+  flex: 1;
+}
+
+.gdp-course-item__info h6 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+
+.gdp-course-item__info p {
+  font-size: 12px;
+  color: var(--dash-text-dim);
+  margin: 0;
+}
+
+.gdp-course-item__progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 160px;
+}
+
+.gdp-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.gdp-progress-bar__fill {
+  height: 100%;
+  border-radius: 10px;
+  background: var(--dash-gradient);
+  transition: width 1s ease;
+}
+
+.gdp-course-item__pct {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--dash-text-dim);
+  min-width: 35px;
+  text-align: right;
+}
+
+/* ==================== BOTTOM GRID ==================== */
+.gdp-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.gdp-info-card {
+  background: var(--dash-card);
+  border: 1px solid var(--dash-border);
+  border-radius: var(--dash-radius);
+  padding: 28px 30px;
+}
+
+.gdp-info-card h5 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 20px;
+}
+
+.gdp-info-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--dash-border);
+  cursor: pointer;
+  transition: var(--dash-transition);
+}
+
+.gdp-info-row:last-child {
+  border-bottom: none;
+}
+
+.gdp-info-row:hover {
+  opacity: 0.8;
+}
+
+.gdp-info-row__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gdp-info-row__left i {
+  width: 18px;
+  color: var(--dash-primary);
+  font-size: 14px;
+}
+
+.gdp-info-row__label {
+  font-size: 12px;
+  color: var(--dash-text-dim);
+  margin-bottom: 2px;
+}
+
+.gdp-info-row__value {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.gdp-info-row__right i {
+  color: var(--dash-text-muted);
+  font-size: 12px;
+}
+
+/* Settings Toggle */
+.gdp-toggle {
+  width: 40px;
+  height: 22px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  position: relative;
+  cursor: pointer;
+  transition: var(--dash-transition);
+  border: none;
+}
+
+.gdp-toggle.active {
+  background: var(--dash-primary);
+}
+
+.gdp-toggle::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  background: white;
+  border-radius: 50%;
+  transition: var(--dash-transition);
+}
+
+.gdp-toggle.active::after {
+  left: 21px;
+}
+
+/* ==================== FOOTER ==================== */
+.gdp-dashboard__footer {
+  text-align: center;
+  padding: 30px 0 0;
+  color: var(--dash-text-muted);
+  font-size: 12px;
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 1024px) {
+  .gdp-sidebar {
+    width: 70px;
+    padding: 20px 8px;
+  }
+  .gdp-sidebar__logo,
+  .gdp-sidebar__link span,
+  .gdp-sidebar__premium p,
+  .gdp-sidebar__premium-badge {
+    display: none;
+  }
+  .gdp-sidebar__link {
+    justify-content: center;
+    padding: 14px;
+  }
+  .gdp-sidebar__premium {
+    padding: 12px 8px;
+  }
+  .gdp-sidebar__premium-btn {
+    padding: 10px;
+    font-size: 0;
+  }
+  .gdp-sidebar__premium-btn i {
+    font-size: 16px;
+  }
+  .gdp-main {
+    margin-left: 70px;
+    max-width: calc(100% - 70px);
+    padding: 30px;
+  }
+  .gdp-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .gdp-sidebar {
+    display: none;
+  }
+  .gdp-main {
+    margin-left: 0;
+    max-width: 100%;
+    padding: 20px;
+  }
+  .gdp-profile-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  .gdp-profile__meta {
+    align-items: center;
+  }
+  .gdp-progress__grid {
+    grid-template-columns: 1fr;
+  }
+}

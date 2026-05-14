@@ -1,0 +1,74 @@
+.workshop-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.session-info-wrapper {
+  display: flex;
+  gap: 50px;
+  align-items: center;
+}
+
+.session-date-box {
+  text-align: center;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  padding-right: 50px;
+  min-width: 120px;
+}
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+}
+
+@media (max-width: 992px) {
+  .session-info-wrapper {
+    gap: 30px;
+  }
+  .session-date-box {
+    padding-right: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .workshop-row {
+    flex-direction: column;
+    text-align: center;
+    padding: 30px 20px;
+    gap: 30px;
+  }
+
+  .session-info-wrapper {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .session-date-box {
+    border-right: none;
+    padding-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 20px;
+    width: 100%;
+  }
+
+  .steps-grid {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .live-guidelines {
+    padding: 40px 20px !important;
+  }
+  
+  .session-actions {
+    text-align: center !important;
+    width: 100%;
+  }
+}
