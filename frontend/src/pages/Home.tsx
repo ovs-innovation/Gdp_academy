@@ -13,9 +13,10 @@ import '../styles/home.css';
 interface LazyVideoProps {
   src: string;
   className?: string;
+  scale?: number;
 }
 
-const LazyVideo: React.FC<LazyVideoProps> = ({ src, className }) => {
+const LazyVideo: React.FC<LazyVideoProps> = ({ src, className, scale = 1.1 }) => {
   const elRef = useRef<any>(null);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -28,11 +29,10 @@ const LazyVideo: React.FC<LazyVideoProps> = ({ src, className }) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
         } else {
-          // Unload when scrolled out to save YouTube sessions
           setIsVisible(false);
         }
       },
-      { rootMargin: '200px' }
+      { rootMargin: '400px' }
     );
 
     observer.observe(el);
@@ -49,7 +49,7 @@ const LazyVideo: React.FC<LazyVideoProps> = ({ src, className }) => {
           <iframe 
             width="100%" 
             height="100%" 
-            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&controls=0&playlist=${videoId}&vq=hd1080&playsinline=1`} 
+            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&controls=0&playlist=${videoId}&vq=hd1080&playsinline=1&modestbranding=1&rel=0&iv_load_policy=3&disablekb=1&fs=0`} 
             frameBorder="0" 
             allow="autoplay; encrypted-media" 
             allowFullScreen
@@ -61,7 +61,7 @@ const LazyVideo: React.FC<LazyVideoProps> = ({ src, className }) => {
               left: '50%', 
               width: '100%', 
               height: '100%', 
-              transform: 'translate(-50%, -50%) scale(1.5)', /* Reduced scale for better framing */
+              transform: `translate(-50%, -50%) scale(${scale})`,
               minWidth: '100%',
               minHeight: '100%'
             }}
@@ -372,7 +372,7 @@ const Home: React.FC = () => {
                     key={i}
                     className="highlight-card-v3"
                   >
-                    <LazyVideo src={item.vid} className="highlight-video-bg" />
+                    <LazyVideo src={item.vid} className="highlight-video-bg" scale={2.5} />
                     <div className="highlight-card-overlay">
                       <div className="highlight-content-left">
                         <span className="highlight-views"><strong>{item.views}</strong> Views</span>
@@ -517,7 +517,7 @@ const Home: React.FC = () => {
                   viewport={{ once: true }}
                   style={{ marginTop: item.offset }}
                 >
-                  <LazyVideo src={item.vid} />
+                  <LazyVideo src={item.vid} scale={1.1} />
                   
                   {/* Reels UI Overlay */}
                   <div className="insta-reels-ui">
@@ -612,7 +612,7 @@ const Home: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
               >
-                <LazyVideo src={item.vid} className="testimonial-video-bg" />
+                <LazyVideo src={item.vid} className="testimonial-video-bg" scale={1.1} />
                 <div className="video-overlay-gradient"></div>
                 {index === 0 && <div className="carousel-arrow left">‹</div>}
                 {index === 3 && <div className="carousel-arrow right">›</div>}
