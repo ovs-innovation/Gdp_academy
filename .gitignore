@@ -3,3 +3,12 @@ node_modules/
 *.mp4
 .next
 dist
+admin/.env
+frontend/.env
+backend/.env
+.env
+.env.*
+node_modules/
+.next
+dist
+*.log
