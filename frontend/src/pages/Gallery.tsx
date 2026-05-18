@@ -1,65 +1,137 @@
 import React from 'react';
-import Layout from '../components/layout/Layout';
 import { motion } from 'framer-motion';
+import Layout from '../components/layout/Layout';
+import SEO from '../components/SEO';
+import '../styles/gallery.css';
 
 const Gallery: React.FC = () => {
-  const photos = [
-    "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1535525153412-5a42439a210d?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1516475429286-465d815a0df7?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1537367680248-a449a6affb04?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1518834107812-67b0b7c58434?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1502519144081-acca18599766?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80"
+  const galleryItems = [
+    {
+      id: 1,
+      url: "/svc-stage.png",
+      title: "Stage Performance",
+      category: "Live Show",
+      size: "large" // col-span-2 row-span-2
+    },
+    {
+      id: 2,
+      url: "/svc-hiphop.png",
+      title: "Studio Rehearsal",
+      category: "Training",
+      size: "tall" // row-span-2
+    },
+    {
+      id: 3,
+      url: "/svc-kids.jpg",
+      title: "Urban Cypher",
+      category: "Freestyle",
+      size: "standard" 
+    },
+    {
+      id: 4,
+      url: "/svc-wedding.jpg",
+      title: "Neon Nights",
+      category: "Concept Video",
+      size: "wide" // col-span-2
+    },
+    {
+      id: 5,
+      url: "/svc-hiphop.png",
+      title: "Crew Showcase",
+      category: "Competition",
+      size: "standard"
+    },
+    {
+      id: 6,
+      url: "/svc-stage.png",
+      title: "Contemporary Flow",
+      category: "Choreography",
+      size: "tall" // row-span-2
+    },
+    {
+      id: 7,
+      url: "/svc-wedding.jpg",
+      title: "Breakdance Battle",
+      category: "Underground",
+      size: "wide"
+    }
   ];
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemFade = {
+    hidden: { opacity: 0, scale: 0.95 },
+    visible: { 
+      opacity: 1, 
+      scale: 1,
+      transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
+    }
+  };
 
   return (
     <Layout>
-      <section className="gallery-hero section-padding">
-        <div className="container">
+      <SEO pageTitle="Gallery" />
+      
+      <div className="gallery-page-wrapper">
+        <section className="gal-hero-section">
+          <div className="gal-ambient-bg"></div>
+          
           <motion.h1 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="section-title"
+            className="gal-hero-title"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
-            ART IN <span className="gradient-text">MOTION</span>
+            THE <span>ARCHIVE</span>
           </motion.h1>
-          <p className="hero-subtitle">Capturing the raw emotion and precision of our academy's performances.</p>
-        </div>
-      </section>
+          
+          <motion.div 
+            className="gal-hero-subtitle"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 1 }}
+          >
+            Raw emotion and precision
+          </motion.div>
+        </section>
 
-      <section className="gallery-content section-padding" style={{ paddingTop: '0' }}>
-        <div className="container">
-          <div className="gallery-grid" style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(3, 1fr)', 
-            gap: '20px',
-            gridAutoRows: '300px'
-          }}>
-            {photos.map((photo, i) => (
+        <section className="container">
+          <motion.div 
+            className="gal-bento-grid"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={staggerContainer}
+          >
+            {galleryItems.map((item) => (
               <motion.div 
-                key={i}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.05 }}
-                className="gallery-item"
-                style={{ overflow: 'hidden', cursor: 'pointer' }}
+                key={item.id} 
+                className={`gal-item ${item.size}`}
+                variants={itemFade}
               >
                 <img 
-                  src={photo} 
-                  alt={`Gallery ${i}`} 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', transition: '0.5s' }} 
-                  onMouseOver={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-                  onMouseOut={(e) => e.currentTarget.style.transform = 'scale(1)'}
+                  src={item.url} 
+                  alt={item.title} 
+                  className="gal-image"
+                  loading="lazy"
                 />
+                <div className="gal-overlay">
+                  <h3 className="gal-item-title">{item.title}</h3>
+                  <div className="gal-item-category">{item.category}</div>
+                </div>
               </motion.div>
             ))}
-          </div>
-        </div>
-      </section>
+          </motion.div>
+        </section>
+      </div>
     </Layout>
   );
 };

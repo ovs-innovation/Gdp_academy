@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +14,7 @@ import { useRole } from '@/contexts/RoleContext';
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
@@ -26,6 +27,33 @@ const LoginPage = () => {
   const [resetOtp, setResetOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const { setCurrentRole, setPermissions } = useRole();
+
+  useEffect(() => {
+    const token = searchParams.get('token');
+    if (token && !isLoading) {
+      const performAutoLogin = async () => {
+        setIsLoading(true);
+        setToken(token, true);
+        try {
+          const data = await AuthAPI.me();
+          if (data.user) {
+            setCurrentRole(data.user.role);
+            setPermissions((data.user.permissions || []) as any);
+            localStorage.setItem('user-email', data.user.email);
+            localStorage.setItem('user-name', data.user.name || data.user.email);
+            localStorage.setItem('user-id', data.user.id);
+            toast.success('Admin access granted');
+            navigate('/');
+          }
+        } catch (err) {
+          toast.error("Auto-login failed. Please login manually.");
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      performAutoLogin();
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

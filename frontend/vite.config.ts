@@ -13,7 +13,12 @@ export default defineConfig({
   ],
 
   server: {
+    host: "0.0.0.0",
     port: 3000,
+
+    // Replace this if ngrok gives a new URL
+    allowedHosts: ["grandly-work-gigantic.ngrok-free.dev"],
+
     proxy: {
       '/api': {
         target: 'http://localhost:8096',
@@ -22,27 +27,42 @@ export default defineConfig({
       },
     },
   },
+
   esbuild: {
     drop: ['console', 'debugger'],
   },
+
   build: {
     target: 'esnext',
     minify: 'esbuild',
     cssCodeSplit: true,
     chunkSizeWarningLimit: 2000,
+
     rollupOptions: {
       output: {
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('react') || id.includes('react-dom') || id.includes('react-router-dom')) {
+
+            if (
+              id.includes('react') ||
+              id.includes('react-dom') ||
+              id.includes('react-router-dom')
+            ) {
               return 'vendor-react';
             }
-            if (id.includes('gsap') || id.includes('framer-motion') || id.includes('aos')) {
+
+            if (
+              id.includes('gsap') ||
+              id.includes('framer-motion') ||
+              id.includes('aos')
+            ) {
               return 'vendor-animation';
             }
+
             if (id.includes('firebase')) {
               return 'vendor-firebase';
             }
+
             return 'vendor-core';
           }
         }

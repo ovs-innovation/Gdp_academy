@@ -1,86 +1,156 @@
 import React from 'react';
-import Layout from '../components/layout/Layout';
 import { motion } from 'framer-motion';
+import Layout from '../components/layout/Layout';
+import SEO from '../components/SEO';
+import '../styles/blog.css';
 
 const Blog: React.FC = () => {
+  // Use guaranteed local images to avoid network blocking
+  const featuredPost = {
+    id: 1,
+    title: "The Anatomy of a Perfect Stage Performance",
+    date: "OCT 24, 2024",
+    category: "Masterclass",
+    author: "Anubhav",
+    excerpt: "Preparing for a live showcase goes far beyond just remembering the choreography. We break down the psychology of stage presence, blocking, and crowd control.",
+    image: "/svc-stage.png"
+  };
+
   const posts = [
     {
-      id: 1,
-      title: "The Art of Contemporary Flow",
-      date: "Oct 24, 2024",
-      category: "Technique",
-      author: "Marcus Chen",
-      excerpt: "Exploring the fluid movements and emotional depth of modern contemporary dance styles.",
-      image: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&q=80"
-    },
-    {
       id: 2,
-      title: "Mastering the Stage: Performance Tips",
-      date: "Oct 20, 2024",
-      category: "Performance",
-      author: "Elena Volkova",
-      excerpt: "How to overcome stage fright and project confidence during professional showcases.",
-      image: "https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&q=80"
+      title: "Finding Your Groove in Hip Hop Foundations",
+      date: "OCT 20, 2024",
+      category: "Technique",
+      author: "GDP Team",
+      excerpt: "Understanding the bounce, rock, and roll. Why basic fundamentals are the key to advanced texturing and musicality.",
+      image: "/svc-hiphop.png"
     },
     {
       id: 3,
-      title: "Urban Rhythms: Hip-Hop Culture",
-      date: "Oct 15, 2024",
-      category: "Culture",
-      author: "Jordan Knight",
-      excerpt: "Tracing the history and evolution of urban dance styles from the streets to the stage.",
-      image: "https://images.unsplash.com/photo-1535525153412-5a42439a210d?auto=format&fit=crop&q=80"
+      title: "Building Confidence in Kids Through Dance",
+      date: "OCT 15, 2024",
+      category: "Development",
+      author: "GDP Team",
+      excerpt: "How structured studio training helps children and teens develop discipline, creativity, and self-esteem early on.",
+      image: "/svc-kids.jpg"
+    },
+    {
+      id: 4,
+      title: "Crafting the Ultimate Wedding Routine",
+      date: "OCT 10, 2024",
+      category: "Choreography",
+      author: "Anubhav",
+      excerpt: "From song selection to the final dip. Tips on making your first dance memorable, elegant, and completely stress-free.",
+      image: "/svc-wedding.jpg"
+    },
+    {
+      id: 5,
+      title: "Behind The Scenes: The Cypher Vol. 2",
+      date: "OCT 05, 2024",
+      category: "Events",
+      author: "GDP Team",
+      excerpt: "An exclusive look at our latest underground battle event. The energy, the community, and the standout moments.",
+      image: "/anubhav.png"
+    },
+    {
+      id: 6,
+      title: "How to Recover Fast After Intensive Training",
+      date: "SEP 28, 2024",
+      category: "Health",
+      author: "GDP Team",
+      excerpt: "Dance is an extreme sport. Here is our recommended protocol for muscle recovery, stretching, and staying injury-free.",
+      image: "/svc-stage.png"
     }
   ];
 
+  const fadeUp = {
+    hidden: { opacity: 0, y: 40 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+  };
+
   return (
     <Layout>
-      <section className="blog-hero section-padding">
-        <div className="container">
+      <SEO pageTitle="Journal" />
+      
+      <div className="blog-page-wrapper">
+        <section className="blog-hero-section">
+          <div className="blog-ambient-bg"></div>
+          
           <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
+            className="blog-hero-title"
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            className="section-title"
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
-            LATEST <span className="gradient-text">INSIGHTS</span>
+            THE <span>JOURNAL</span>
           </motion.h1>
-          <p className="hero-subtitle">Deep dives into dance technique, culture, and professional artistry.</p>
-        </div>
-      </section>
+          
+          <motion.div 
+            style={{ color: 'rgba(255,255,255,0.7)', fontSize: '18px', letterSpacing: '2px', fontFamily: 'var(--font-montserrat)' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 1 }}
+          >
+            Insights into technique, culture, and artistry.
+          </motion.div>
+        </section>
 
-      <section className="blog-content section-padding" style={{ paddingTop: '0' }}>
-        <div className="container">
-          <div className="blog-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '40px' }}>
+        <section className="container">
+          {/* Featured Post */}
+          <motion.div 
+            className="blog-featured"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+            variants={fadeUp}
+          >
+            <div className="blog-featured-img">
+              <img src={featuredPost.image} alt={featuredPost.title} />
+            </div>
+            <div className="blog-featured-content">
+              <div className="blog-meta">
+                <span className="blog-cat">{featuredPost.category}</span>
+                <span className="blog-date">{featuredPost.date}</span>
+              </div>
+              <h2 className="blog-title">{featuredPost.title}</h2>
+              <p className="blog-excerpt">{featuredPost.excerpt}</p>
+              <div>
+                <button className="blog-read-more">READ ARTICLE <span>→</span></button>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Grid Posts */}
+          <div className="blog-grid">
             {posts.map((post, i) => (
               <motion.div 
-                key={post.id}
+                key={post.id} 
+                className="blog-card"
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="blog-card glass-card"
-                style={{ padding: '0', overflow: 'hidden' }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
               >
-                <div className="blog-image" style={{ height: '240px', overflow: 'hidden' }}>
-                  <img src={post.image} alt={post.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <div className="blog-card-img">
+                  <img src={post.image} alt={post.title} />
                 </div>
-                <div className="blog-info" style={{ padding: '30px' }}>
-                  <div className="blog-meta" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '15px' }}>
-                    <span style={{ color: 'var(--accent-color)', fontSize: '10px', letterSpacing: '2px', fontWeight: '700' }}>{post.category.toUpperCase()}</span>
-                    <span style={{ color: 'var(--text-gray)', fontSize: '12px' }}>{post.date}</span>
+                <div className="blog-card-content">
+                  <div className="blog-meta">
+                    <span className="blog-cat">{post.category}</span>
+                    <span className="blog-date">{post.date}</span>
                   </div>
-                  <h3 style={{ fontSize: '20px', marginBottom: '15px', color: '#fff', fontFamily: 'Montserrat', fontWeight: '700' }}>{post.title}</h3>
-                  <p style={{ color: 'var(--text-gray)', fontSize: '14px', marginBottom: '20px', lineHeight: '1.6' }}>{post.excerpt}</p>
-                  <div className="blog-footer" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ color: '#fff', fontSize: '12px' }}>By {post.author}</span>
-                    <button className="text-btn" style={{ fontSize: '12px' }}>READ MORE →</button>
+                  <h3 className="blog-title" style={{ fontSize: '16px' }}>{post.title}</h3>
+                  <p className="blog-excerpt" style={{ fontSize: '13px' }}>{post.excerpt}</p>
+                  <div>
+                    <button className="blog-read-more">READ <span>→</span></button>
                   </div>
                 </div>
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </Layout>
   );
 };

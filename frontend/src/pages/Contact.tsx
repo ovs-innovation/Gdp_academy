@@ -1,62 +1,93 @@
 import React from 'react';
-import Layout from '../components/layout/Layout';
 import { motion } from 'framer-motion';
+import Layout from '../components/layout/Layout';
+import SEO from '../components/SEO';
+import '../styles/contact.css';
 
 const Contact: React.FC = () => {
   return (
     <Layout>
-      <section className="contact-hero section-padding">
-        <div className="container">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="section-title"
+      <SEO pageTitle="Contact Us" />
+      
+      <div className="contact-page-wrapper">
+        <div className="contact-ambient"></div>
+        <div className="contact-ambient-2"></div>
+        
+        <div className="contact-container">
+          {/* Left Info Side */}
+          <motion.div 
+            className="contact-info-side"
+            initial={{ opacity: 0, x: -40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           >
-            GET IN <span className="gradient-text">TOUCH</span>
-          </motion.h1>
-          <p className="hero-subtitle">Have questions about our programs or memberships? Our team is here to help.</p>
-        </div>
-      </section>
+            <h1 className="contact-hero-title">
+              LET'S <span>CONNECT.</span>
+            </h1>
+            <p className="contact-hero-subtitle">
+              Whether you're a beginner taking your first step, or a professional looking for elite training, our doors are open.
+            </p>
 
-      <section className="contact-content section-padding" style={{ paddingTop: '0' }}>
-        <div className="container">
-          <div className="cta-content glass-card" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', padding: '60px' }}>
-            <div className="contact-info">
-              <h2 style={{ marginBottom: '32px' }}>CONTACT <span className="gradient-text">US</span></h2>
-              <div className="info-item" style={{ marginBottom: '24px' }}>
-                <h4 style={{ color: 'var(--accent-color)', fontSize: '12px', letterSpacing: '2px', marginBottom: '8px' }}>VISIT US</h4>
-                <p style={{ fontSize: '15px', color: 'var(--text-gray)' }}>123 Dance Avenue, Art District<br />New York, NY 10001</p>
+            <div className="contact-details-grid">
+              <div className="contact-detail-block">
+                <h4>THE STUDIO</h4>
+                <p>123 Dance Avenue<br />Art District<br />New York, NY 10001</p>
               </div>
-              <div className="info-item" style={{ marginBottom: '24px' }}>
-                <h4 style={{ color: 'var(--accent-color)', fontSize: '12px', letterSpacing: '2px', marginBottom: '8px' }}>EMAIL</h4>
-                <p style={{ fontSize: '15px', color: 'var(--text-gray)' }}>hello@gdpacademy.com<br />support@gdpacademy.com</p>
+              
+              <div className="contact-detail-block">
+                <h4>CONTACT</h4>
+                <p>hello@gdpacademy.com<br />+1 (555) 123-4567</p>
               </div>
-              <div className="info-item" style={{ marginBottom: '24px' }}>
-                <h4 style={{ color: 'var(--accent-color)', fontSize: '12px', letterSpacing: '2px', marginBottom: '8px' }}>PHONE</h4>
-                <p style={{ fontSize: '15px', color: 'var(--text-gray)' }}>+1 (555) 123-4567</p>
+
+              <div className="contact-detail-block">
+                <h4>HOURS</h4>
+                <p>Mon-Fri: 9AM - 10PM<br />Sat-Sun: 10AM - 8PM</p>
+              </div>
+              
+              <div className="contact-detail-block">
+                <h4>SOCIALS</h4>
+                <p style={{ display: 'flex', gap: '15px' }}>
+                  <a href="#" style={{ color: 'var(--svc-green)', textDecoration: 'none' }}>IG</a>
+                  <a href="#" style={{ color: 'var(--svc-green)', textDecoration: 'none' }}>YT</a>
+                  <a href="#" style={{ color: 'var(--svc-green)', textDecoration: 'none' }}>TK</a>
+                </p>
               </div>
             </div>
+          </motion.div>
 
-            <div className="contact-form-container">
-              <form className="auth-form">
-                <div className="form-group">
-                  <label>FULL NAME</label>
-                  <input type="text" placeholder="John Doe" />
-                </div>
-                <div className="form-group">
-                  <label>EMAIL ADDRESS</label>
-                  <input type="email" placeholder="name@example.com" />
-                </div>
-                <div className="form-group">
-                  <label>MESSAGE</label>
-                  <textarea placeholder="How can we help you?" style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '16px', color: '#fff', borderRadius: '4px', minHeight: '120px' }}></textarea>
-                </div>
-                <button type="submit" className="primary-btn join-btn w-full" style={{ marginTop: '20px' }}>SEND MESSAGE</button>
-              </form>
-            </div>
-          </div>
+          {/* Right Form Side */}
+          <motion.div 
+            className="contact-form-side"
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <form onSubmit={(e) => e.preventDefault()}>
+              <div className="c-form-group">
+                <label>YOUR NAME</label>
+                <input type="text" className="c-form-input" placeholder="e.g. John Doe" />
+              </div>
+              
+              <div className="c-form-group">
+                <label>EMAIL ADDRESS</label>
+                <input type="email" className="c-form-input" placeholder="john@example.com" />
+              </div>
+              
+              <div className="c-form-group">
+                <label>INTERESTED IN</label>
+                <input type="text" className="c-form-input" placeholder="e.g. Hip Hop, Wedding, Private..." />
+              </div>
+              
+              <div className="c-form-group">
+                <label>MESSAGE</label>
+                <textarea className="c-form-textarea" placeholder="Tell us about your dance goals..."></textarea>
+              </div>
+              
+              <button type="submit" className="c-submit-btn">SEND MESSAGE</button>
+            </form>
+          </motion.div>
         </div>
-      </section>
+      </div>
     </Layout>
   );
 };

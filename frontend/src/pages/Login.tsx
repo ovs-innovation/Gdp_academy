@@ -21,7 +21,12 @@ const Login: React.FC = () => {
         localStorage.setItem('auth_token', response.token);
         localStorage.setItem('auth_user', JSON.stringify(response.user));
         toast.success(`Welcome back, ${response.user.name}!`);
-        window.location.href = '/dashboard';
+        
+        if (response.user.role === 'admin' || response.user.role === 'superadmin' || response.user.role === 'super_admin') {
+          window.location.href = `http://localhost:8080/login?token=${response.token}`;
+        } else {
+          window.location.href = '/dashboard';
+        }
       } else {
         toast.info('OTP required for login.');
       }
