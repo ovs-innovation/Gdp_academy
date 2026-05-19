@@ -9,6 +9,7 @@ import faq_data from '../data/home-data/FaqData';
 import instructor_data from '../data/home-data/InstructorData';
 import event_data from '../data/home-data/EventData';
 import LazyVideo from '../components/common/LazyVideo';
+import Hero from '../components/homes/home-one/Hero';
 import '../styles/home.css';
 
 const Home: React.FC = () => {
@@ -115,38 +116,7 @@ const Home: React.FC = () => {
   return (
     <Layout>
       {/* 1. Hero Section */}
-      <section className="hero">
-        <div className="hero-video-container" style={{ overflow: 'hidden' }}>
-          <div id="hero-video-player" className="hero-video" style={{ pointerEvents: 'none', transform: 'scale(1.5)', position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></div>
-          <div className="hero-overlay"></div>
-        </div>
-
-        <div className="container hero-content">
-          <motion.div 
-            className="hero-text"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="hero-title" style={{ fontFamily: 'var(--font-title)', lineHeight: '1.1', textTransform: 'none' }}>
-              Keep up your fitness <br /> through <span style={{ color: '#00d1ff' }}>Dance</span>
-            </h1>
-            <p className="hero-subtitle" style={{ maxWidth: '450px', textTransform: 'none', opacity: 0.9 }}>
-              Garima Dance Productions is the place to go when you want to learn <br /> something artistic, be happy, get fit
-            </p>
-          </motion.div>
-        </div>
-          
-          <motion.div 
-            className="scroll-indicator"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 2, duration: 1 }}
-          >
-            <div className="mouse"></div>
-            <span>SCROLL</span>
-          </motion.div>
-      </section>
+      <Hero />
 
       {/* 2. Services Section */}
       <section className="services-section section-padding">

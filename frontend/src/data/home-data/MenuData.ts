@@ -35,45 +35,29 @@ const menu_data: MenuItem[] = [
     },
     {
         id: 2,
-        title: "About",
+        title: "About Us",
         titleKey: "common.about_us",
         link: "/about",
     },
     {
         id: 3,
-        title: "Programs",
-        titleKey: "common.programs",
-        link: "/programs",
-    },
-    {
-        id: 4,
-        title: "Services",
         title: "Services",
         link: "/services",
     },
     {
-        id: 5,
+        id: 4,
         title: "FAQ",
-        titleKey: "FAQ",
         link: "/faq",
     },
     {
-        id: 6,
-        title: "Blog",
+        id: 5,
         title: "Blog",
         link: "/blog",
     },
     {
-        id: 7,
-        title: "Gallery",
+        id: 6,
         title: "Gallery",
         link: "/gallery",
-    },
-    {
-        id: 8,
-        title: "Contact Us",
-        title: "Contact Us",
-        link: "/contact",
     }
 ];
 export default menu_data;
