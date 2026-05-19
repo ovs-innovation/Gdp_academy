@@ -13,7 +13,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   React.useEffect(() => {
     getSiteSettings().then((s) => {
       setSettings(s);
-      document.title = `${s.siteName} | Garima Dance Production`;
+      const cleanSiteName = s.siteName && s.siteName !== "AdminHub" ? s.siteName : "GDP";
+      if (window.location.pathname === "/") {
+        document.title = `${cleanSiteName} | Garima Dance Productions`;
+      }
     });
   }, []);
 

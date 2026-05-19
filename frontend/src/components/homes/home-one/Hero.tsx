@@ -211,19 +211,24 @@ const Hero = () => {
                     margin-top: 50px;
                     display: flex;
                     gap: 30px;
-                    opacity: 0.3;
                     align-items: center;
                     flex-wrap: wrap;
                 }
 
-                .content-logos-wrapper span {
-                    color: #FFF;
+                .content-logos-wrapper a {
+                    color: rgba(255, 255, 255, 0.7);
                     font-size: 1rem;
                     font-family: 'Montserrat', sans-serif;
                     font-weight: 600;
                     display: flex;
                     align-items: center;
                     gap: 8px;
+                    text-decoration: none;
+                    transition: all 0.3s ease;
+                }
+                .content-logos-wrapper a:hover {
+                    color: #ffffff;
+                    transform: translateY(-2px);
                 }
                 .content-logos-wrapper i {
                     font-size: 1.4rem;
@@ -373,9 +378,15 @@ const Hero = () => {
                         </Link>
 
                         <div className="content-logos-wrapper">
-                            <span><i className="fab fa-google"></i> Google</span>
-                            <span><i className="fab fa-facebook-f"></i> Facebook</span>
-                            <span><i className="fab fa-instagram"></i> Instagram</span>
+                            <a href="https://wa.me/919711384768" target="_blank" rel="noopener noreferrer">
+                                <i className="fab fa-whatsapp" style={{ color: '#25D366' }}></i> WhatsApp
+                            </a>
+                            <a href="https://youtube.com/@garimadanceproductions1146?si=XEMV40bqEVW6JM71" target="_blank" rel="noopener noreferrer">
+                                <i className="fab fa-youtube" style={{ color: '#FF0000' }}></i> YouTube
+                            </a>
+                            <a href="https://www.instagram.com/gdp_garimadanceproductions?igsh=MWhueGpqZGQzZGN0ZA==" target="_blank" rel="noopener noreferrer">
+                                <i className="fab fa-instagram" style={{ color: '#E1306C' }}></i> Instagram
+                            </a>
                         </div>
                     </div>
                 </div>

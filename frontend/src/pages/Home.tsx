@@ -29,6 +29,7 @@ const Home: React.FC = () => {
   const announcementText = settings?.announcementText || "📢 NEW WORKSHOP: CONTEMPORARY MASTERCLASS WITH ELENA VOLKOVA - ENROLLMENT OPEN NOW!";
   
   const [isMuted, setIsMuted] = useState(true);
+  const [isTheaterMode, setIsTheaterMode] = useState(false);
   const playerRef = useRef<any>(null);
 
   useEffect(() => {
@@ -286,9 +287,39 @@ const Home: React.FC = () => {
       {/* 3. About Section */}
       <section className="about-section section-padding">
         <div className="container">
-          <div className="about-content-wrapper">
+          <div className={`about-content-wrapper ${isTheaterMode ? 'theater-mode' : ''}`}>
             <div className="about-image-container animate-fade-in" style={{ position: 'relative', aspectRatio: '16/9', background: '#000' }}>
               <div id="about-video-player" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></div>
+              
+              {/* Theater Mode Toggle Button */}
+              <button 
+                onClick={() => setIsTheaterMode(!isTheaterMode)}
+                className="theater-toggle-btn"
+                style={{
+                  position: 'absolute',
+                  top: '20px',
+                  right: '20px',
+                  zIndex: 10,
+                  background: 'rgba(99, 75, 250, 0.8)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '8px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  fontFamily: 'var(--font-krona)',
+                  fontSize: '10px',
+                  fontWeight: 'bold',
+                  letterSpacing: '1px',
+                  boxShadow: '0 4px 15px rgba(0,0,0,0.3)',
+                  transition: 'all 0.3s ease'
+                }}
+              >
+                {isTheaterMode ? '🗗 NORMAL' : '🗖 THEATER MODE'}
+              </button>
+
               <button 
                 onClick={toggleMute}
                 className="mute-toggle-btn"

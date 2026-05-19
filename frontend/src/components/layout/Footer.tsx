@@ -42,9 +42,9 @@ const Footer: React.FC = () => {
           <div className="footer-links">
             <h4>Social media</h4>
             <ul>
-              <li><a href="https://instagram.com" target="_blank" rel="noreferrer">Instagram</a></li>
-              <li><a href="https://facebook.com" target="_blank" rel="noreferrer">Facebook</a></li>
-              <li><a href="https://youtube.com" target="_blank" rel="noreferrer">Youtube</a></li>
+              <li><a href="https://www.instagram.com/gdp_garimadanceproductions?igsh=MWhueGpqZGQzZGN0ZA==" target="_blank" rel="noreferrer">Instagram</a></li>
+              <li><a href="https://youtube.com/@garimadanceproductions1146?si=XEMV40bqEVW6JM71" target="_blank" rel="noreferrer">Youtube</a></li>
+              <li><a href="https://wa.me/919711384768" target="_blank" rel="noreferrer">WhatsApp</a></li>
             </ul>
           </div>
 

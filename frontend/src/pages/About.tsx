@@ -191,33 +191,62 @@ const About: React.FC = () => {
                 </div>
               </motion.div>
 
-              {/* Right Visual Composition - Laptop Only */}
+              {/* Right Visual - Futuristic Holographic Showcase */}
               <motion.div 
-                className="laptop-exp-visual float-slow"
-                initial={{ opacity: 0, scale: 0.9, rotateY: 10 }}
-                whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
+                className="hologram-exp-visual float-slow"
+                initial={{ opacity: 0, scale: 0.92, y: 40 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
                 viewport={{ once: true, margin: "-100px" }}
                 transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
               >
-                
-                <div className="laptop-mockups-wrapper">
-                  
-                  {/* Laptop Setup */}
-                  <div className="laptop-3d-frame">
-                    <img src="/laptop.png" alt="GDP Experience on Laptop" className="laptop-mockup-img" />
+                <div className="hologram-showcase-wrapper">
+                  {/* Ambient Glows */}
+                  <div className="hologram-glow hologram-glow-purple"></div>
+                  <div className="hologram-glow hologram-glow-green"></div>
+
+                  {/* Corner Target Markers (Futuristic Tech Aesthetic) */}
+                  <div className="hologram-corner corner-tl"></div>
+                  <div className="hologram-corner corner-tr"></div>
+                  <div className="hologram-corner corner-bl"></div>
+                  <div className="hologram-corner corner-br"></div>
+
+                  {/* Main Holographic Glass Viewport */}
+                  <div className="hologram-viewport">
+                    <video
+                      src="/hero.mp4"
+                      autoPlay muted loop playsInline
+                      className="hologram-video"
+                    />
                     
-                    <div className="laptop-screen-content cinematic-overlay">
-                      <iframe 
-                        src="https://www.youtube.com/embed/n_AHV1XwP9w?autoplay=1&mute=1&loop=1&playlist=n_AHV1XwP9w&controls=0&showinfo=0&rel=0&modestbranding=1"
-                        className="laptop-video-embed"
-                        title="GDP Experience"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        style={{ border: 'none', pointerEvents: 'none' }}
-                      ></iframe>
-                      <div className="screen-reflection"></div>
+                    {/* Futuristic Scanning Laser Line */}
+                    <div className="hologram-scanner-line"></div>
+                    
+                    {/* Glass Glare Reflection */}
+                    <div className="hologram-glare"></div>
+                    
+                    {/* Soundwave HUD Graphic at Bottom */}
+                    <div className="hologram-soundwave">
+                      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
                     </div>
                   </div>
+
+                  {/* Interactive Floating Glass Badges */}
+                  <div className="hologram-badge badge-top-left">
+                    <span className="pulse-dot"></span>
+                    <span className="badge-text">GDP LIVE FEED</span>
+                  </div>
                   
+                  <div className="hologram-badge badge-top-right">
+                    <span className="badge-tech-label">CORE SYSTEM v4.2</span>
+                  </div>
+
+                  <div className="hologram-badge badge-bottom-left">
+                    <span className="badge-gradient-text">CREATIVE LOOP ACTIVE</span>
+                  </div>
+
+                  <div className="hologram-badge badge-bottom-right">
+                    <span className="badge-text">120 FPS // 4K</span>
+                  </div>
                 </div>
               </motion.div>
 
@@ -274,121 +303,182 @@ const About: React.FC = () => {
           </div>
         </section>
 
-        {/* ================= 3. OUR STORY SECTION ================= */}
-        <section className="who-we-are section-padding" style={{ position: 'relative', overflow: 'hidden' }}>
-          {/* Giant background quote mark */}
-          <div className="giant-quote-mark">"</div>
-
-          <div className="container">
-            <motion.div
-              className="premium-story-block"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={fadeInUp}
-            >
-              <div className="cyber-label" style={{ marginBottom: '40px' }}>THE LEGACY</div>
-              <h2 className="premium-story-text">
-                GDP started with one vision — to build a dance community where talent grows beyond limits. From beginners to performers, we focus on <span className="text-highlight-green">creativity</span>, <span className="text-highlight-purple">confidence</span>, <span className="text-highlight-green">discipline</span>, and real artistic expression.
-              </h2>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* ================= 4. WHY GDP SECTION ================= */}
-        <section className="why-choose-us section-padding">
+        {/* ================= 3. CORE PILLARS SECTION ================= */}
+        <section className="about-pillars-section">
           <div className="container">
             <div className="premium-section-header">
-              <div className="cyber-label">SYSTEM METRICS</div>
-              <h2 className="section-title">WHY GDP</h2>
+              <div className="cyber-label">THE FOUNDATION</div>
+              <h2 className="section-title">CORE PILLARS</h2>
             </div>
 
-            <motion.div
-              className="premium-features-grid"
+            <motion.div 
+              className="about-pillars-grid"
               initial="hidden"
               whileInView="visible"
               viewport={{ once: true, margin: "-100px" }}
               variants={staggerContainer}
             >
-
-              {/* Feature 1 */}
-              <motion.div className="premium-feature-card" variants={fadeInUp}>
-                <div className="feature-bg-number">01</div>
-                <div className="premium-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                </div>
-                <div className="feature-content">
-                  <h3>Performance Training</h3>
-                  <p>Build high-energy camera presence and technical body control designed strictly for modern stages and visual productions.</p>
-                </div>
+              {/* Pillar 1 */}
+              <motion.div className="pillar-card" variants={fadeInUp}>
+                <span className="pillar-num">PILLAR 01</span>
+                <h3>Choreography & Style</h3>
+                <p>
+                  Master unique textures, dynamic timing, and rhythmic pacing. Our training bridges stylistic street vibes with technical contemporary performance to build your individual dance signature.
+                </p>
               </motion.div>
 
-              {/* Feature 2 */}
-              <motion.div className="premium-feature-card" variants={fadeInUp} style={{ marginTop: '40px' }}>
-                <div className="feature-bg-number">02</div>
-                <div className="premium-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-                </div>
-                <div className="feature-content">
-                  <h3>Choreography Sessions</h3>
-                  <p>Master unique routines that blend styling textures, dynamic speeds, and premium rhythm patterns from master mentors.</p>
-                </div>
+              {/* Pillar 2 */}
+              <motion.div className="pillar-card" variants={fadeInUp}>
+                <span className="pillar-num">PILLAR 02</span>
+                <h3>Stage Presence</h3>
+                <p>
+                  We build camera presence, spatial intelligence, and battle-ready confidence. Performers learn the psychology of movement projection to command spotlights and capture live audiences.
+                </p>
               </motion.div>
 
-              {/* Feature 3 */}
-              <motion.div className="premium-feature-card" variants={fadeInUp}>
-                <div className="feature-bg-number">03</div>
-                <div className="premium-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7c0 3.31 2.69 6 6 6s6-2.69 6-6V2z"></path></svg>
-                </div>
-                <div className="feature-content">
-                  <h3>Dance Battles & Events</h3>
-                  <p>Claim your spotlight in weekly showcase nights, street battles, ciphers, and collaborative community events.</p>
-                </div>
+              {/* Pillar 3 */}
+              <motion.div className="pillar-card" variants={fadeInUp}>
+                <span className="pillar-num">PILLAR 03</span>
+                <h3>Dynamic Groove</h3>
+                <p>
+                  Elevate your musicality and physical syncopation. We teach precision beat-isolation and body control designed strictly for modern choreography paces and commercial speed dynamics.
+                </p>
               </motion.div>
-
-              {/* Feature 4 */}
-              <motion.div className="premium-feature-card" variants={fadeInUp} style={{ marginTop: '40px' }}>
-                <div className="feature-bg-number">04</div>
-                <div className="premium-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg>
-                </div>
-                <div className="feature-content">
-                  <h3>Personal Growth</h3>
-                  <p>We focus on personal identity and mental confidence, turning passion into absolute self-discipline.</p>
-                </div>
-              </motion.div>
-
-              {/* Feature 5 */}
-              <motion.div className="premium-feature-card" variants={fadeInUp}>
-                <div className="feature-bg-number">05</div>
-                <div className="premium-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                </div>
-                <div className="feature-content">
-                  <h3>Team Culture</h3>
-                  <p>Be part of a raw, supportive family of high-energy creators. Learn, battle, and grow alongside peers who inspire you.</p>
-                </div>
-              </motion.div>
-
-              {/* Feature 6 */}
-              <motion.div className="premium-feature-card" variants={fadeInUp} style={{ marginTop: '40px' }}>
-                <div className="feature-bg-number">06</div>
-                <div className="premium-icon">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.46 2 12 2z"></path></svg>
-                </div>
-                <div className="feature-content">
-                  <h3>Creative Environment</h3>
-                  <p>An artistic space fitted with top aesthetics, allowing complete freedom to express individual style and energy.</p>
-                </div>
-              </motion.div>
-
             </motion.div>
           </div>
         </section>
 
-        {/* ================= 5. FINAL CTA SECTION ================= */}
-        <section className="final-cta-section section-padding" style={{ position: 'relative' }}>
+        {/* ================= 4. DANCE CHRONICLES TIMELINE ================= */}
+        <section className="about-timeline-section">
+          <div className="container">
+            <div className="premium-section-header">
+              <div className="cyber-label">OUR PATHWAY</div>
+              <h2 className="section-title">THE CHRONICLES</h2>
+            </div>
+
+            <div className="timeline-pipeline-wrapper">
+              {/* Horizontal Progress Pipeline Conduit */}
+              <div className="pipeline-conduit"></div>
+
+              <div className="pipeline-grid">
+                {/* Year 2020 */}
+                <div className="pipeline-item">
+                  <div className="pipeline-node"></div>
+                  <div className="pipeline-card">
+                    <span className="pipeline-year">2020</span>
+                    <h3>The Core Vision</h3>
+                    <p>
+                      GDP was founded by passionate master instructors with a single mission: to redefine street and commercial choreography training, moving away from average steps toward elite artistic expression.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Year 2022 */}
+                <div className="pipeline-item">
+                  <div className="pipeline-node"></div>
+                  <div className="pipeline-card">
+                    <span className="pipeline-year">2022</span>
+                    <h3>Cinematic Portfolios</h3>
+                    <p>
+                      Introduced professional cinematic video production into the core curriculum, allowing students to record high-fidelity showcase ciphers and build premium visual performance reels.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Year 2024 */}
+                <div className="pipeline-item">
+                  <div className="pipeline-node"></div>
+                  <div className="pipeline-card">
+                    <span className="pipeline-year">2024</span>
+                    <h3>Studio Expansion</h3>
+                    <p>
+                      Built a fully acoustic-treated, flagship studio hub complete with professional shock-absorbing flooring, multi-cam shooting rigs, and smart dynamic RGB mood matrices.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Year 2026 */}
+                <div className="pipeline-item">
+                  <div className="pipeline-node"></div>
+                  <div className="pipeline-card">
+                    <span className="pipeline-year">2026</span>
+                    <h3>National Standard</h3>
+                    <p>
+                      With 5000+ students trained and weekly battle cipher coves established, GDP stands as the national vanguard for high-energy dance education and professional performer portfolios.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= 5. STUDIO ECOSYSTEM SECTION ================= */}
+        <section className="about-ecosystem-section">
+          <div className="container">
+            <div className="premium-section-header">
+              <div className="cyber-label">THE INFRASTRUCTURE</div>
+              <h2 className="section-title">STUDIO ECOSYSTEM</h2>
+            </div>
+
+            <div className="ecosystem-grid">
+              {/* Feature 1 */}
+              <div className="ecosystem-card">
+                <div className="ecosystem-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="6 2 18 2 18 6 6 6 6 2"></polygon><rect x="3" y="6" width="18" height="16" rx="2"></rect></svg>
+                </div>
+                <div className="ecosystem-info">
+                  <h3>Shock-Absorbing Dance Floors</h3>
+                  <p>
+                    Custom engineered floating wooden dance floors lined with multi-layer high-density shock absorbers to prevent joint injury and optimize footwork impact dynamics.
+                  </p>
+                </div>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="ecosystem-card">
+                <div className="ecosystem-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M23 7a2 2 0 0 0-2.45-1.45L16 7V5a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2l4.55 1.45A2 2 0 0 0 23 17V7z"></path></svg>
+                </div>
+                <div className="ecosystem-info">
+                  <h3>Visual Production Suite</h3>
+                  <p>
+                    In-house professional multi-cam setup, motorized stabilizer rigs, and premium lighting systems designed to film and compile high-definition student choreo reels.
+                  </p>
+                </div>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="ecosystem-card">
+                <div className="ecosystem-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="22"></line></svg>
+                </div>
+                <div className="ecosystem-info">
+                  <h3>High-Fidelity Bass Acoustics</h3>
+                  <p>
+                    Flagship-level audio distribution and acoustic panelling tuned strictly to capture low-frequency rhythmic beats, helping students feel and track micro-grooves.
+                  </p>
+                </div>
+              </div>
+
+              {/* Feature 4 */}
+              <div className="ecosystem-card">
+                <div className="ecosystem-icon">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                </div>
+                <div className="ecosystem-info">
+                  <h3>RGB Dynamic Neon Grid</h3>
+                  <p>
+                    State-of-the-art smart LED arrays that synchronize ambient light presets to choreo tempos and styles, amplifying dance video loops visually.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= 6. FINAL CTA SECTION ================= */}
+        <section className="final-cta-section">
           <div className="cta-glow-bg"></div>
 
           <div className="container">
@@ -400,14 +490,14 @@ const About: React.FC = () => {
               transition={{ duration: 0.8 }}
             >
               <h2 className="premium-cta-title">
-                READY TO MOVE?
+                READY TO CHOOSE YOUR GROOVE?
               </h2>
               <p className="premium-cta-desc">
-                Join the next generation of performers with GDP Dance Academy.
+                Join the next generation of performers. Experience premium training, cinematic ciphers, and a raw support family.
               </p>
-              <div style={{ marginTop: '50px' }}>
-                <Link to="/signup" className="glow-btn-primary" style={{ padding: '24px 50px', fontSize: '14px' }}>
-                  Start Your Journey
+              <div style={{ marginTop: '40px' }}>
+                <Link to="/contact" className="glow-btn-primary" style={{ padding: '20px 45px', fontSize: '13px', display: 'inline-block' }}>
+                  START YOUR EXPERIENCE
                 </Link>
               </div>
             </motion.div>
