@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const uniqueVideos = [
     '/hero.mp4', 
@@ -9,9 +9,17 @@ const uniqueVideos = [
     '/service3.mp4'
 ];
 
-const gridVideosList = [
-    ...uniqueVideos, ...uniqueVideos, uniqueVideos[0]
-]; // 9 videos for the grid
+const gridItems = [
+    { type: 'video', src: '/hero.mp4' },
+    { type: 'image', src: '/svc-stage.png' },
+    { type: 'video', src: '/services4.mp4' },
+    { type: 'image', src: '/svc-wedding.jpg' },
+    { type: 'video', src: '/service3.mp4' },
+    { type: 'image', src: '/svc-hiphop.png' },
+    { type: 'video', src: '/services.mp4' },
+    { type: 'image', src: '/laptop.png' },
+    { type: 'video', src: '/hero.mp4' }
+];
 
 const Hero = () => {
     // 1 = Grid (3s), 2 = Single Zoom (4s), 3 = 2-Split (5s)
@@ -255,84 +263,99 @@ const Hero = () => {
                 <div className="steezy-complex-hero">
                     {/* LEFT SIDE: Dynamic Video Area */}
                     <div className="left-video-area">
-                        {/* STATE 1: 3x3 Grid Collage */}
-                        <div 
-                            className="state-container grid-3x3"
-                            style={{ 
-                                opacity: state === 1 ? 1 : 0, 
-                                zIndex: state === 1 ? 2 : 1 
-                            }}
-                        >
-                            {gridVideosList.map((vid, i) => (
-                                <video key={`grid-${i}`} src={vid} autoPlay muted loop playsInline />
-                            ))}
-                        </div>
+                        <AnimatePresence initial={false}>
+                            {/* STATE 1: 3x3 Grid Collage */}
+                            {state === 1 && (
+                                <motion.div 
+                                    key="state-1"
+                                    className="state-container grid-3x3"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.8 }}
+                                    style={{ zIndex: 2 }}
+                                >
+                                    {gridItems.map((item, i) => (
+                                        item.type === 'video' ? (
+                                            <video key={`grid-${i}`} src={item.src} autoPlay muted loop playsInline />
+                                        ) : (
+                                            <img key={`grid-${i}`} src={item.src} alt={`collage-${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                        )
+                                    ))}
+                                </motion.div>
+                            )}
 
-                        {/* STATE 2: Single Video Zoom */}
-                        <motion.div 
-                            className="state-container"
-                            initial={false}
-                            animate={{ 
-                                scale: state === 2 ? 1 : 0.5,
-                                opacity: state === 2 ? 1 : 0
-                            }}
-                            transition={state === 2 ? { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] } : { duration: 0 }}
-                            style={{ zIndex: state === 2 ? 3 : 1 }}
-                        >
-                            {uniqueVideos.map((vid, i) => (
-                                <video 
-                                    key={`single-${i}`} 
-                                    src={vid} 
-                                    autoPlay muted loop playsInline 
-                                    style={{
-                                        position: 'absolute', inset: 0,
-                                        opacity: singleIndex === i ? 1 : 0,
-                                        transition: 'none' // Instant zero-gap cut
-                                    }}
-                                />
-                            ))}
-                        </motion.div>
+                            {/* STATE 2: Single Video Zoom */}
+                            {state === 2 && (
+                                <motion.div 
+                                    key="state-2"
+                                    className="state-container"
+                                    initial={{ opacity: 0, scale: 0.5 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.5 }}
+                                    transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+                                    style={{ zIndex: 3 }}
+                                >
+                                    {uniqueVideos.map((vid, i) => (
+                                        <video 
+                                            key={`single-${i}`} 
+                                            src={vid} 
+                                            autoPlay muted loop playsInline 
+                                            style={{
+                                                position: 'absolute', inset: 0,
+                                                opacity: singleIndex === i ? 1 : 0,
+                                                transition: 'none' // Instant zero-gap cut
+                                            }}
+                                        />
+                                    ))}
+                                </motion.div>
+                            )}
 
-                        {/* STATE 3: 2-Split Panel */}
-                        <div 
-                            className="state-container split-2x1"
-                            style={{ 
-                                opacity: state === 3 ? 1 : 0, 
-                                zIndex: state === 3 ? 2 : 1 
-                            }}
-                        >
-                            {/* LEFT COLUMN */}
-                            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                                {uniqueVideos.map((vid, i) => (
-                                    <video 
-                                        key={`left-${i}`} 
-                                        src={vid} 
-                                        autoPlay muted loop playsInline 
-                                        style={{
-                                            position: 'absolute', inset: 0,
-                                            opacity: leftIndex === i ? 1 : 0,
-                                            transition: 'none'
-                                        }}
-                                    />
-                                ))}
-                            </div>
-                            
-                            {/* RIGHT COLUMN */}
-                            <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                                {uniqueVideos.map((vid, i) => (
-                                    <video 
-                                        key={`right-${i}`} 
-                                        src={vid} 
-                                        autoPlay muted loop playsInline 
-                                        style={{
-                                            position: 'absolute', inset: 0,
-                                            opacity: rightIndex === i ? 1 : 0,
-                                            transition: 'none'
-                                        }}
-                                    />
-                                ))}
-                            </div>
-                        </div>
+                            {/* STATE 3: 2-Split Panel */}
+                            {state === 3 && (
+                                <motion.div 
+                                    key="state-3"
+                                    className="state-container split-2x1"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.8 }}
+                                    style={{ zIndex: 2 }}
+                                >
+                                    {/* LEFT COLUMN */}
+                                    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                                        {uniqueVideos.map((vid, i) => (
+                                            <video 
+                                                key={`left-${i}`} 
+                                                src={vid} 
+                                                autoPlay muted loop playsInline 
+                                                style={{
+                                                    position: 'absolute', inset: 0,
+                                                    opacity: leftIndex === i ? 1 : 0,
+                                                    transition: 'none'
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                    
+                                    {/* RIGHT COLUMN */}
+                                    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                                        {uniqueVideos.map((vid, i) => (
+                                            <video 
+                                                key={`right-${i}`} 
+                                                src={vid} 
+                                                autoPlay muted loop playsInline 
+                                                style={{
+                                                    position: 'absolute', inset: 0,
+                                                    opacity: rightIndex === i ? 1 : 0,
+                                                    transition: 'none'
+                                                }}
+                                            />
+                                        ))}
+                                    </div>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
                     </div>
 
                     {/* RIGHT SIDE: Static Content Panel */}

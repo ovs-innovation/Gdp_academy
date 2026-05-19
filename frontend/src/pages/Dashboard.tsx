@@ -5,7 +5,6 @@ import { getMyBookings } from '../services/bookingService'
 import type { Booking } from '../services/bookingService'
 import { toast } from 'react-toastify'
 import WishlistArea from '../dashboard/student-dashboard/student-dashboard/WishlistArea'
-import StudentDashboardArea from '../dashboard/student-dashboard/student-dashboard/StudentDashboardArea'
 import ProfileSettingArea from '../dashboard/student-dashboard/student-dashboard/ProfileSettingArea'
 import '../styles/dashboard-premium.css'
 

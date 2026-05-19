@@ -127,9 +127,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setToken(authResponse.token)
       setUser(authResponse.user)
       
-      if (authResponse.user.role === 'teacher') {
-        navigate('/instructor-dashboard', { replace: true })
-      } else if (authResponse.user.role === 'student') {
+      if (authResponse.user.role === 'teacher' || authResponse.user.role === 'student') {
         navigate('/dashboard', { replace: true })
       } else {
         navigate('/', { replace: true })
@@ -155,9 +153,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setToken(authResponse.token)
         setUser(authResponse.user)
 
-        if (authResponse.user.role === 'teacher') {
-          navigate('/instructor-dashboard', { replace: true })
-        } else if (authResponse.user.role === 'student') {
+        if (authResponse.user.role === 'teacher' || authResponse.user.role === 'student') {
           navigate('/dashboard', { replace: true })
         } else {
           navigate('/', { replace: true })
@@ -213,9 +209,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setToken(authResponse.token)
         setUser(authResponse.user)
         
-        if (authResponse.user.role === 'teacher') {
-          navigate('/instructor-dashboard', { replace: true })
-        } else if (authResponse.user.role === 'student') {
+        if (authResponse.user.role === 'teacher' || authResponse.user.role === 'student') {
           navigate('/dashboard', { replace: true })
         } else {
           navigate('/', { replace: true })
