@@ -1,5 +1,4 @@
-import faq_data from "../../../data/home-data/FaqData";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // ─── Static FAQ content (avoids broken i18n keys) ───────────────────────────
@@ -7,87 +6,54 @@ const STATIC_FAQS = {
   general: [
     {
       id: 1,
-      q: "What is Edunyte?",
-      a: "Edunyte is an online learning platform that connects students with expert tutors. You can find the right tutor, book a session, and learn through live one-on-one classes.",
+      q: "What is GDP Studio?",
+      a: "GDP Studio is a premium full-stack dance academy. We provide top-tier, CMS-driven choreography programs, workshops, and memberships for dancers of all skill levels.",
     },
     {
       id: 2,
-      q: "How does the platform work?",
-      a: "Simply sign up, browse verified tutors by subject or price, book a session at a time that suits you, and join the live class directly from your browser — no downloads needed.",
+      q: "How does the academy work?",
+      a: "Simply sign up, browse our diverse range of Dance Programs, choose your level, and subscribe to a Membership Plan to unlock unlimited access to elite choreography.",
     },
     {
       id: 3,
-      q: "Are the tutors verified?",
-      a: "Yes. Every tutor on Edunyte goes through an identity and credential verification process before their profile becomes publicly visible.",
+      q: "Are the programs suitable for beginners?",
+      a: "Yes! Our dance programs are designed for all levels. We offer beginner-friendly foundations, intermediate styles, and advanced masterclasses.",
     },
     {
       id: 4,
-      q: "How do I book a lesson?",
-      a: "Go to the tutor's profile, pick an available time slot on their calendar, choose your session duration, and confirm your booking. You'll receive a confirmation email instantly.",
+      q: "How do I enroll in a program?",
+      a: "Simply browse our Programs or Workshops, select the choreography that matches your level, and join directly. You can purchase specific courses or subscribe to a monthly/yearly membership.",
     },
     {
       id: 5,
-      q: "Can I reschedule or cancel a session?",
-      a: "Yes. You can reschedule or cancel a session up to 24 hours before the start time from your dashboard, free of charge.",
+      q: "Can I manage my subscription?",
+      a: "Yes. You can manage, upgrade, or cancel your active membership subscription at any time directly from your student dashboard under Billing settings.",
     },
     {
       id: 6,
       q: "What payment methods are available?",
-      a: "We accept all major credit/debit cards, PayPal, and several regional payment options. All transactions are secured with industry-standard encryption.",
+      a: "We accept all major credit/debit cards, PayPal, and several secured digital payment options. All transactions are fully encrypted and secure.",
     },
   ],
   student: [
     {
       id: 10,
-      q: "How do I find the right tutor for me?",
-      a: "Use our smart search to filter by subject, language, availability, rating, and price. You can also read student reviews to help you decide.",
+      q: "How do I find the right dance style for me?",
+      a: "Use our smart programs page to filter by Dance Style (Hip Hop, Bollywood, Contemporary, etc.) and level (Beginner to Advanced) to find the perfect fit.",
     },
     {
       id: 11,
-      q: "What if I'm not happy with my first session?",
-      a: "We offer a satisfaction guarantee on your first session. If you're not satisfied, contact support within 24 hours and we will arrange a full refund or a free replacement session.",
-    },
-    {
-      id: 12,
-      q: "Can I take a trial lesson before committing?",
-      a: "Many tutors offer a discounted or free trial lesson. Look for the 'Trial Available' badge on tutor profiles.",
-    },
-    {
-      id: 13,
-      q: "How do I access my session recordings?",
-      a: "If your tutor enables recording, the session replay will be available in your dashboard under 'My Sessions' within 1–2 hours of the class ending.",
-    },
-  ],
-  tutor: [
-    {
-      id: 20,
-      q: "How can I become a tutor on Edunyte?",
-      a: "Click 'Become a Tutor', fill in your profile, upload your credentials, and submit for review. Our team typically responds within 2–3 business days.",
-    },
-    {
-      id: 21,
-      q: "How and when do tutors get paid?",
-      a: "Earnings are transferred to your registered bank account or PayPal every Monday for the previous week's completed sessions, after the platform fee is deducted.",
-    },
-    {
-      id: 22,
-      q: "Can I manage my availability as a tutor?",
-      a: "Yes. Your tutor dashboard has a full calendar where you can set recurring availability, block dates, and adjust your schedule at any time.",
-    },
-    {
-      id: 23,
-      q: "What is the platform's commission rate?",
-      a: "Edunyte charges a 15 % service fee on each completed session. There are no monthly fees or hidden charges — you only pay when you earn.",
+      q: "Do I get support during my learning journey?",
+      a: "Absolutely! Our active student community and dedicated support team are always available to help you. You can submit queries directly through our contact page.",
     },
   ],
 };
 
-type Category = "general" | "student" | "tutor";
+type Category = "general" | "student";
 
 const TABS: { id: Category; label: string; icon: string }[] = [
   { id: "general", label: "General Questions", icon: "fas fa-th-large" },
   { id: "student", label: "For Students",      icon: "fas fa-user-graduate" },
-  { id: "tutor",   label: "For Tutors",         icon: "fas fa-user-tie" },
 ];
 
 const THEME = "#5751e1";
@@ -466,7 +432,7 @@ const FaqArea = () => {
                 desc="Prefer email? Send us your query and we'll get back to you within 24 hours."
                 btnLabel="Send Email"
                 btnColor="#3b82f6"
-                href="mailto:support@edunyte.com"
+                href="mailto:hello@gdpstudio.com"
               />
             </div>
           </div>

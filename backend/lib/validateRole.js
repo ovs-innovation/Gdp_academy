@@ -1,9 +1,10 @@
-import Role from "../models/roleModel.js";
+const Role = require("../models/roleModel.js");
 
-export const resolveRoleKey = async (roleKey) => {
-  if (!roleKey) return "super_admin";
+const resolveRoleKey = async (roleKey) => {
+  if (!roleKey) return "student";
   const key = roleKey.toLowerCase();
   const dbRole = await Role.findOne({ key });
-  return dbRole ? dbRole.key : "super_admin";
+  return dbRole ? dbRole.key : "student";
 };
 
+module.exports = { resolveRoleKey };

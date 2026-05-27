@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
-import { Product } from "../redux/features/wishlistSlice";
+import type { RootState } from "../redux/store";
+import type { Product } from "../redux/features/wishlistSlice";
 
 const UseWishlistInfo = () => {
    const [wishlistItems, setWishlistItems] = useState<Product[]>([]);

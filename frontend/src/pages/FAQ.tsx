@@ -1,30 +1,46 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/layout/Layout';
 import { motion } from 'framer-motion';
+import { getFAQs } from '../services/cmsService';
+import { usePageContent, renderSplitHeroTitle } from '../hooks/usePageContent';
+
+const DEFAULT_FAQS = [
+  {
+    question: "What dance styles do you teach at Garima Dance Production?",
+    answer: "We specialize in a rich variety of Indian classical and modern styles including Kathak, Bharatnatyam, Bollywood, Contemporary, and traditional Folk dances. Our classes are designed for all levels of experience."
+  },
+  {
+    question: "Do you offer online live Zoom classes?",
+    answer: "Yes, absolutely! We offer high-quality live interactive classes via Zoom. In addition, students have 24/7 access to our extensive video library containing pre-recorded choreography and tutorial sessions."
+  },
+  {
+    question: "Can absolute beginners join the programs?",
+    answer: "Yes, we welcome dancers of all levels. We have foundation programs tailored specifically for beginners to help build rhythm, grace, posture, and core dance techniques from the ground up."
+  },
+  {
+    question: "How do the membership plans work?",
+    answer: "We offer flexible monthly and annual plans. Each plan grants access to specific live sessions, complete video library access, workshop discounts, and one-on-one virtual choreography assessments based on your selected tier."
+  }
+];
 
 const FAQ: React.FC = () => {
-  const faqs = [
-    {
-      question: "WHAT IS THE REGISTRATION PROCESS?",
-      answer: "You can register online through our Membership page. Choose a plan that suits your goals, complete the payment, and you'll get immediate access to our member portal."
-    },
-    {
-      question: "DO YOU OFFER PROGRAMS FOR BEGINNERS?",
-      answer: "Yes, we have specialized programs for all levels, from 'Intro to Rhythm' for absolute beginners to 'Mastery' levels for professional dancers."
-    },
-    {
-      question: "CAN I CANCEL MY MEMBERSHIP AT ANY TIME?",
-      answer: "Monthly memberships can be cancelled at any time through your dashboard settings. Annual plans have a commitment period but offer significant savings."
-    },
-    {
-      question: "HOW DO I ACCESS LIVE ZOOM SESSIONS?",
-      answer: "Once registered, all live session links are available in your Member Dashboard under the 'Session Schedule' tab."
-    },
-    {
-      question: "WHO ARE THE DANCE COACHES?",
-      answer: "Our coaches are world-class performers and choreographers with years of experience in their respective styles. You can view their profiles on the 'Dance Coaches' page."
-    }
-  ];
+  const { content } = usePageContent('faq');
+  const hero = renderSplitHeroTitle(content, { before: 'COMMON ', highlight: 'QUESTIONS' });
+  const heroSubtitle =
+    (content.heroSubtitle as string) || 'Everything you need to know about joining GDP Studio.';
+  const [faqs, setFaqs] = useState<any[]>([]);
+
+  useEffect(() => {
+    getFAQs()
+      .then((data) => {
+        if (data && data.length > 0) {
+          setFaqs(data);
+        } else {
+          setFaqs(DEFAULT_FAQS);
+        }
+      })
+      .catch(() => setFaqs(DEFAULT_FAQS));
+  }, []);
 
   return (
     <Layout>
@@ -35,9 +51,9 @@ const FAQ: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="section-title"
           >
-            COMMON <span className="gradient-text">QUESTIONS</span>
+            {hero.before}<span className="gradient-text">{hero.highlight}</span>
           </motion.h1>
-          <p className="hero-subtitle">Everything you need to know about joining GDP Academy.</p>
+          <p className="hero-subtitle">{heroSubtitle}</p>
         </div>
       </section>
 

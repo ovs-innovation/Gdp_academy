@@ -1,8 +1,6 @@
 import ContactForm from "../../../forms/ContactForm"
-import { useTranslation } from "react-i18next";
 
 const ContactArea = () => {
-    const { t } = useTranslation();
     return (
         <section className="contact-area section-pt-120 section-pb-120 glow-bg">
             <div className="container">
@@ -10,7 +8,7 @@ const ContactArea = () => {
                     <div className="col-lg-4">
                         <div className="glass-panel p-5 h-100 shadow-sm" style={{ border: '1px solid var(--glass-border)' }}>
                             <h3 className="title mb-4" style={{ fontWeight: 800, fontSize: '1.8rem' }}>Get in Touch</h3>
-                            <p className="opacity-70 mb-40">Have questions about our platform? Our team is here to help you navigate your educational journey.</p>
+                            <p className="opacity-70 mb-40">Have questions about our platform? Our team is here to help you navigate your artistic journey.</p>
                             
                             <div className="contact-info-list">
                                 <div className="d-flex align-items-start gap-4 mb-30">
@@ -19,8 +17,8 @@ const ContactArea = () => {
                                     </div>
                                     <div className="content">
                                         <h5 className="mb-1" style={{ fontWeight: 700 }}>Student Support</h5>
-                                        <a href="mailto:support@edunyte.com" className="text-primary fw-bold" style={{ textDecoration: 'none' }}>support@edunyte.com</a>
-                                        <p className="small opacity-60 m-0 mt-1">24/7 Academic Assistance</p>
+                                        <a href="mailto:support@gdpstudio.com" className="text-primary fw-bold" style={{ textDecoration: 'none' }}>support@gdpstudio.com</a>
+                                        <p className="small opacity-60 m-0 mt-1">24/7 Training Assistance</p>
                                     </div>
                                 </div>
 
@@ -29,9 +27,9 @@ const ContactArea = () => {
                                         <i className="fas fa-chalkboard-teacher"></i>
                                     </div>
                                     <div className="content">
-                                        <h5 className="mb-1" style={{ fontWeight: 700 }}>Tutor Support</h5>
-                                        <a href="mailto:careers@edunyte.com" className="text-primary fw-bold" style={{ textDecoration: 'none' }}>careers@edunyte.com</a>
-                                        <p className="small opacity-60 m-0 mt-1">Join our expert faculty</p>
+                                        <h5 className="mb-1" style={{ fontWeight: 700 }}>Academy Support</h5>
+                                        <a href="mailto:info@gdpstudio.com" className="text-primary fw-bold" style={{ textDecoration: 'none' }}>info@gdpstudio.com</a>
+                                        <p className="small opacity-60 m-0 mt-1">General inquiries & administration</p>
                                     </div>
                                 </div>
 
@@ -41,8 +39,8 @@ const ContactArea = () => {
                                     </div>
                                     <div className="content">
                                         <h5 className="mb-1" style={{ fontWeight: 700 }}>Partnerships</h5>
-                                        <a href="mailto:partnerships@edunyte.com" className="text-primary fw-bold" style={{ textDecoration: 'none' }}>partnerships@edunyte.com</a>
-                                        <p className="small opacity-60 m-0 mt-1">Corporate & School Collabs</p>
+                                        <a href="mailto:partnerships@gdpstudio.com" className="text-primary fw-bold" style={{ textDecoration: 'none' }}>partnerships@gdpstudio.com</a>
+                                        <p className="small opacity-60 m-0 mt-1">Corporate & Studio Collabs</p>
                                     </div>
                                 </div>
                             </div>

@@ -82,8 +82,8 @@ const ProgramManagementPage = () => {
   const loadPrograms = async () => {
     setLoading(true);
     try {
-      const data = await ProgramsAPI.list();
-      setPrograms(data.Programs || []);
+      const data = await ProgramsAPI.list('program');
+      setPrograms(data.courses || data.Programs || []);
     } catch (err: any) {
       toast({ title: 'Failed to load Programs', description: err?.message, variant: 'destructive' });
     } finally {
@@ -114,7 +114,7 @@ const ProgramManagementPage = () => {
       setFormData({
         name: getLanguageValue(Program.name),
         description: getLanguageValue(Program.description),
-        danceStyle: Program.DanceStyle || '',
+        danceStyle: Program.danceStyle || Program.DanceStyle || Program.category || '',
         image: Program.image || '',
         status: Program.status,
       });
@@ -147,7 +147,8 @@ const ProgramManagementPage = () => {
     try {
       const payload = {
         ...formData,
-        DanceStyle: formData.danceStyle, // Map back to API property name if needed
+        danceStyle: formData.danceStyle,
+        category: formData.danceStyle,
         name: normalizeLanguageValue(formData.name),
         description: normalizeLanguageValue(formData.description),
       };
@@ -195,7 +196,8 @@ const ProgramManagementPage = () => {
               await ProgramsAPI.update(id, {
                 name: getLanguageValue(Program.name),
                 description: getLanguageValue(Program.description),
-                DanceStyle: Program.DanceStyle,
+                danceStyle: Program.danceStyle || Program.DanceStyle || Program.category,
+                category: Program.danceStyle || Program.DanceStyle || Program.category,
                 image: Program.image,
                 status: 'inactive',
               });
@@ -234,7 +236,7 @@ const ProgramManagementPage = () => {
                 Export
               </Button>
             </PermissionGate>
-            <PermissionGate permission="Programs.create">
+            <PermissionGate permission="programs.create">
               <Button
                 size="sm"
                 className="gap-2 gradient-primary text-primary-foreground hover:opacity-90"
@@ -314,8 +316,8 @@ const ProgramManagementPage = () => {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {Program.DanceStyle ? (
-                        <Badge variant="outline">{Program.DanceStyle}</Badge>
+                      {(Program.danceStyle || Program.DanceStyle || Program.category) ? (
+                        <Badge variant="outline">{Program.danceStyle || Program.DanceStyle || Program.category}</Badge>
                       ) : (
                         <span className="text-muted-foreground">-</span>
                       )}
@@ -346,13 +348,13 @@ const ProgramManagementPage = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <PermissionGate permission="Programs.edit">
+                          <PermissionGate permission="programs.edit">
                             <DropdownMenuItem onClick={() => handleOpenDialog(Program)}>
                               <Pencil className="h-4 w-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
                           </PermissionGate>
-                          <PermissionGate permission="Programs.delete">
+                          <PermissionGate permission="programs.delete">
                             <DropdownMenuItem
                               onClick={() => handleDelete(Program._id)}
                               className="text-destructive"

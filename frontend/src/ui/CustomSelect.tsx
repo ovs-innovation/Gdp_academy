@@ -8,7 +8,7 @@ import { fetchDanceStyles, type DanceStyle } from '../services/danceStyleService
 
 const animatedComponents = makeAnimated()
 
-const CustomSelect = ({ value, onChange }: any) => {
+const CustomSelect = ({ onChange }: any) => {
    const { t } = useTranslation()
    const navigate = useNavigate()
    const [danceStyles, setDanceStyles] = useState<DanceStyle[]>([])

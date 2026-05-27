@@ -4,6 +4,7 @@ import { Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { uploadMediaFile } from "@/lib/mediaUpload";
 
 interface CloudinaryImageUploaderProps {
   imageUrl?: string;
@@ -30,51 +31,7 @@ export function CloudinaryImageUploader({
     setPreview(imageUrl || null);
   }, [imageUrl]);
 
-  const uploadToCloudinary = async (file: File): Promise<string> => {
-    const cloudName = import.meta.env.VITE_APP_CLOUD_NAME;
-    const uploadPreset = import.meta.env.VITE_APP_CLOUDINARY_UPLOAD_PRESET;
-
-    if (!cloudName || !uploadPreset) {
-      throw new Error(
-        "Cloudinary configuration missing. Please set VITE_APP_CLOUD_NAME and VITE_APP_CLOUDINARY_UPLOAD_PRESET"
-      );
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("upload_preset", uploadPreset);
-    if (folder) {
-      formData.append("folder", folder);
-    }
-
-    try {
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || `Upload failed with status ${response.status}`);
-      }
-
-      const data = await response.json();
-      const secureUrl = data.secure_url;
-
-      if (!secureUrl) {
-        throw new Error("Invalid Cloudinary response: missing secure_url");
-      }
-
-      if (!secureUrl.startsWith("https://res.cloudinary.com/")) {
-        throw new Error(`Invalid Cloudinary URL format: ${secureUrl}`);
-      }
-
-      return secureUrl;
-    } catch (error: any) {
-      console.error("Cloudinary upload error:", error);
-      throw error;
-    }
-  };
+  const uploadToCloudinary = async (file: File): Promise<string> => uploadMediaFile(file, folder);
 
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
@@ -99,10 +56,11 @@ export function CloudinaryImageUploader({
         toast({
           title: "Image uploaded successfully",
         });
-      } catch (error: any) {
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : "Failed to upload file";
         toast({
           title: "Upload failed",
-          description: error.message || "Failed to upload image",
+          description: message,
           variant: "destructive",
         });
       } finally {

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-export type ThemeColor = 'sky' | 'violet' | 'emerald' | 'rose' | 'amber' | 'orange' | 'teal' | 'pink' | 'indigo' | 'cyan' | 'lime' | 'red';
+export type ThemeColor = 'gdp' | 'sky' | 'violet' | 'emerald' | 'rose' | 'amber' | 'orange' | 'teal' | 'pink' | 'indigo' | 'cyan' | 'lime' | 'red';
 
 interface ThemeColorContextType {
   themeColor: ThemeColor;
@@ -10,6 +10,7 @@ interface ThemeColorContextType {
 const ThemeColorContext = createContext<ThemeColorContextType | undefined>(undefined);
 
 const colorValues: Record<ThemeColor, { light: string; dark: string }> = {
+  gdp: { light: '252 95% 64%', dark: '252 95% 64%' },
   sky: { light: '199 89% 48%', dark: '187 85% 53%' },
   violet: { light: '262 83% 58%', dark: '270 76% 66%' },
   emerald: { light: '158 64% 42%', dark: '160 84% 45%' },
@@ -27,7 +28,7 @@ const colorValues: Record<ThemeColor, { light: string; dark: string }> = {
 export const ThemeColorProvider = ({ children }: { children: ReactNode }) => {
   const [themeColor, setThemeColorState] = useState<ThemeColor>(() => {
     const stored = localStorage.getItem('theme-color');
-    return (stored as ThemeColor) || 'sky';
+    return (stored as ThemeColor) || 'gdp';
   });
 
   const applyColors = (color: ThemeColor) => {

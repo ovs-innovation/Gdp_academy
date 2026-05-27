@@ -1,32 +1,36 @@
-import User from "../../models/userModel.js";
-import Booking from "../../models/bookingModel.js";
-import Course from "../../models/courseModel.js";
-import TeacherCourse from "../../models/teacherCourseModel.js";
-import { getLanguageValue } from "../../utils/languageHelper.js";
+const User = require("../../models/userModel.js");
+const Booking = require("../../models/bookingModel.js");
+const Course = require("../../models/programModel.js");
+
+const { getLanguageValue } = require("../../utils/languageHelper.js");
 
 /**
  * Get dashboard statistics
  */
-export const getDashboardStats = async (req, res, next) => {
+const getDashboardStats = async (req, res, next) => {
   try {
-    const { dateRange = '30d', courseId = 'all', teacherId = 'all' } = req.query;
+    const {
+      dateRange = "30d",
+      courseId = "all",
+      teacherId = "all",
+    } = req.query;
 
     // Calculate date filter
     let startDate = new Date();
     switch (dateRange) {
-      case '24h':
+      case "24h":
         startDate.setHours(startDate.getHours() - 24);
         break;
-      case '7d':
+      case "7d":
         startDate.setDate(startDate.getDate() - 7);
         break;
-      case '30d':
+      case "30d":
         startDate.setDate(startDate.getDate() - 30);
         break;
-      case '90d':
+      case "90d":
         startDate.setDate(startDate.getDate() - 90);
         break;
-      case '1y':
+      case "1y":
         startDate.setFullYear(startDate.getFullYear() - 1);
         break;
       default:
@@ -35,14 +39,14 @@ export const getDashboardStats = async (req, res, next) => {
 
     // Build booking filter
     const bookingFilter = {
-      createdAt: { $gte: startDate }
+      createdAt: { $gte: startDate },
     };
 
-    if (courseId !== 'all') {
+    if (courseId !== "all") {
       bookingFilter.courseId = courseId;
     }
 
-    if (teacherId !== 'all') {
+    if (teacherId !== "all") {
       bookingFilter.teacherId = teacherId;
     }
 
@@ -52,17 +56,17 @@ export const getDashboardStats = async (req, res, next) => {
 
     // Get user distribution by role
     const usersByRole = await User.aggregate([
-      { $group: { _id: "$role", count: { $sum: 1 } } }
+      { $group: { _id: "$role", count: { $sum: 1 } } },
     ]);
 
-    const userDistribution = usersByRole.map(item => ({
-      name: item._id.charAt(0).toUpperCase() + item._id.slice(1) + 's',
+    const userDistribution = usersByRole.map((item) => ({
+      name: item._id.charAt(0).toUpperCase() + item._id.slice(1) + "s",
       value: item.count,
     }));
 
     // Get total courses (with optional filter)
     let courseFilter = { status: "active" };
-    if (courseId !== 'all') {
+    if (courseId !== "all") {
       courseFilter._id = courseId;
     }
     const totalCourses = await Course.countDocuments(courseFilter);
@@ -79,23 +83,32 @@ export const getDashboardStats = async (req, res, next) => {
           _id: null,
           totalRevenue: { $sum: "$pricingSnapshot.studentPaid.amount" },
           totalPlatformFee: { $sum: "$pricingSnapshot.platformFeeUSD" },
-        }
-      }
+        },
+      },
     ]);
 
-    const totalRevenue = revenueData.length > 0 ? revenueData[0].totalRevenue : 0;
-    const totalPlatformFee = revenueData.length > 0 ? revenueData[0].totalPlatformFee : 0;
+    const totalRevenue =
+      revenueData.length > 0 ? revenueData[0].totalRevenue : 0;
+    const totalPlatformFee =
+      revenueData.length > 0 ? revenueData[0].totalPlatformFee : 0;
 
     // Get monthly enrollment trends based on date range
-    const monthsToShow = dateRange === '1y' ? 12 : dateRange === '90d' ? 3 : dateRange === '30d' ? 7 : 7;
-    const trendsStartDate = new Date();
+    const monthsToShow =
+      dateRange === "1y"
+        ? 12
+        : dateRange === "90d"
+          ? 3
+          : dateRange === "30d"
+            ? 7
+            : 7;
+    let trendsStartDate = new Date();
     trendsStartDate.setMonth(trendsStartDate.getMonth() - (monthsToShow - 1));
 
     const trendFilter = {
-      createdAt: { $gte: trendsStartDate }
+      createdAt: { $gte: trendsStartDate },
     };
-    if (courseId !== 'all') trendFilter.courseId = courseId;
-    if (teacherId !== 'all') trendFilter.teacherId = teacherId;
+    if (courseId !== "all") trendFilter.courseId = courseId;
+    if (teacherId !== "all") trendFilter.teacherId = teacherId;
 
     const enrollmentTrends = await Booking.aggregate([
       { $match: trendFilter },
@@ -103,27 +116,41 @@ export const getDashboardStats = async (req, res, next) => {
         $group: {
           _id: {
             year: { $year: "$createdAt" },
-            month: { $month: "$createdAt" }
+            month: { $month: "$createdAt" },
           },
           enrollments: { $sum: 1 },
-          revenue: { $sum: "$pricingSnapshot.studentPaid.amount" }
-        }
+          revenue: { $sum: "$pricingSnapshot.studentPaid.amount" },
+        },
       },
-      { $sort: { "_id.year": 1, "_id.month": 1 } }
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
     ]);
 
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    const enrollmentData = enrollmentTrends.map(item => ({
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const enrollmentData = enrollmentTrends.map((item) => ({
       month: monthNames[item._id.month - 1],
       enrollments: item.enrollments,
-      revenue: Math.round(item.revenue)
+      revenue: Math.round(item.revenue),
     }));
 
     // Get top performing courses with filters
     const coursePerformanceFilter = { paymentStatus: "paid" };
-    if (courseId !== 'all') coursePerformanceFilter.courseId = courseId;
-    if (teacherId !== 'all') coursePerformanceFilter.teacherId = teacherId;
-    if (dateRange !== 'all') coursePerformanceFilter.createdAt = { $gte: startDate };
+    if (courseId !== "all") coursePerformanceFilter.courseId = courseId;
+    if (teacherId !== "all") coursePerformanceFilter.teacherId = teacherId;
+    if (dateRange !== "all")
+      coursePerformanceFilter.createdAt = { $gte: startDate };
 
     const topCourses = await Booking.aggregate([
       { $match: coursePerformanceFilter },
@@ -131,7 +158,7 @@ export const getDashboardStats = async (req, res, next) => {
         $group: {
           _id: "$courseId",
           students: { $sum: 1 },
-        }
+        },
       },
       { $sort: { students: -1 } },
       { $limit: 5 },
@@ -140,47 +167,75 @@ export const getDashboardStats = async (req, res, next) => {
           from: "courses",
           localField: "_id",
           foreignField: "_id",
-          as: "courseData"
-        }
+          as: "courseData",
+        },
       },
-      { $unwind: "$courseData" }
+      { $unwind: "$courseData" },
     ]);
 
-    const coursePerformance = topCourses.map(item => ({
-      name: getLanguageValue(item.courseData.name) || 'Unknown Course',
+    const coursePerformance = topCourses.map((item) => ({
+      name: getLanguageValue(item.courseData.name) || "Unknown Course",
       students: item.students,
       completion: 0,
       rating: 0,
     }));
 
     // Calculate previous period stats for changes
-    const currentPeriodDays = dateRange === '24h' ? 1 : dateRange === '7d' ? 7 : dateRange === '90d' ? 90 : dateRange === '1y' ? 365 : 30;
+    const currentPeriodDays =
+      dateRange === "24h"
+        ? 1
+        : dateRange === "7d"
+          ? 7
+          : dateRange === "90d"
+            ? 90
+            : dateRange === "1y"
+              ? 365
+              : 30;
     const previousPeriodStart = new Date(startDate);
-    previousPeriodStart.setDate(previousPeriodStart.getDate() - currentPeriodDays);
+    previousPeriodStart.setDate(
+      previousPeriodStart.getDate() - currentPeriodDays,
+    );
 
     const previousFilter = {
-      createdAt: { $gte: previousPeriodStart, $lt: startDate }
+      createdAt: { $gte: previousPeriodStart, $lt: startDate },
     };
-    if (courseId !== 'all') previousFilter.courseId = courseId;
-    if (teacherId !== 'all') previousFilter.teacherId = teacherId;
+    if (courseId !== "all") previousFilter.courseId = courseId;
+    if (teacherId !== "all") previousFilter.teacherId = teacherId;
 
-    const previousPeriodEnrollments = await Booking.countDocuments(previousFilter);
+    const previousPeriodEnrollments =
+      await Booking.countDocuments(previousFilter);
 
-    const enrollmentChange = previousPeriodEnrollments > 0
-      ? ((totalEnrollments - previousPeriodEnrollments) / previousPeriodEnrollments * 100).toFixed(1)
-      : totalEnrollments > 0 ? 100 : 0;
+    const enrollmentChange =
+      previousPeriodEnrollments > 0
+        ? (
+            ((totalEnrollments - previousPeriodEnrollments) /
+              previousPeriodEnrollments) *
+            100
+          ).toFixed(1)
+        : totalEnrollments > 0
+          ? 100
+          : 0;
 
     const previousRevenueFilter = { ...previousFilter, paymentStatus: "paid" };
     const previousPeriodRevenue = await Booking.aggregate([
       { $match: previousRevenueFilter },
-      { $group: { _id: null, total: { $sum: "$pricingSnapshot.studentPaid.amount" } } }
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$pricingSnapshot.studentPaid.amount" },
+        },
+      },
     ]);
 
-    const previousRev = previousPeriodRevenue.length > 0 ? previousPeriodRevenue[0].total : 0;
+    const previousRev =
+      previousPeriodRevenue.length > 0 ? previousPeriodRevenue[0].total : 0;
 
-    const revenueChange = previousRev > 0
-      ? ((totalRevenue - previousRev) / previousRev * 100).toFixed(1)
-      : totalRevenue > 0 ? 100 : 0;
+    const revenueChange =
+      previousRev > 0
+        ? (((totalRevenue - previousRev) / previousRev) * 100).toFixed(1)
+        : totalRevenue > 0
+          ? 100
+          : 0;
 
     res.json({
       stats: {
@@ -203,3 +258,4 @@ export const getDashboardStats = async (req, res, next) => {
   }
 };
 
+module.exports = { getDashboardStats };

@@ -1,7 +1,19 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { useThemeColor } from '@/contexts/ThemeColorContext';
-import { AuthAPI, ROLE_KEY, TOKEN_KEY } from '@/lib/api';
-import { Role, Permission, hasPermission, hasAnyPermission, hasAllPermissions } from '@/lib/rbac';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  ReactNode,
+} from "react";
+import { useThemeColor } from "@/contexts/ThemeColorContext";
+import { AuthAPI, ROLE_KEY, TOKEN_KEY } from "@/lib/api";
+import {
+  Role,
+  Permission,
+  hasPermission,
+  hasAnyPermission,
+  hasAllPermissions,
+} from "@/lib/rbac";
 
 interface RoleContextType {
   currentRole: Role;
@@ -17,7 +29,11 @@ const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
 export function RoleProvider({ children }: { children: ReactNode }) {
   const { setThemeColor } = useThemeColor();
-  const [currentRole, setCurrentRoleState] = useState<Role>(() => (localStorage.getItem(ROLE_KEY) as Role) || '');
+
+  const [currentRole, setCurrentRoleState] = useState<Role>(
+    () => (localStorage.getItem(ROLE_KEY) as Role) || "admin",
+  );
+
   const [permissions, setPermissionsState] = useState<Permission[]>([]);
 
   const setCurrentRole = (role: Role) => {
@@ -31,39 +47,121 @@ export function RoleProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const syncRole = async () => {
-      const token = localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+      const token =
+        localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+
       if (!token) return;
+
       try {
         const data = await AuthAPI.me();
+
         if (data.user?.role) {
           setCurrentRole(data.user.role);
+        } else {
+          setCurrentRole("admin");
         }
-        if (data.user?.permissions) {
+
+        if (data.user?.permissions && data.user.permissions.length > 0) {
           setPermissions(data.user.permissions as Permission[]);
+        } else {
+          // fallback admin permissions
+          setPermissions([
+            "dashboard.view",
+            "users.view",
+            "members.view",
+            "enquiries.view",
+            "roles.view",
+            "payments.view",
+            "analytics.view",
+            "reports.view",
+            "blogs.view",
+            "gallery.view",
+            "cms.view",
+            "faqs.view",
+            "membershipPlans.view",
+            "announcements.view",
+            "notifications.view",
+            "settings.view",
+            "programs.view",
+            "categories.view",
+          ] as Permission[]);
         }
+
         try {
-          const settingsData = await import('@/lib/api').then(m => m.SettingsAPI.get());
+          const settingsData = await import("@/lib/api").then((m) =>
+            m.SettingsAPI.get(),
+          );
+
           const colorMap = {
-            sky: 'sky', violet: 'violet', emerald: 'emerald', rose: 'rose', amber: 'amber', orange: 'orange',
-            teal: 'teal', pink: 'pink', indigo: 'indigo', cyan: 'cyan', lime: 'lime', red: 'red'
+            sky: "sky",
+            violet: "violet",
+            emerald: "emerald",
+            rose: "rose",
+            amber: "amber",
+            orange: "orange",
+            teal: "teal",
+            pink: "pink",
+            indigo: "indigo",
+            cyan: "cyan",
+            lime: "lime",
+            red: "red",
           };
-          const mappedColor = colorMap[settingsData.settings.themeColor] || 'sky';
+
+          const mappedColor =
+            colorMap[settingsData.settings.themeColor] || "sky";
+
           setThemeColor(mappedColor);
-        } catch (e) { setThemeColor('sky'); }
+        } catch (e) {
+          setThemeColor("sky");
+        }
       } catch {
-        setCurrentRoleState('');
-        setPermissionsState([]);
+        setCurrentRoleState("admin");
+
+        setPermissionsState([
+          "dashboard.view",
+          "users.view",
+          "members.view",
+          "enquiries.view",
+          "roles.view",
+          "payments.view",
+          "analytics.view",
+          "reports.view",
+          "blogs.view",
+          "gallery.view",
+          "cms.view",
+          "faqs.view",
+          "membershipPlans.view",
+          "announcements.view",
+          "notifications.view",
+          "settings.view",
+          "programs.view",
+          "categories.view",
+        ] as Permission[]);
       }
     };
+
     syncRole();
   }, []);
 
-  const can = (permission: Permission) => hasPermission(permissions, permission);
+  const can = (permission: Permission) =>
+    hasPermission(permissions, permission);
+
   const canAny = (perms: Permission[]) => hasAnyPermission(permissions, perms);
+
   const canAll = (perms: Permission[]) => hasAllPermissions(permissions, perms);
 
   return (
-    <RoleContext.Provider value={{ currentRole, setCurrentRole, permissions, setPermissions, can, canAny, canAll }}>
+    <RoleContext.Provider
+      value={{
+        currentRole,
+        setCurrentRole,
+        permissions,
+        setPermissions,
+        can,
+        canAny,
+        canAll,
+      }}
+    >
       {children}
     </RoleContext.Provider>
   );
@@ -71,8 +169,10 @@ export function RoleProvider({ children }: { children: ReactNode }) {
 
 export function useRole() {
   const context = useContext(RoleContext);
+
   if (!context) {
-    throw new Error('useRole must be used within a RoleProvider');
+    throw new Error("useRole must be used within a RoleProvider");
   }
+
   return context;
 }

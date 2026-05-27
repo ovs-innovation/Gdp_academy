@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
+import { clearToken } from '@/lib/api';
 
 export function UserMenu() {
   const navigate = useNavigate();
@@ -28,17 +29,19 @@ export function UserMenu() {
     .slice(0, 2);
 
   const handleLogout = () => {
+    clearToken();
+    localStorage.removeItem('user-email');
+    localStorage.removeItem('user-name');
+    localStorage.removeItem('user-id');
+    sessionStorage.removeItem('user-email');
+    sessionStorage.removeItem('user-name');
+    sessionStorage.removeItem('user-id');
     toast.success('Logged out successfully');
     navigate('/login');
   };
 
   const handleProfile = () => {
-    // Navigate to role-specific profile page
-    if (currentRole === 'teacher') {
-      navigate('/teacher-profile');
-    } else {
-      navigate('/profile');
-    }
+    navigate('/profile');
     toast.info('Profile opened');
   };
 

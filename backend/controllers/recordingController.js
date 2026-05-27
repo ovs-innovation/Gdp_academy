@@ -1,6 +1,6 @@
-import Booking from "../models/bookingModel.js";
+const Booking = require("../models/bookingModel.js");
 
-export const getBookingRecording = async (req, res, next) => {
+const getBookingRecording = async (req, res, next) => {
   try {
     const bookingId = req.params.id;
     const userId = req.user.userId;
@@ -18,7 +18,8 @@ export const getBookingRecording = async (req, res, next) => {
 
     if (!isStudent && !isTeacher && !isAdmin) {
       return res.status(403).json({
-        error: "Access denied: You don't have permission to view this recording",
+        error:
+          "Access denied: You don't have permission to view this recording",
       });
     }
 
@@ -57,8 +58,10 @@ export const getBookingRecording = async (req, res, next) => {
 
 const getRecordingStatusMessage = (status) => {
   const messages = {
-    pending: "Recording is being processed. Please check back in 10-15 minutes.",
-    processing: "Recording is currently being uploaded. Please check back soon.",
+    pending:
+      "Recording is being processed. Please check back in 10-15 minutes.",
+    processing:
+      "Recording is currently being uploaded. Please check back soon.",
     ready: "Recording is ready to view.",
     failed: "Recording processing failed. Please contact support.",
     not_available: "Recording is not available for this session.",
@@ -66,7 +69,7 @@ const getRecordingStatusMessage = (status) => {
   return messages[status] || "Recording status unknown.";
 };
 
-export const listAllRecordings = async (req, res, next) => {
+const listAllRecordings = async (req, res, next) => {
   try {
     const { status, page = 1, limit = 20 } = req.query;
 
@@ -105,7 +108,7 @@ export const listAllRecordings = async (req, res, next) => {
   }
 };
 
-export const getRecordingStats = async (req, res, next) => {
+const getRecordingStats = async (req, res, next) => {
   try {
     const stats = await Booking.aggregate([
       {
@@ -143,4 +146,10 @@ export const getRecordingStats = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+module.exports = {
+  getBookingRecording,
+  listAllRecordings,
+  getRecordingStats,
 };

@@ -7,30 +7,30 @@ import { ThemeProvider } from "next-themes";
 import { RoleProvider } from "@/contexts/RoleContext";
 import { ThemeColorProvider } from "@/contexts/ThemeColorContext";
 import ControlDashboardPage from "./pages/ControlDashboardPage";
-import TeacherDashboardPage from "./pages/TeacherDashboardPage";
 import UsersPage from "./pages/UsersPage";
-import TeachersPage from "./pages/TeachersPage";
 import MembersPage from "./pages/MembersPage";
 import RolesPage from "./pages/RolesPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
 import ProfilePage from "./pages/ProfilePage";
-import TeacherProfilePage from "./pages/TeacherProfilePage";
 import LoginPage from "./pages/LoginPage";
 import SupportTicketsPage from "./pages/SupportTicketsPage";
 import BlogsPage from "./pages/BlogsPage";
 import ReviewModerationPage from "./pages/ReviewModerationPage";
 import ProgramManagementPage from "./pages/ProgramManagementPage";
 import DanceStyleManagementPage from "./pages/DanceStyleManagementPage";
-import TeacherApprovalPage from "./pages/TeacherApprovalPage";
-import TeacherJoinProgramPage from "./pages/TeacherJoinProgramPage";
-import TeacherMyProgramsPage from "./pages/TeacherMyProgramsPage";
-import TeacherAvailabilityPage from "./pages/TeacherAvailabilityPage";
-import TeacherBookingsPage from "./pages/TeacherBookingsPage";
 import PaymentsPage from "./pages/PaymentsPage";
 import CMSPage from "./pages/CMSPage";
+import FAQManagementPage from "./pages/FAQManagementPage";
+import MembershipPlansPage from "./pages/MembershipPlansPage";
+import ContactMessagesPage from "./pages/ContactMessagesPage";
 import WorkshopsManagementPage from "./pages/WorkshopsManagementPage";
+import EnquiriesPage from "./pages/EnquiriesPage";
+import GalleryPage from "./pages/GalleryPage";
+import TestimonialsManagementPage from "./pages/TestimonialsManagementPage";
+import ServicesCMSPage from "./pages/ServicesCMSPage";
+import NotificationsPage from "./pages/NotificationsPage";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardRouter from "./components/DashboardRouter";
@@ -57,26 +57,10 @@ const App = () => (
                   }
                 />
                 <Route
-                  path="/teacher-dashboard"
-                  element={
-                    <ProtectedRoute>
-                      <TeacherDashboardPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
                   path="/users"
                   element={
                     <ProtectedRoute>
                       <UsersPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/teachers"
-                  element={
-                    <ProtectedRoute>
-                      <TeachersPage />
                     </ProtectedRoute>
                   }
                 />
@@ -137,6 +121,14 @@ const App = () => (
                   }
                 />
                 <Route
+                  path="/enquiries"
+                  element={
+                    <ProtectedRoute>
+                      <EnquiriesPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/payments"
                   element={
                     <ProtectedRoute>
@@ -161,6 +153,62 @@ const App = () => (
                   }
                 />
                 <Route
+                  path="/faqs"
+                  element={
+                    <ProtectedRoute>
+                      <FAQManagementPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/membership-plans"
+                  element={
+                    <ProtectedRoute>
+                      <MembershipPlansPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/contact-messages"
+                  element={
+                    <ProtectedRoute>
+                      <ContactMessagesPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/gallery"
+                  element={
+                    <ProtectedRoute>
+                      <GalleryPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/testimonials"
+                  element={
+                    <ProtectedRoute>
+                      <TestimonialsManagementPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/services-cms"
+                  element={
+                    <ProtectedRoute>
+                      <ServicesCMSPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/notifications"
+                  element={
+                    <ProtectedRoute>
+                      <NotificationsPage />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/workshops"
                   element={
                     <ProtectedRoute>
@@ -177,14 +225,6 @@ const App = () => (
                   }
                 />
                 <Route
-                  path="/teacher-profile"
-                  element={
-                    <ProtectedRoute>
-                      <TeacherProfilePage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
                   path="/programs"
                   element={
                     <ProtectedRoute>
@@ -197,46 +237,6 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <DanceStyleManagementPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/teacher-approvals"
-                  element={
-                    <ProtectedRoute>
-                      <TeacherApprovalPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/teacher/join-program"
-                  element={
-                    <ProtectedRoute>
-                      <TeacherJoinProgramPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/teacher/my-programs"
-                  element={
-                    <ProtectedRoute>
-                      <TeacherMyProgramsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/teacher/availability"
-                  element={
-                    <ProtectedRoute>
-                      <TeacherAvailabilityPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/teacher/bookings"
-                  element={
-                    <ProtectedRoute>
-                      <TeacherBookingsPage />
                     </ProtectedRoute>
                   }
                 />

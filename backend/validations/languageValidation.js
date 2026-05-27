@@ -1,4 +1,4 @@
-import { z } from "zod";
+const { z } = require("zod");
 
 const nameSchema = z.any().refine(
   (val) => {
@@ -10,30 +10,39 @@ const nameSchema = z.any().refine(
     }
     return false;
   },
-  { message: "Name must be a non-empty string or language object with 'en' key" }
+  {
+    message: "Name must be a non-empty string or language object with 'en' key",
+  },
 );
 
-const nativeNameSchema = z.any().refine(
-  (val) => {
-    if (val === undefined || val === null) return true;
-    if (typeof val === "string") return true;
-    if (typeof val === "object" && val !== null) {
-      return Object.keys(val).length > 0;
-    }
-    return false;
-  },
-  { message: "Native name must be a string or language object" }
-).optional();
+const nativeNameSchema = z
+  .any()
+  .refine(
+    (val) => {
+      if (val === undefined || val === null) return true;
+      if (typeof val === "string") return true;
+      if (typeof val === "object" && val !== null) {
+        return Object.keys(val).length > 0;
+      }
+      return false;
+    },
+    { message: "Native name must be a string or language object" },
+  )
+  .optional();
 
-export const createLanguageSchema = z.object({
+const createLanguageSchema = z.object({
   name: nameSchema,
-  code: z.string().min(2, "Language code must be at least 2 characters").max(5).trim(),
+  code: z
+    .string()
+    .min(2, "Language code must be at least 2 characters")
+    .max(5)
+    .trim(),
   nativeName: nativeNameSchema,
   flag: z.string().optional().default(""),
   status: z.enum(["active", "inactive"]).optional().default("active"),
 });
 
-export const updateLanguageSchema = z.object({
+const updateLanguageSchema = z.object({
   name: nameSchema.optional(),
   code: z.string().min(2).max(5).trim().optional(),
   nativeName: nativeNameSchema,
@@ -41,3 +50,4 @@ export const updateLanguageSchema = z.object({
   status: z.enum(["active", "inactive"]).optional(),
 });
 
+module.exports = { createLanguageSchema, updateLanguageSchema };

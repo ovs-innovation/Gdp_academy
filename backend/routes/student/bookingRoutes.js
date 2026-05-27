@@ -1,17 +1,18 @@
-import express from "express";
-import {
-  getAvailableSlots,
-} from "../../controllers/availabilityController.js";
-import {
+const express = require("express");
+const {
   createBooking,
   getMyBookings,
   getBooking,
   updateBookingStatus,
   rescheduleBooking,
-} from "../../controllers/bookingController.js";
-import { verifyToken } from "../../middlewares/authMiddleware.js";
-import { validateRequest } from "../../middlewares/validateRequest.js";
-import { createBookingSchema, updateBookingStatusSchema } from "../../validations/bookingValidation.js";
+  getAvailableSlots,
+} = require("../../controllers/bookingController.js");
+const { verifyToken } = require("../../middlewares/authMiddleware.js");
+const { validateRequest } = require("../../middlewares/validateRequest.js");
+const {
+  createBookingSchema,
+  updateBookingStatusSchema,
+} = require("../../validations/bookingValidation.js");
 
 const router = express.Router();
 
@@ -22,11 +23,7 @@ router.use(verifyToken);
 router.get("/available-slots/:teacherCourseId", getAvailableSlots);
 
 // Create booking (student books a slot)
-router.post(
-  "/",
-  validateRequest(createBookingSchema),
-  createBooking
-);
+router.post("/", validateRequest(createBookingSchema), createBooking);
 
 // Get student's bookings
 router.get("/my-bookings", getMyBookings);
@@ -38,16 +35,10 @@ router.get("/:id", getBooking);
 router.patch(
   "/:id/status",
   validateRequest(updateBookingStatusSchema),
-  updateBookingStatus
+  updateBookingStatus,
 );
-
 
 // Reschedule booking
-router.post(
-  "/:id/reschedule",
-  // validateRequest(rescheduleBookingSchema), // Optional: Add validation if needed
-  rescheduleBooking
-);
+router.post("/:id/reschedule", rescheduleBooking);
 
-export default router;
-
+module.exports = router;

@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const bookingSchema = new mongoose.Schema(
   {
@@ -82,13 +82,28 @@ const bookingSchema = new mongoose.Schema(
 
     payout: {
       teacherAmountUSD: { type: Number, required: true, min: 0 },
-      teacherCurrency: { type: String, required: true, uppercase: true, trim: true },
-      status: { type: String, enum: ["pending", "paid", "failed"], default: "pending", index: true },
+      teacherCurrency: {
+        type: String,
+        required: true,
+        uppercase: true,
+        trim: true,
+      },
+      status: {
+        type: String,
+        enum: ["pending", "paid", "failed"],
+        default: "pending",
+        index: true,
+      },
     },
 
     payment: {
-      stripePaymentIntentId: { type: String, required: true, index: true },
-      status: { type: String, enum: ["pending", "paid", "failed", "refunded"], default: "paid", index: true },
+      stripePaymentIntentId: { type: String, required: true },
+      status: {
+        type: String,
+        enum: ["pending", "paid", "failed", "refunded"],
+        default: "paid",
+        index: true,
+      },
     },
 
     meeting: {
@@ -97,7 +112,12 @@ const bookingSchema = new mongoose.Schema(
       joinUrlStudent: { type: String, default: "" },
       joinUrlTeacher: { type: String, default: "" },
     },
-    paymentStatus: { type: String, enum: ["pending", "paid", "failed", "refunded"], default: "paid", index: true },
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid", "failed", "refunded"],
+      default: "paid",
+      index: true,
+    },
     paymentId: { type: String, default: "" },
     status: {
       type: String,
@@ -110,41 +130,22 @@ const bookingSchema = new mongoose.Schema(
       enum: ["zoom", "google_meet", "teams", "custom"],
       default: "zoom",
     },
-    meetingUrl: {
-      type: String,
-      default: "",
-    },
-    meetingId: {
-      type: String,
-      default: "",
-    },
-    meetingPassword: {
-      type: String,
-      default: "",
-    },
+    meetingUrl: { type: String, default: "" },
+    meetingId: { type: String, default: "" },
+    meetingPassword: { type: String, default: "" },
+
     cancelledBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null,
     },
-    cancelledAt: {
-      type: Date,
-      default: null,
-    },
-    cancellationReason: {
-      type: String,
-      default: "",
-    },
-    studentNotes: {
-      type: String,
-      default: "",
-    },
-    teacherNotes: {
-      type: String,
-      default: "",
-    },
+    cancelledAt: { type: Date, default: null },
+    cancellationReason: { type: String, default: "" },
+
+    studentNotes: { type: String, default: "" },
+    teacherNotes: { type: String, default: "" },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Indexes
@@ -152,7 +153,9 @@ bookingSchema.index({ studentId: 1, status: 1, sessionDate: 1 });
 bookingSchema.index({ teacherId: 1, status: 1, sessionDate: 1 });
 bookingSchema.index({ sessionDate: 1, status: 1 });
 // Idempotency: one booking per Stripe PaymentIntent
-bookingSchema.index({ "payment.stripePaymentIntentId": 1 }, { unique: true, sparse: true });
+bookingSchema.index(
+  { "payment.stripePaymentIntentId": 1 },
+  { unique: true, sparse: true },
+);
 
-export default mongoose.model("Booking", bookingSchema);
-
+module.exports = mongoose.model("Booking", bookingSchema);

@@ -6,8 +6,8 @@ import {
   convertPrice,
   formatPrice,
   convertAndFormatPrice,
-  ExchangeRates,
 } from '../services/currencyService';
+import type { ExchangeRates } from '../services/currencyService';
 
 interface UseCurrencyReturn {
   currency: string;

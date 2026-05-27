@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAuth } from "../../../contexts/AuthContext"
-import { getMyBookings, Booking } from "../../../services/bookingService"
+import { getMyBookings } from "../../../services/bookingService"
+import type { Booking } from "../../../services/bookingService"
 
 const StudentHistoryContent = () => {
    const { token } = useAuth()

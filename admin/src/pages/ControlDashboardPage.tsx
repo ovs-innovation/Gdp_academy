@@ -116,7 +116,7 @@ const ControlDashboardPage = () => {
       const token = getToken();
       
       // Fetch Programs
-      const ProgramsRes = await fetch(`${API_URL}/admin/Programs`, {
+      const ProgramsRes = await fetch(`${API_URL}/admin/courses`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
@@ -124,7 +124,7 @@ const ControlDashboardPage = () => {
       });
       if (ProgramsRes.ok) {
         const ProgramsData = await ProgramsRes.json();
-        setPrograms(ProgramsData.Programs || []);
+        setPrograms(ProgramsData.courses || ProgramsData.programs || ProgramsData.Programs || []);
       }
 
       // Fetch teachers
@@ -164,9 +164,32 @@ const ControlDashboardPage = () => {
 
       const data = await response.json();
       
-      setStats(data.stats);
-      setRegistrationData(data.RegistrationData || []);
-      setProgramPerformanceData(data.ProgramPerformance || []);
+      const rawStats = data.stats || {};
+      setStats({
+        activeUsers: rawStats.activeUsers ?? 0,
+        totalRevenue: rawStats.totalRevenue ?? 0,
+        totalPrograms: rawStats.totalPrograms ?? rawStats.totalCourses ?? 0,
+        totalRegistrations: rawStats.totalRegistrations ?? rawStats.totalEnrollments ?? 0,
+        RegistrationChange: rawStats.RegistrationChange ?? rawStats.enrollmentChange ?? 0,
+        revenueChange: rawStats.revenueChange ?? 0,
+      });
+
+      const rawRegistrationData = data.RegistrationData || data.enrollmentData || [];
+      const mappedRegistrationData = rawRegistrationData.map((item: any) => ({
+        month: item.month,
+        Registrations: item.Registrations ?? item.enrollments ?? 0,
+        revenue: item.revenue ?? 0,
+      }));
+      setRegistrationData(mappedRegistrationData);
+
+      const rawProgramPerformance = data.ProgramPerformance || data.coursePerformance || [];
+      const mappedProgramPerformance = rawProgramPerformance.map((item: any) => ({
+        name: item.name,
+        Members: item.Members ?? item.students ?? 0,
+        completion: item.completion ?? 0,
+        rating: item.rating ?? 0,
+      }));
+      setProgramPerformanceData(mappedProgramPerformance);
       
       // Add colors to user distribution
       const distributionWithColors = (data.userDistribution || []).map((item: any, index: number) => ({
@@ -236,11 +259,16 @@ const ControlDashboardPage = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Dance Coaches</SelectItem>
-                {teachers.map((teacher) => (
-                  <SelectItem key={teacher.userId._id} value={teacher.userId._id}>
-                    {teacher.userId.name}
-                  </SelectItem>
-                ))}
+                {teachers.map((teacher) => {
+                  const uid = teacher?.userId?._id || teacher?.userId;
+                  const name = teacher?.userId?.name || teacher?.name || 'Unknown';
+                  if (!uid) return null;
+                  return (
+                    <SelectItem key={uid} value={uid}>
+                      {name}
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
 
@@ -285,7 +313,7 @@ const ControlDashboardPage = () => {
                   Active
                 </Badge>
               </div>
-              <p className="mt-4 text-2xl font-bold text-foreground">{stats.activeUsers.toLocaleString()}</p>
+              <p className="mt-4 text-2xl font-bold text-foreground">{(stats?.activeUsers ?? 0).toLocaleString()}</p>
               <p className="text-sm text-muted-foreground">Active Users</p>
               <p className="mt-1 text-xs text-muted-foreground/70">Currently active</p>
             </Card>
@@ -297,16 +325,16 @@ const ControlDashboardPage = () => {
                 </div>
                 <Badge 
                   variant="outline" 
-                  className={stats.revenueChange >= 0 
+                  className={(stats?.revenueChange ?? 0) >= 0 
                     ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500' 
                     : 'border-red-500/30 bg-red-500/10 text-red-500'
                   }
                 >
-                  {stats.revenueChange >= 0 ? <TrendingUp className="mr-1 h-3 w-3" /> : <TrendingDown className="mr-1 h-3 w-3" />}
-                  {stats.revenueChange >= 0 ? '+' : ''}{stats.revenueChange}%
+                  {(stats?.revenueChange ?? 0) >= 0 ? <TrendingUp className="mr-1 h-3 w-3" /> : <TrendingDown className="mr-1 h-3 w-3" />}
+                  {(stats?.revenueChange ?? 0) >= 0 ? '+' : ''}{stats?.revenueChange ?? 0}%
                 </Badge>
               </div>
-              <p className="mt-4 text-2xl font-bold text-foreground">${stats.totalRevenue.toLocaleString()}</p>
+              <p className="mt-4 text-2xl font-bold text-foreground">${(stats?.totalRevenue ?? 0).toLocaleString()}</p>
               <p className="text-sm text-muted-foreground">Total Revenue</p>
               <p className="mt-1 text-xs text-muted-foreground/70">Last 30 days</p>
             </Card>
@@ -324,7 +352,7 @@ const ControlDashboardPage = () => {
                   Active
                 </Badge>
               </div>
-              <p className="mt-4 text-2xl font-bold text-foreground">{stats.totalPrograms.toLocaleString()}</p>
+              <p className="mt-4 text-2xl font-bold text-foreground">{(stats?.totalPrograms ?? 0).toLocaleString()}</p>
               <p className="text-sm text-muted-foreground">Total Programs</p>
               <p className="mt-1 text-xs text-muted-foreground/70">Published Programs</p>
             </Card>
@@ -336,16 +364,16 @@ const ControlDashboardPage = () => {
                 </div>
                 <Badge 
                   variant="outline" 
-                  className={stats.RegistrationChange >= 0 
+                  className={(stats?.RegistrationChange ?? 0) >= 0 
                     ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-500' 
                     : 'border-red-500/30 bg-red-500/10 text-red-500'
                   }
                 >
-                  {stats.RegistrationChange >= 0 ? <TrendingUp className="mr-1 h-3 w-3" /> : <TrendingDown className="mr-1 h-3 w-3" />}
-                  {stats.RegistrationChange >= 0 ? '+' : ''}{stats.RegistrationChange}%
+                  {(stats?.RegistrationChange ?? 0) >= 0 ? <TrendingUp className="mr-1 h-3 w-3" /> : <TrendingDown className="mr-1 h-3 w-3" />}
+                  {(stats?.RegistrationChange ?? 0) >= 0 ? '+' : ''}{stats?.RegistrationChange ?? 0}%
                 </Badge>
               </div>
-              <p className="mt-4 text-2xl font-bold text-foreground">{stats.totalRegistrations.toLocaleString()}</p>
+              <p className="mt-4 text-2xl font-bold text-foreground">{(stats?.totalRegistrations ?? 0).toLocaleString()}</p>
               <p className="text-sm text-muted-foreground">Total Registrations</p>
               <p className="mt-1 text-xs text-muted-foreground/70">All time</p>
             </Card>
@@ -483,7 +511,7 @@ const ControlDashboardPage = () => {
                 <div key={item.name} className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
                   <span className="text-xs text-muted-foreground">{item.name}</span>
-                  <span className="text-xs font-medium text-foreground">{item.value.toLocaleString()}</span>
+                  <span className="text-xs font-medium text-foreground">{(item?.value ?? 0).toLocaleString()}</span>
                 </div>
               ))}
             </div>

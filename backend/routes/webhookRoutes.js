@@ -1,14 +1,19 @@
-import express from "express";
-import {
+const express = require("express");
+const {
   handleZoomWebhook,
   manualTriggerRecording,
-} from "../controllers/zoomWebhookController.js";
-import { authenticateToken } from "../middlewares/authMiddleware.js";
-import { isAdmin } from "../middlewares/roleMiddleware.js";
+} = require("../controllers/zoomWebhookController.js");
+const { authenticateToken } = require("../middlewares/authMiddleware.js");
+const { isAdmin } = require("../middlewares/roleMiddleware.js");
 
 const router = express.Router();
 
 router.post("/zoom", handleZoomWebhook);
-router.post("/zoom/manual-trigger", authenticateToken, isAdmin, manualTriggerRecording);
+router.post(
+  "/zoom/manual-trigger",
+  authenticateToken,
+  isAdmin,
+  manualTriggerRecording,
+);
 
-export default router;
+module.exports = router;

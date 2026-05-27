@@ -1,4 +1,4 @@
-export const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res, next) => {
   console.error("Error detected: ", err.message);
   if (err.stack) console.error(err.stack);
 
@@ -15,3 +15,5 @@ export const errorHandler = (err, req, res, next) => {
     } : undefined
   });
 };
+
+module.exports = { errorHandler };

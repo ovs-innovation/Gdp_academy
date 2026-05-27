@@ -1,11 +1,9 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
-import { useTranslation } from "react-i18next";
 
 const DashboardSidebarTwo = () => {
    const { user, logout } = useAuth();
-   const { t } = useTranslation();
    const location = useLocation();
 
    const menuItems = [

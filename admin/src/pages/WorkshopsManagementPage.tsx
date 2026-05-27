@@ -208,7 +208,7 @@ const WorkshopsManagementPage = () => {
                 Export
               </Button>
             </PermissionGate>
-            <PermissionGate permission="Programs.create">
+            <PermissionGate permission="programs.create">
               <Button
                 size="sm"
                 className="gap-2 gradient-primary text-primary-foreground hover:opacity-90"
@@ -320,13 +320,13 @@ const WorkshopsManagementPage = () => {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <PermissionGate permission="Programs.edit">
+                          <PermissionGate permission="programs.edit">
                             <DropdownMenuItem onClick={() => handleOpenDialog(workshop)}>
                               <Pencil className="h-4 w-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
                           </PermissionGate>
-                          <PermissionGate permission="Programs.delete">
+                          <PermissionGate permission="programs.delete">
                             <DropdownMenuItem
                               onClick={() => handleDelete(workshop._id)}
                               className="text-destructive"

@@ -1,16 +1,23 @@
-import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
-import Role from "../models/roleModel.js";
+const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
+const Role = require("../models/roleModel.js");
+
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true },
-    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
     password: { type: String, required: true, minlength: 6 },
     role: {
       type: String,
       lowercase: true,
       trim: true,
-      default: "super_admin",
+      default: "student",
       validate: [
         {
           validator: async function (value) {
@@ -23,12 +30,16 @@ const userSchema = new mongoose.Schema(
         },
       ],
     },
-    status: { type: String, enum: ["active", "inactive", "pending"], default: "active" },
+    status: {
+      type: String,
+      enum: ["active", "inactive", "pending"],
+      default: "active",
+    },
     googleId: { type: String },
     firebaseId: { type: String },
     lastLogin: { type: Date },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 userSchema.pre("save", async function (next) {
@@ -42,5 +53,4 @@ userSchema.methods.matchPassword = function (enteredPassword) {
   return bcrypt.compare(enteredPassword, this.password);
 };
 
-export default mongoose.model("User", userSchema);
-
+module.exports = mongoose.model("User", userSchema);

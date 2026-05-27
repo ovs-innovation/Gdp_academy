@@ -1,4 +1,5 @@
-import { useState, useCallback, useRef, FC, ChangeEvent } from "react";
+import { useState, useCallback, useRef } from "react";
+import type { FC, ChangeEvent } from "react";
 import { useClickAway } from "react-use";
 
 interface Option {

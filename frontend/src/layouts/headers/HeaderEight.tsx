@@ -48,7 +48,7 @@ const HeaderEight = () => {
                     <div className="tgmenu__action tgmenu__action-five tgmenu__action-eight">
                       <ul className="list-wrap">
                         <li className="header-user">
-                          <Link to="/instructor-dashboard"><InjectableSvg src="/assets/img/icons/user.svg" alt="" className="injectable" /></Link>
+                          <Link to="/dashboard"><InjectableSvg src="/assets/img/icons/user.svg" alt="" className="injectable" /></Link>
                         </li>
                         <li className="mini-cart-icon">
                           <Link to="/cart" className="cart-count">

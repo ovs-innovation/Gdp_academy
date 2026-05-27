@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const studentProfileSchema = new mongoose.Schema(
   {
@@ -38,31 +38,18 @@ const studentProfileSchema = new mongoose.Schema(
       default: "UTC",
     },
     // Social Links
-    wishlist: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    }],
+    wishlist: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
     socialLinks: {
-      facebook: {
-        type: String,
-        default: "",
-      },
-      twitter: {
-        type: String,
-        default: "",
-      },
-      linkedin: {
-        type: String,
-        default: "",
-      },
-      website: {
-        type: String,
-        default: "",
-      },
-      github: {
-        type: String,
-        default: "",
-      },
+      facebook: { type: String, default: "" },
+      twitter: { type: String, default: "" },
+      linkedin: { type: String, default: "" },
+      website: { type: String, default: "" },
+      github: { type: String, default: "" },
     },
     // Learning Progress (calculated from bookings)
     progress: {
@@ -72,9 +59,7 @@ const studentProfileSchema = new mongoose.Schema(
       totalLessonsCompleted: { type: Number, default: 0 },
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-studentProfileSchema.index({ userId: 1 });
-
-export default mongoose.model("StudentProfile", studentProfileSchema);
+module.exports = mongoose.model("StudentProfile", studentProfileSchema);

@@ -1,12 +1,12 @@
-import express from "express";
-import { getSettings, updateSettings } from "../controllers/settingsController.js";
-import { verifyToken } from "../middlewares/authMiddleware.js";
-import { requirePermission } from "../middlewares/permissionMiddleware.js";
-
+const express = require('express');
 const router = express.Router();
 
-router.get("/", getSettings);
-router.patch("/", verifyToken, requirePermission("settings.edit"), updateSettings);
+const { getSettings, updateSettings } = require('../controllers/settingsController');
 
-export default router;
+// Retrieve current site settings
+router.get('/', getSettings);
 
+// Update site settings (expects JSON body with updated fields)
+router.put('/', updateSettings);
+
+module.exports = router;

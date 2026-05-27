@@ -79,7 +79,7 @@
     "our_values": "Our Values",
     "our_advisory_board": "Our Advisory Board",
     "our_partners": "Our Partners",
-    "work_at_gdp": "Work at GDP Academy",
+    "work_at_gdp": "Work at GDP Studio",
     "quizlet_plus": "GDP Plus",
     "become_teacher": "Become Dance Coach",
     "become_a_Member": "Become a Member",
@@ -252,14 +252,14 @@
       "title": "Build Skills with Trusted Global Mentors",
       "description": "Expert-led Programs designed to help you grow faster and smarter.",
       "questions": {
-        "q1": "Why should I choose Edunyte for learning?",
-        "a1": "Because Edunyte offers flexible, skill-based Programs taught by expert Dance Coaches in multiple languages.",
+        "q1": "Why should I choose GDP Studio for learning?",
+        "a1": "Because GDP Studio offers flexible, skill-based Programs taught by expert dance mentors in multiple languages.",
         "q2": "Can I learn skills in my local language?",
         "a2": "Yes, Programs are available in Hindi, English, and other regional languages for easy understanding.",
         "q3": "Are the Programs taught by certified experts?",
         "a3": "Absolutely. All Programs are delivered by verified and experienced professionals.",
-        "q4": "Is Edunyte affordable for Members?",
-        "a4": "Yes, Edunyte provides high-quality education at Member-friendly and affordable prices."
+        "q4": "Is GDP Studio affordable for Members?",
+        "a4": "Yes, GDP Studio provides high-quality education at student-friendly and affordable prices."
       }
     },
     "features": {
@@ -268,8 +268,8 @@
       "description": "A simple learning experience that brings Members and mentors together to learn, track progress, and succeed.",
       "home_2_header": {
         "subtitle": "Our Top Features",
-        "title": "Achieve Your Goal With Edunyte",
-        "description": "Edunyte helps you reach your personal and professional goals through clear paths, expert guidance, and proven results."
+        "title": "Achieve Your Goal With GDP Studio",
+        "description": "GDP Studio helps you reach your personal and professional goals through clear paths, expert guidance, and proven results."
       },
       "items": {
         "home_1": {
@@ -342,7 +342,7 @@
   "about_page": {
     "hero": {
       "title": "Where Artists Learn Better & Dance Coaches Grow Stronger",
-      "description": "GDP Academy is a premium arts platform built to bring dancers and coaches together in one cinematic ecosystem. We believe artistic growth works best when it’s personal, expressive, and human-led.",
+      "description": "GDP Studio is a premium arts platform built to bring dancers and coaches together in one cinematic ecosystem. We believe artistic growth works best when it’s personal, expressive, and human-led.",
       "button": "Join the GDP Community"
     },
     "breadcrumb": {
@@ -370,7 +370,7 @@
     },
     "platform": {
       "title": "One Stage for Everyone",
-      "description": "Whether you’re here to train, coach, or perform — GDP Academy welcomes you.",
+      "description": "Whether you’re here to train, coach, or perform — GDP Studio welcomes you.",
       "tabs": {
         "teachers": {
           "name": "coaches",
@@ -425,8 +425,8 @@
     "story": {
       "title": "Building the Future of Dance",
       "subtitle": "GDP is more than an academy — it’s a vibrant community of artists and coaches.",
-      "p1": "GDP Academy is a modern arts platform built to bring dancers and coaches together in one meaningful artistic ecosystem. We believe artistry works best when it’s personal, technical, and human-led.",
-      "p2": "Whether you’re here to train, coach, or perform — GDP Academy welcomes you. Success at GDP is built together.",
+      "p1": "GDP Studio is a modern arts platform built to bring dancers and coaches together in one meaningful artistic ecosystem. We believe artistry works best when it’s personal, technical, and human-led.",
+      "p2": "Whether you’re here to train, coach, or perform — GDP Studio welcomes you. Success at GDP is built together.",
       "box_title": "How GDP Works",
       "list": {
         "1": "Dancers choose programs and styles",
@@ -437,7 +437,7 @@
     },
     "testimonials": {
       "subtitle": "Our Performers",
-      "title": "What Dancers Say About GDP Academy",
+      "title": "What Dancers Say About GDP Studio",
       "description": "Hear from our community of artists who have transformed their craft with GDP.",
       "items": {
         "1": {
@@ -462,7 +462,7 @@
   "become_coach_page": {
     "breadcrumb_title": "Become a Dance Coach",
     "hero": {
-      "title": "Train it right, perform it bright, and step onto a global stage with GDP Academy.",
+      "title": "Train it right, perform it bright, and step onto a global stage with GDP Studio.",
       "cta": "Create a coach profile now"
     },
     "steps": {
@@ -495,8 +495,8 @@
     },
     "global": {
       "title": "Inspire Minds. Lead Globally. Grow With Us.",
-      "desc_p1": "At GDP Academy, we believe great coaches create great artists.",
-      "desc_p2": "If you’re passionate about coaching and want to make a real impact, GDP Academy is hiring artists across multiple styles and levels.",
+      "desc_p1": "At GDP Studio, we believe great coaches create great artists.",
+      "desc_p2": "If you’re passionate about coaching and want to make a real impact, GDP Studio is hiring artists across multiple styles and levels.",
       "list": {
         "1": "Mentor Members from anywhere",
         "2": "Flexible coaching hours",
@@ -508,7 +508,7 @@
       "cta": "Create a coach profile now"
     },
     "testimonial": {
-      "quote": "GDP Academy allowed me to make a living through my passion!",
+      "quote": "GDP Studio allowed me to make a living through my passion!",
       "name": "Krista A.",
       "role": "Modern Dance Coach",
       "cta": "Create a coach profile now"
@@ -517,7 +517,7 @@
       "title": "Frequently asked questions",
       "items": {
         "1": {
-          "question": "What kind of coaches does GDP Academy look for?",
+          "question": "What kind of coaches does GDP Studio look for?",
           "answer": "We look for passionate artists who have elite technical mastery and are masters of their craft. While certifications are a plus, technical excellence and coaching ability are mandatory."
         },
         "2": {
@@ -525,7 +525,7 @@
           "answer": "You can coach over 50 styles including Classical, Contemporary, Urban, Hobbies, and Performance Art. If your style is not listed, you can suggest it during registration."
         },
         "3": {
-          "question": "How do I become an online coach at GDP Academy?",
+          "question": "How do I become an online coach at GDP Studio?",
           "answer": "The process is simple: Sign up, create your profile, upload a cinematic intro video, and submit for review. Our team approves profiles within 3-5 business days."
         },
         "4": {
@@ -533,19 +533,19 @@
           "answer": "Ensure your profile is cinematic with high-quality artistic photos, a well-written bio, and a clear performance intro. Verify your mastery to speed up the process."
         },
         "5": {
-          "question": "Why should I coach on GDP Academy?",
+          "question": "Why should I coach on GDP Studio?",
           "answer": "GDP offers elite flexibility to set your own rates and schedule, access to a global member base, secure payments, and a premium artistic community."
         },
         "6": {
-          "question": "What equipment do I need to coach on GDP Academy?",
+          "question": "What equipment do I need to coach on GDP Studio?",
           "answer": "You need a laptop with a stable connection, a high-quality camera, and a professional space with proper lighting and sound."
         },
         "7": {
-          "question": "Is it free to create a coach profile on GDP Academy?",
+          "question": "Is it free to create a coach profile on GDP Studio?",
           "answer": "Yes, creating a profile and getting listed is free. We only charge a small platform commission on the sessions you coach."
         },
         "8": {
-          "question": "How much can I earn on GDP Academy?",
+          "question": "How much can I earn on GDP Studio?",
           "answer": "You set your own hourly rate. Earnings depend on your rate and the number of hours you mentor. Elite coaches earn significantly by building a strong member following."
         }
       }
@@ -729,7 +729,7 @@
   },
   "footer": {
     "mobile_app": "GDP App",
-    "description_1": "GDP Academy is a premium dance ecosystem connecting ambitious dancers with world-class coaches. We believe in movement that is cinematic, expressive, and driven by technical excellence.",
+    "description_1": "GDP Studio is a premium dance ecosystem connecting ambitious dancers with world-class coaches. We believe in movement that is cinematic, expressive, and driven by technical excellence.",
     "address": "GDP Studio, Arts District, Global Hub",
     "phone": "+1 (800) GDP-DANCE",
     "useful_links": "Our Ecosystem",

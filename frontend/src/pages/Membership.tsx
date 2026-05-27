@@ -1,21 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Layout from '../components/layout/Layout';
 import { motion } from 'framer-motion';
+import { getMembershipPlans } from '../services/cmsService';
+import { usePageContent, renderSplitHeroTitle } from '../hooks/usePageContent';
 import '../styles/membership.css';
 
+const DEFAULT_PLANS = [
+  { name: 'Starter Passion Plan', price: '$29', period: 'month', features: ['Access to 2 Live Zoom classes per month', 'Beginner choreography video library access', 'Community forum discussion access', 'Standard email support'], recommended: false },
+  { name: 'Pro Performer Plan', price: '$59', period: 'month', features: ['Access to 8 Live Zoom classes per month', 'Full access to entire pre-recorded library', 'Interactive feedback from choreographers', '10% discount on special workshops', 'Priority support response'], recommended: true },
+  { name: 'Elite Master Plan', price: '$99', period: 'month', features: ['Unlimited access to all Live Zoom sessions', 'Unlimited access to video library & masterclasses', 'Monthly 1-on-1 personalized review', 'Free entry to all seasonal workshops', 'Certificate of completion & VIP support'], recommended: false },
+];
+
 const Membership: React.FC = () => {
-  const plans = [
-    { name: 'Basic Member', price: '$49', period: 'month', features: ['2 Dance Styles', 'Live Zoom Sessions', 'Community Access', 'Digital Certificate'], recommended: false },
-    { name: 'Elite Artist', price: '$99', period: 'month', features: ['All Dance Styles', 'Recorded Library Access', '1-on-1 Coach Feedback', 'Performance Opportunities', 'Priority Support'], recommended: true },
-    { name: 'Academy Pro', price: '$899', period: 'year', features: ['Lifetime Access', 'VIP Workshop Invites', 'Custom Training Plan', 'Studio Rentals Discount', 'Personal Brand Coaching'], recommended: false },
-  ];
+  const { content } = usePageContent('membership');
+  const hero = renderSplitHeroTitle(content, { before: 'CHOOSE YOUR ', highlight: 'MEMBERSHIP' });
+  const heroSubtitle =
+    (content.heroSubtitle as string) ||
+    'Elevate your craft with flexible plans designed for every stage of your dance journey.';
+  const [plans, setPlans] = useState<any[]>([]);
+
+  useEffect(() => {
+    getMembershipPlans()
+      .then((data) => {
+        if (data && data.length > 0) {
+          const mapped = data.map((plan: any) => ({
+            name: plan.title,
+            price: `${plan.currency === 'USD' ? '$' : plan.currency + ' '}${plan.price}`,
+            period: plan.durationUnit || 'month',
+            features: plan.features || [],
+            recommended: plan.title.toLowerCase().includes('pro') || plan.title.toLowerCase().includes('elite') || plan.title.toLowerCase().includes('performer')
+          }));
+          setPlans(mapped);
+        } else {
+          setPlans(DEFAULT_PLANS);
+        }
+      })
+      .catch(() => {
+        setPlans(DEFAULT_PLANS);
+      });
+  }, []);
 
   return (
     <Layout>
       <section className="membership-hero">
         <div className="container">
-          <h1 className="section-title">CHOOSE YOUR <span className="gradient-text">MEMBERSHIP</span></h1>
-          <p className="hero-subtitle">Elevate your craft with flexible plans designed for every stage of your dance journey.</p>
+          <h1 className="section-title">{hero.before}<span className="gradient-text">{hero.highlight}</span></h1>
+          <p className="hero-subtitle">{heroSubtitle}</p>
         </div>
       </section>
 
@@ -39,7 +69,7 @@ const Membership: React.FC = () => {
                 </div>
                 <div className="divider"></div>
                 <ul className="features-list">
-                  {plan.features.map(f => <li key={f}>{f}</li>)}
+                  {plan.features.map((f: string) => <li key={f}>{f}</li>)}
                 </ul>
                 <button className={`primary-btn join-btn ${plan.recommended ? '' : 'glass-btn'}`} style={{ width: '100%' }}>
                   START MEMBERSHIP
@@ -54,4 +84,3 @@ const Membership: React.FC = () => {
 };
 
 export default Membership;
-

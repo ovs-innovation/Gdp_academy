@@ -1,20 +1,30 @@
-import express from "express";
-import { getCourses, getCourseById } from "../../controllers/courseController.js";
-import { getCourseTeachersBySlug } from "../../controllers/teacherCourseController.js";
-import { getCourseAvailability } from "../../controllers/availabilityController.js";
+const express = require("express");
+const {
+  getCourses,
+  getCourseById,
+} = require("../../controllers/courseController.js");
 
 const router = express.Router();
 
-router.get("/", (req, res, next) => {
-  req.query.status = "active";
-  next();
-}, getCourses);
+router.get(
+  "/",
+  (req, res, next) => {
+    req.query.status = "active";
+    next();
+  },
+  getCourses,
+);
 
-// This route must come before /:id to avoid route conflicts
-router.get("/:slug/teachers", getCourseTeachersBySlug);
-router.get("/availability", getCourseAvailability);
+// Dummy fallback for course teachers since teacher/instructor roles are eliminated
+router.get("/:slug/teachers", (req, res) => {
+  res.json({ teachers: [], count: 0 });
+});
+
+// Dummy fallback for availability since direct scheduling/bookings are disabled
+router.get("/availability", (req, res) => {
+  res.json({ availabilities: [], count: 0 });
+});
 
 router.get("/:id", getCourseById);
 
-export default router;
-
+module.exports = router;

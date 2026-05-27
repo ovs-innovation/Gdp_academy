@@ -8,7 +8,6 @@ import InjectableSvg from "../../hooks/InjectableSvg"
 import CustomSelect from "../../ui/CustomSelect"
 import TotalWishlist from "../../components/common/TotalWishlist"
 import LanguageCurrencySwitcher from "../../components/common/LanguageCurrencySwitcher"
-import { useTranslation } from "react-i18next"
 import { useAuth } from "../../contexts/AuthContext"
 import { useNavigate } from "react-router-dom"
 
@@ -17,7 +16,6 @@ const HeaderOne = () => {
    const handleSelectChange = (option: any) => setSelectedOption(option);
    const { sticky } = UseSticky();
    const [isActive, setIsActive] = useState<boolean>(false);
-   const { t } = useTranslation();
    const { isAuthenticated, user, logout } = useAuth();
    const navigate = useNavigate();
 
@@ -74,7 +72,7 @@ const HeaderOne = () => {
                                                    <span className="d-block fw-bold small text-white">{user?.name}</span>
                                                    <span className="d-block small text-muted">{user?.email}</span>
                                                 </li>
-                                                <li><Link className="dropdown-item py-2 text-white" to={user?.role === 'teacher' ? "/instructor-dashboard" : "/dashboard"}><i className="fas fa-th-large me-2 text-primary"></i> Dashboard</Link></li>
+                                                <li><Link className="dropdown-item py-2 text-white" to="/dashboard"><i className="fas fa-th-large me-2 text-primary"></i> Dashboard</Link></li>
                                                 <li><Link className="dropdown-item py-2 text-white" to="/my-profile-setting"><i className="fas fa-user-cog me-2 text-primary"></i> Settings</Link></li>
                                                 <li><hr className="dropdown-divider border-secondary border-opacity-10" /></li>
                                                 <li><button className="dropdown-item py-2 text-danger" onClick={() => { logout(); navigate('/'); }}><i className="fas fa-sign-out-alt me-2"></i> Logout</button></li>

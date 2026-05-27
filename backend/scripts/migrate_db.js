@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const OLD_URI = 'mongodb://ovsdeveloper26_db_user:csyoq9rF2htdtiDq@ac-9nayvcr-shard-00-00.97jnm8d.mongodb.net:27017,ac-9nayvcr-shard-00-01.97jnm8d.mongodb.net:27017,ac-9nayvcr-shard-00-02.97jnm8d.mongodb.net:27017/edunyte?ssl=true&authSource=admin&replicaSet=atlas-mldxhe-shard-0&retryWrites=true&w=majority';
+const OLD_URI = 'mongodb://ovsdeveloper26_db_user:csyoq9rF2htdtiDq@ac-9nayvcr-shard-00-00.97jnm8d.mongodb.net:27017,ac-9nayvcr-shard-00-01.97jnm8d.mongodb.net:27017,ac-9nayvcr-shard-00-02.97jnm8d.mongodb.net:27017/gdp_academy_old?ssl=true&authSource=admin&replicaSet=atlas-mldxhe-shard-0&retryWrites=true&w=majority';
 const NEW_URI = 'mongodb://gdpAcademy:gdpdance123@ac-rreiwsx-shard-00-00.tr38jwh.mongodb.net:27017,ac-rreiwsx-shard-00-01.tr38jwh.mongodb.net:27017,ac-rreiwsx-shard-00-02.tr38jwh.mongodb.net:27017/gdpAcademy?ssl=true&authSource=admin&replicaSet=atlas-xji6j1-shard-0&retryWrites=true&w=majority';
 
 async function migrateData() {
@@ -9,7 +9,7 @@ async function migrateData() {
 
   try {
     // Connect to OLD DB
-    console.log('Connecting to Old Database (edunyte)...');
+    console.log('Connecting to Old Database (gdp_academy_old)...');
     const oldDb = await mongoose.createConnection(OLD_URI, { family: 4, serverSelectionTimeoutMS: 10000 }).asPromise();
     console.log('Successfully connected to Old Database.');
 

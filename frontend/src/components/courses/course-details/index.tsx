@@ -111,7 +111,7 @@ const CourseDetails = () => {
       <>
          <HeaderOne />
          <main className="main-area fix glow-bg">
-            <ProgramDetailsArea />
+            <ProgramDetailsArea program={program} />
          </main>
          <FooterOne style={false} style_2={true} />
       </>

@@ -1,9 +1,9 @@
-import Booking from "../../models/bookingModel.js";
+const Booking = require("../../models/bookingModel.js");
 
 /**
  * Get all payments/bookings for admin
  */
-export const getAllPayments = async (req, res, next) => {
+const getAllPayments = async (req, res, next) => {
   try {
     const payments = await Booking.find()
       .populate("studentId", "name email")
@@ -21,7 +21,7 @@ export const getAllPayments = async (req, res, next) => {
 /**
  * Get payment by ID
  */
-export const getPaymentById = async (req, res, next) => {
+const getPaymentById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const payment = await Booking.findById(id)
@@ -44,7 +44,7 @@ export const getPaymentById = async (req, res, next) => {
 /**
  * Update payout status for a booking
  */
-export const updatePayoutStatus = async (req, res, next) => {
+const updatePayoutStatus = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -61,11 +61,13 @@ export const updatePayoutStatus = async (req, res, next) => {
     booking.payout.status = status;
     await booking.save();
 
-    res.json({ 
+    res.json({
       message: "Payout status updated successfully",
-      booking 
+      booking,
     });
   } catch (err) {
     next(err);
   }
 };
+
+module.exports = { getAllPayments, getPaymentById, updatePayoutStatus };

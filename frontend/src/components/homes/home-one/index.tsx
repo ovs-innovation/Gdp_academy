@@ -6,7 +6,6 @@ import HowItWorks from "./HowItWorks"
 import Categories from "./Categories"
 import Tutors from "./Tutors"
 import Newsletter from "./Newsletter"
-import Blog from "./Blog"
 
 const HomeOne = () => {
    return (

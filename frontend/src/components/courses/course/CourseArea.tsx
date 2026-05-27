@@ -123,7 +123,7 @@ const CourseArea = () => {
                                     <div className="glass-panel h-100 shadow-sm overflow-hidden border-0 bg-white hover-scale">
                                        <div className="position-relative">
                                           <Link to={`/program/${item.slug || item._id}`}>
-                                             <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name} className="w-100" style={{ height: '220px', objectFit: 'cover' }} />
+                                             <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={typeof item.name === 'string' ? item.name : (item.name as any)?.en || ''} className="w-100" style={{ height: '220px', objectFit: 'cover' }} />
                                           </Link>
                                           <button
                                              onClick={(e) => {
@@ -175,7 +175,7 @@ const CourseArea = () => {
                                        <div className="col-md-4">
                                           <div className="position-relative rounded-4 overflow-hidden">
                                              <Link to={`/program/${item.slug || item._id}`}>
-                                                <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name} className="w-100" style={{ height: '200px', objectFit: 'cover' }} />
+                                                <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={typeof item.name === 'string' ? item.name : (item.name as any)?.en || ''} className="w-100" style={{ height: '200px', objectFit: 'cover' }} />
                                              </Link>
                                           </div>
                                        </div>

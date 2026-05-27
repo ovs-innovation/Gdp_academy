@@ -40,7 +40,7 @@ const HeaderSix = () => {
                                        </a>
                                     </li>
                                     <li className="header-user">
-                                       <Link to="/instructor-dashboard"><InjectableSvg src="/assets/img/icons/user.svg" alt="" className="injectable" /></Link>
+                                       <Link to="/dashboard"><InjectableSvg src="/assets/img/icons/user.svg" alt="" className="injectable" /></Link>
                                     </li>
                                     <li className="mini-cart-icon">
                                        <Link to="/cart" className="cart-count">

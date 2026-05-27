@@ -1,36 +1,42 @@
-import nodemailer from "nodemailer";
-import dotenv from "dotenv";
+const nodemailer = require("nodemailer");
+const dotenv = require("dotenv");
 
 dotenv.config();
 
-export const transporter = nodemailer.createTransport({
-  service: 'gmail',
+const transporter = nodemailer.createTransport({
+  service: "gmail",
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
   tls: {
-    rejectUnauthorized: false
-  }
+    rejectUnauthorized: false,
+  },
 });
 
-// Verify connection configuration on startup
-transporter.verify(function (error, success) {
-  if (error) {
-    console.error("❌ Email Transporter Error:", error.message);
-    if (error.message.includes("Invalid login")) {
-      console.error("👉 TIP: Your Gmail App Password seems incorrect or expired. Please generate a new one.");
+const canSendEmail = () =>
+  Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+
+// Verify only when credentials are configured
+if (canSendEmail()) {
+  transporter.verify(function (error) {
+    if (error) {
+      console.error("❌ Email Transporter Error:", error.message);
+      if (error.message.includes("Invalid login")) {
+        console.error(
+          "👉 TIP: Your Gmail App Password seems incorrect or expired. Please generate a new one.",
+        );
+      }
+    } else {
+      console.log("✅ Email Server is ready to send notifications");
     }
-  } else {
-    console.log("✅ Email Server is ready to send notifications");
-  }
-});
+  });
+}
 
-
-export const sendOTPEmail = async (email, otp, userName) => {
+const sendOTPEmail = async (email, otp, userName) => {
   try {
     const mailOptions = {
-      from: `"Edunyte Security" <${process.env.EMAIL_USER}>`,
+      from: `"GDP Studio Security" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Your Login Verification Code",
       html: `
@@ -66,7 +72,7 @@ export const sendOTPEmail = async (email, otp, userName) => {
                   If you didn’t request this, please reset your password and review recent activity.
                 </p>
                 <p style="margin:0 0 6px 0;font-size:13px;color:#94a3b8;">Stay secure,</p>
-                <p style="margin:0;font-size:13px;color:#e2e8f0;font-weight:600;">Edunyte Security</p>
+                <p style="margin:0;font-size:13px;color:#e2e8f0;font-weight:600;">GDP Studio Security</p>
               </td>
             </tr>
             <tr>
@@ -86,10 +92,10 @@ export const sendOTPEmail = async (email, otp, userName) => {
   }
 };
 
-export const sendResetPasswordEmail = async (email, otp, userName) => {
+const sendResetPasswordEmail = async (email, otp, userName) => {
   try {
     const mailOptions = {
-      from: `"Edunyte Security" <${process.env.EMAIL_USER}>`,
+      from: `"GDP Studio Security" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Reset your password",
       html: `
@@ -117,7 +123,7 @@ export const sendResetPasswordEmail = async (email, otp, userName) => {
                 <p style="margin:0 0 12px 0;font-size:14px;line-height:1.6;color:#94a3b8;">
                   If you didn't request this, you can ignore this email—your password will remain unchanged.
                 </p>
-                <p style="margin:0;font-size:13px;color:#e2e8f0;font-weight:600;">Edunyte Security</p>
+                <p style="margin:0;font-size:13px;color:#e2e8f0;font-weight:600;">GDP Studio Security</p>
               </td>
             </tr>
             <tr>
@@ -137,11 +143,11 @@ export const sendResetPasswordEmail = async (email, otp, userName) => {
   }
 };
 
-export const sendTeacherRegistrationNotificationToAdmin = async (teacherData) => {
+const sendTeacherRegistrationNotificationToAdmin = async (teacherData) => {
   try {
     const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
     const mailOptions = {
-      from: `"Edunyte System" <${process.env.EMAIL_USER}>`,
+      from: `"GDP Studio System" <${process.env.EMAIL_USER}>`,
       to: adminEmail,
       subject: "New Instructor Registration Pending Approval",
       html: `
@@ -154,34 +160,36 @@ export const sendTeacherRegistrationNotificationToAdmin = async (teacherData) =>
             <p><strong>Registration Date:</strong> ${new Date().toLocaleString()}</p>
           </div>
           <p style="margin-top: 20px;">Please login to the admin panel to review and approve this account.</p>
-          <p>Regards,<br/>Edunyte System</p>
+          <p>Regards,<br/>GDP Studio System</p>
         </div>
       `,
     };
     await transporter.sendMail(mailOptions);
-    console.log(`Admin notification sent for new teacher: ${teacherData.email}`);
+    console.log(
+      `Admin notification sent for new teacher: ${teacherData.email}`,
+    );
   } catch (error) {
     console.error("Error sending admin notification email:", error);
   }
 };
 
-export const sendInstructorApprovalEmail = async (email, userName) => {
+const sendInstructorApprovalEmail = async (email, userName) => {
   try {
     const mailOptions = {
-      from: `"Edunyte Team" <${process.env.EMAIL_USER}>`,
+      from: `"GDP Studio Team" <${process.env.EMAIL_USER}>`,
       to: email,
       subject: "Your Instructor Account has been Approved!",
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
           <h2 style="color: #10b981;">Congratulations!</h2>
           <p>Hello ${userName},</p>
-          <p>Your instructor account on Edunyte has been approved by the administrators.</p>
-          <p>You can now log in to the platform and start creating your courses or managing your profile.</p>
+          <p>Your instructor account on GDP Studio has been approved by the administrators.</p>
+          <p>You can now log in to the platform and start managing your profile.</p>
           <div style="margin-top: 30px;">
-            <a href="${process.env.FRONTEND_URL || 'http://localhost:5173'}/login/instructor" style="background: #10b981; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login to your Account</a>
+            <a href="${process.env.FRONTEND_URL || "http://localhost:5173"}/login" style="background: #10b981; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login to your Account</a>
           </div>
-          <p style="margin-top: 30px;">Welcome to the Edunyte community!</p>
-          <p>Regards,<br/>Edunyte Team</p>
+          <p style="margin-top: 30px;">Welcome to the GDP Studio community!</p>
+          <p>Regards,<br/>GDP Studio Team</p>
         </div>
       `,
     };
@@ -190,4 +198,68 @@ export const sendInstructorApprovalEmail = async (email, userName) => {
   } catch (error) {
     console.error("Error sending approval email:", error);
   }
+};
+
+const sendEnquiryConfirmationEmail = async ({ name, email }) => {
+  if (!canSendEmail()) {
+    console.log(
+      "Email credentials missing; skipping enquiry confirmation email.",
+    );
+    return;
+  }
+
+  const mailOptions = {
+    from: `"GDP Studio" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "We received your GDP Studio enquiry",
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #222;">
+        <h2 style="color: #634BFA;">Thanks for reaching out, ${name}!</h2>
+        <p>We have received your enquiry for Garima Dance Production / GDP Studio.</p>
+        <p>Our team will review your message and contact you shortly.</p>
+        <p style="margin-top: 24px;">Regards,<br/>GDP Studio Team</p>
+      </div>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+const sendEnquiryNotificationToAdmin = async ({ enquiry }) => {
+  if (!canSendEmail()) {
+    console.log(
+      "Email credentials missing; skipping enquiry admin notification.",
+    );
+    return;
+  }
+
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+  const mailOptions = {
+    from: `"GDP Studio" <${process.env.EMAIL_USER}>`,
+    to: adminEmail,
+    subject: `New ${enquiry.source || "website"} enquiry`,
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #222;">
+        <h2 style="color: #634BFA;">New GDP Studio Enquiry</h2>
+        <p><strong>Name:</strong> ${enquiry.name}</p>
+        <p><strong>Email:</strong> ${enquiry.email}</p>
+        <p><strong>Phone:</strong> ${enquiry.phone}</p>
+        <p><strong>Source:</strong> ${enquiry.source || "general"}</p>
+        <p><strong>Message:</strong></p>
+        <p style="white-space: pre-wrap;">${enquiry.message}</p>
+      </div>
+    `,
+  };
+
+  await transporter.sendMail(mailOptions);
+};
+
+module.exports = {
+  transporter,
+  sendOTPEmail,
+  sendResetPasswordEmail,
+  sendTeacherRegistrationNotificationToAdmin,
+  sendInstructorApprovalEmail,
+  sendEnquiryConfirmationEmail,
+  sendEnquiryNotificationToAdmin,
 };

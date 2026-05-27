@@ -3,7 +3,6 @@ import Features from "./Features"
 import About from "./About"
 import Courses from "./Courses"
 import Faq from "./Faq"
-import Instructor from "./Instructor"
 import Blog from "./Blog"
 import Testimonial from "./Testimonial"
 import HeaderFive from "../../../layouts/headers/HeaderFive"
@@ -19,7 +18,6 @@ const HomeFive = () => {
             <About/>
             <Courses />
             <Faq />
-            <Instructor />
             <Testimonial />
             <Blog />
          </main>

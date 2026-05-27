@@ -1,16 +1,52 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from '../components/layout/Layout';
 import { motion } from 'framer-motion';
+import { getPageContentBySlug } from '../services/cmsService';
 import '../styles/theme.css';
 
+type ScheduleRow = {
+  time: string;
+  monday: string;
+  tuesday: string;
+  wednesday: string;
+  thursday: string;
+  friday: string;
+};
+
+const DEFAULT_SCHEDULE: ScheduleRow[] = [
+  { time: '08:00 AM', monday: 'Ballet I', tuesday: 'Yoga for Dancers', wednesday: 'Ballet I', thursday: 'Stretch & Flex', friday: 'Ballet II' },
+  { time: '10:00 AM', monday: 'Contemporary', tuesday: 'Jazz Fusion', wednesday: 'Contemporary', thursday: 'Urban Hip-Hop', friday: 'Jazz Fusion' },
+  { time: '02:00 PM', monday: 'Urban Hip-Hop', tuesday: 'Latin Ballroom', wednesday: 'Urban Hip-Hop', thursday: 'Contemporary', friday: 'Latin Ballroom' },
+  { time: '05:00 PM', monday: 'Breakdance', tuesday: 'Ballet III', wednesday: 'Breakdance', thursday: 'Advanced Jazz', friday: 'Showcase Prep' },
+  { time: '07:00 PM', monday: 'Live Workshop', tuesday: 'Coach Q&A', wednesday: 'Live Workshop', thursday: 'Member Social', friday: 'Live Workshop' },
+];
+
+const DEFAULT_HERO_TITLE = 'SESSION SCHEDULE';
+const DEFAULT_HERO_SUBTITLE =
+  'Plan your practice with our weekly schedule of live and in-studio sessions.';
+
 const Schedule: React.FC = () => {
-  const scheduleData = [
-    { time: '08:00 AM', monday: 'Ballet I', tuesday: 'Yoga for Dancers', wednesday: 'Ballet I', thursday: 'Stretch & Flex', friday: 'Ballet II' },
-    { time: '10:00 AM', monday: 'Contemporary', tuesday: 'Jazz Fusion', wednesday: 'Contemporary', thursday: 'Urban Hip-Hop', friday: 'Jazz Fusion' },
-    { time: '02:00 PM', monday: 'Urban Hip-Hop', tuesday: 'Latin Ballroom', wednesday: 'Urban Hip-Hop', thursday: 'Contemporary', friday: 'Latin Ballroom' },
-    { time: '05:00 PM', monday: 'Breakdance', tuesday: 'Ballet III', wednesday: 'Breakdance', thursday: 'Advanced Jazz', friday: 'Showcase Prep' },
-    { time: '07:00 PM', monday: 'Live Workshop', tuesday: 'Coach Q&A', wednesday: 'Live Workshop', thursday: 'Member Social', friday: 'Live Workshop' },
-  ];
+  const [scheduleData, setScheduleData] = useState<ScheduleRow[]>(DEFAULT_SCHEDULE);
+  const [heroTitle, setHeroTitle] = useState(DEFAULT_HERO_TITLE);
+  const [heroSubtitle, setHeroSubtitle] = useState(DEFAULT_HERO_SUBTITLE);
+
+  useEffect(() => {
+    getPageContentBySlug('schedule')
+      .then((page) => {
+        const c = page?.content;
+        if (!c) return;
+        if (c.scheduleRows?.length > 0) {
+          setScheduleData(c.scheduleRows);
+        }
+        if (c.heroTitle) {
+          setHeroTitle(c.heroTitle);
+        }
+        if (c.heroSubtitle) {
+          setHeroSubtitle(c.heroSubtitle);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <Layout>
@@ -21,9 +57,18 @@ const Schedule: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="section-title"
           >
-            SESSION <span className="gradient-text">SCHEDULE</span>
+            {heroTitle.includes(' ') ? (
+              <>
+                {heroTitle.split(' ').slice(0, -1).join(' ')}{' '}
+                <span className="gradient-text">{heroTitle.split(' ').slice(-1)[0]}</span>
+              </>
+            ) : (
+              <>
+                SESSION <span className="gradient-text">{heroTitle}</span>
+              </>
+            )}
           </motion.h1>
-          <p className="hero-subtitle">Plan your practice with our weekly schedule of live and in-studio sessions.</p>
+          <p className="hero-subtitle">{heroSubtitle}</p>
         </div>
       </section>
 

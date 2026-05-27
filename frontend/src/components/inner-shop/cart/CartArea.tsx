@@ -1,7 +1,7 @@
 import { addToCart, clear_cart, decrease_quantity, remove_cart_product } from "../../../redux/features/cartSlice";
 import { useDispatch, useSelector } from "react-redux";
 import UseCartInfo from "../../../hooks/UseCartInfo";
-import { RootState } from "../../../redux/store";
+import type { RootState } from "../../../redux/store";
 import { Link } from "react-router-dom";
 import { usePriceFormatter } from "../../../hooks/usePriceFormatter";
 

@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { type ChangeEvent, useState } from "react";
 import type { Program } from "../../../services/programService";
 import { useTranslation } from "react-i18next";
 

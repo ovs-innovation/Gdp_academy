@@ -48,7 +48,7 @@ const RegistrationArea = ({ role }: { role?: string }) => {
                               <p className="opacity-60 small">{t("common.registration_description")}</p>
                            </div>
 
-                           <RegistrationForm role={role} />
+                           <RegistrationForm />
 
                            <div className="account__switch text-center mt-20 pt-20 border-top">
                               <p className="m-0 text-muted small">

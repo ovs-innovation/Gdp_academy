@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Krona+One&family=Montserrat:wght@400;500;600;700&display=swap');
+
+.admin-login-page {
+  min-height: 100vh;
+  background: #060606;
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-login-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(circle at center, rgba(99, 75, 250, 0.16) 0%, transparent 58%),
+    linear-gradient(rgba(30, 255, 228, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(30, 255, 228, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 60px 60px, 60px 60px;
+  pointer-events: none;
+}
+
+.admin-login-glow {
+  position: fixed;
+  bottom: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150%;
+  height: 55%;
+  background: radial-gradient(ellipse, rgba(99, 75, 250, 0.2) 0%, transparent 70%);
+  filter: blur(90px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.admin-login-inner {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 16px;
+}
+
+.admin-login-brand {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.admin-login-logo-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.admin-login-logo {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+.admin-login-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  font-family: 'Krona One', sans-serif;
+  text-align: left;
+}
+
+.admin-login-brand-text span {
+  font-size: 9px;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.admin-login-title {
+  font-family: 'Krona One', sans-serif;
+  font-size: clamp(24px, 4vw, 32px);
+  letter-spacing: -0.5px;
+  margin: 0 0 8px;
+  color: #fff;
+}
+
+.admin-login-title .accent {
+  color: #634bfa;
+}
+
+.admin-login-subtitle {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 14px;
+}
+
+.admin-login-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 28px;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+.admin-login-card label {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.admin-login-card input {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
+
+.admin-login-card input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.admin-login-card input:focus-visible {
+  border-color: rgba(30, 255, 228, 0.45) !important;
+  box-shadow: 0 0 0 2px rgba(99, 75, 250, 0.25) !important;
+}
+
+.admin-login-submit {
+  width: 100%;
+  height: 44px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #634bfa 0%, #4a38c9 100%);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 8px 24px rgba(99, 75, 250, 0.35);
+}
+
+.admin-login-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(99, 75, 250, 0.45);
+}
+
+.admin-login-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.admin-login-link {
+  color: #1effe4;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.admin-login-link:hover {
+  text-decoration: underline;
+}
+
+.admin-login-note {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(99, 75, 250, 0.1);
+  border: 1px solid rgba(99, 75, 250, 0.2);
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  line-height: 1.6;
+}
+
+.admin-login-note strong {
+  color: #1effe4;
+  font-weight: 600;
+}
+
+.admin-login-outline-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  border-radius: 12px;
+  height: 44px;
+}
+
+.admin-login-outline-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.admin-login-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(30, 255, 228, 0.08);
+  border: 1px solid rgba(30, 255, 228, 0.18);
+  color: #1effe4;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-family: 'Krona One', sans-serif;
+  margin-bottom: 14px;
+}
+
+.admin-login-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #1effe4;
+  box-shadow: 0 0 10px #1effe4;
+}

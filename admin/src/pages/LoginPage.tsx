@@ -1,27 +1,25 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Separator } from '@/components/ui/separator';
-import { ThemeToggle } from '@/components/ThemeToggle';
-import { Eye, EyeOff, Lock, Mail, Shield, KeyRound } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, KeyRound } from 'lucide-react';
 import { toast } from 'sonner';
 import { AuthAPI, setToken } from '@/lib/api';
 import { useRole } from '@/contexts/RoleContext';
+import '@/styles/admin-login.css';
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState('admin@gdpstudio.com');
   const [password, setPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [requiresOTP, setRequiresOTP] = useState(false);
-  const [remember, setRemember] = useState(false);
+  const [remember, setRemember] = useState(true);
   const [forgotMode, setForgotMode] = useState(false);
   const [resetStep, setResetStep] = useState(false);
   const [resetOtp, setResetOtp] = useState('');
@@ -45,8 +43,8 @@ const LoginPage = () => {
             toast.success('Admin access granted');
             navigate('/');
           }
-        } catch (err) {
-          toast.error("Auto-login failed. Please login manually.");
+        } catch {
+          toast.error('Auto-login failed. Please login manually.');
         } finally {
           setIsLoading(false);
         }
@@ -54,6 +52,13 @@ const LoginPage = () => {
       performAutoLogin();
     }
   }, []);
+
+  const persistUser = (user: { email: string; name?: string; id: string }, rememberUser: boolean) => {
+    const storage = rememberUser ? localStorage : sessionStorage;
+    storage.setItem('user-email', user.email);
+    storage.setItem('user-name', user.name || user.email);
+    storage.setItem('user-id', user.id);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,19 +74,18 @@ const LoginPage = () => {
           setResetStep(true);
           toast.success('Reset code sent to your email');
           return;
-        } else {
-          if (!resetOtp || !newPassword) {
-            toast.error('Enter the code and new password');
-            return;
-          }
-          await AuthAPI.reset({ email, otp: resetOtp, password: newPassword });
-          toast.success('Password reset. Please log in.');
-          setForgotMode(false);
-          setResetStep(false);
-          setResetOtp('');
-          setNewPassword('');
+        }
+        if (!resetOtp || !newPassword) {
+          toast.error('Enter the code and new password');
           return;
         }
+        await AuthAPI.reset({ email, otp: resetOtp, password: newPassword });
+        toast.success('Password reset. Please log in.');
+        setForgotMode(false);
+        setResetStep(false);
+        setResetOtp('');
+        setNewPassword('');
+        return;
       }
       if (!email || !password) {
         toast.error('Please enter email and password');
@@ -101,10 +105,7 @@ const LoginPage = () => {
         setToken(data.token, remember);
         setCurrentRole(data.user.role);
         setPermissions((data.user.permissions || []) as any);
-        const storage = remember ? localStorage : sessionStorage;
-        storage.setItem('user-email', data.user.email);
-        storage.setItem('user-name', data.user.name || data.user.email);
-        storage.setItem('user-id', data.user.id);
+        persistUser(data.user, remember);
         toast.success('Login successful');
         navigate('/');
       }
@@ -125,30 +126,44 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
+    <div className="admin-login-page">
+      <div className="admin-login-bg" />
+      <div className="admin-login-glow" />
 
-      <div className="fixed inset-0 gradient-glow pointer-events-none" />
-      <div className="fixed top-0 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-      <div className="fixed bottom-0 right-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-
-      <div className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-md space-y-8 animate-fade-in">
-          <div className="text-center space-y-2">
-            <img src="/assets/img/logo/edunyte-light.png" width={100} height={100} alt="Logo" className="w-52 h-52 mx-auto" />
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">
-              {requiresOTP ? 'Enter Verification Code' : 'Welcome Back'}
+      <div className="admin-login-inner">
+        <div className="w-full max-w-md animate-fade-in">
+          <div className="admin-login-brand">
+            <div className="admin-login-badge">
+              <span className="admin-login-badge-dot" />
+              GDP Admin Panel
+            </div>
+            <div className="admin-login-logo-wrap">
+              <img src="/logo.png" alt="GDP" className="admin-login-logo" />
+              <div className="admin-login-brand-text">
+                <span>Garima</span>
+                <span>Dance</span>
+                <span>Productions</span>
+              </div>
+            </div>
+            <h1 className="admin-login-title">
+              {requiresOTP ? (
+                <>Verify <span className="accent">Access</span></>
+              ) : forgotMode ? (
+                <>Reset <span className="accent">Password</span></>
+              ) : (
+                <>Admin <span className="accent">Login</span></>
+              )}
             </h1>
-            <p className="text-muted-foreground">
+            <p className="admin-login-subtitle">
               {requiresOTP
-                ? 'We sent a verification code to your email'
-                : 'Sign in to access admin/teacher dashboard'}
+                ? 'Enter the verification code sent to your email'
+                : forgotMode
+                  ? 'Recover your admin account securely'
+                  : 'Manage programs, workshops, CMS, students & more'}
             </p>
           </div>
 
-          <Card className="p-6 border-border bg-card/80 backdrop-blur-sm shadow-lg animate-slide-up">
+          <div className="admin-login-card animate-slide-up">
             <form onSubmit={handleLogin} className="space-y-5">
               {!requiresOTP && !forgotMode ? (
                 <>
@@ -159,10 +174,10 @@ const LoginPage = () => {
                       <Input
                         id="email"
                         type="email"
-                        placeholder="admin@example.com"
+                        placeholder="admin@gdpstudio.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10 bg-muted/50"
+                        className="pl-10"
                         disabled={isLoading}
                       />
                     </div>
@@ -178,7 +193,7 @@ const LoginPage = () => {
                         placeholder="••••••••"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="pl-10 pr-10 bg-muted/50"
+                        className="pl-10 pr-10"
                         disabled={isLoading}
                       />
                       <button
@@ -210,7 +225,7 @@ const LoginPage = () => {
                         setRequiresOTP(false);
                         setOtp('');
                       }}
-                      className="text-sm text-primary hover:underline"
+                      className="admin-login-link"
                     >
                       Forgot password?
                     </button>
@@ -225,10 +240,10 @@ const LoginPage = () => {
                       <Input
                         id="resetEmail"
                         type="email"
-                        placeholder="you@example.com"
+                        placeholder="admin@gdpstudio.com"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10 bg-muted/50"
+                        className="pl-10"
                         disabled={isLoading}
                       />
                     </div>
@@ -245,8 +260,8 @@ const LoginPage = () => {
                             type="text"
                             placeholder="Enter 6-digit code"
                             value={resetOtp}
-                            onChange={(e) => setResetOtp(e.target.value.replace(/\\D/g, '').slice(0, 6))}
-                            className="pl-10 bg-muted/50 text-center text-2xl tracking-widest"
+                            onChange={(e) => setResetOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                            className="pl-10 text-center text-2xl tracking-widest"
                             maxLength={6}
                             disabled={isLoading}
                           />
@@ -260,7 +275,6 @@ const LoginPage = () => {
                           placeholder="••••••••"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
-                          className="bg-muted/50"
                           disabled={isLoading}
                         />
                       </div>
@@ -268,31 +282,12 @@ const LoginPage = () => {
                   )}
 
                   <div className="flex gap-3">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleBack}
-                      className="w-1/3"
-                      disabled={isLoading}
-                    >
+                    <Button type="button" variant="outline" onClick={handleBack} className="w-1/3 admin-login-outline-btn" disabled={isLoading}>
                       Back
                     </Button>
-                    <Button
-                      type="submit"
-                      disabled={isLoading}
-                      className="w-2/3 gradient-primary text-primary-foreground hover:opacity-90"
-                    >
-                      {isLoading ? (
-                        <div className="flex items-center gap-2">
-                          <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                          {resetStep ? 'Resetting...' : 'Sending...'}
-                        </div>
-                      ) : resetStep ? (
-                        'Reset Password'
-                      ) : (
-                        'Send Reset Code'
-                      )}
-                    </Button>
+                    <button type="submit" disabled={isLoading} className="w-2/3 admin-login-submit">
+                      {isLoading ? 'Please wait...' : resetStep ? 'Reset Password' : 'Send Reset Code'}
+                    </button>
                   </div>
                 </>
               ) : (
@@ -307,73 +302,34 @@ const LoginPage = () => {
                         placeholder="Enter 6-digit code"
                         value={otp}
                         onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                        className="pl-10 bg-muted/50 text-center text-2xl tracking-widest"
+                        className="pl-10 text-center text-2xl tracking-widest"
                         maxLength={6}
                         disabled={isLoading}
                         autoFocus
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      Check your email for the verification code
-                    </p>
                   </div>
-
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleBack}
-                    className="w-full"
-                    disabled={isLoading}
-                  >
+                  <Button type="button" variant="outline" onClick={handleBack} className="w-full admin-login-outline-btn" disabled={isLoading}>
                     Back to Login
                   </Button>
                 </>
               )}
 
               {!forgotMode && (
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full gradient-primary text-primary-foreground hover:opacity-90 h-11"
-                >
-                  {isLoading ? (
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin" />
-                      {requiresOTP ? 'Verifying...' : 'Signing in...'}
-                    </div>
-                  ) : (
-                    requiresOTP ? 'Verify Code' : 'Sign In'
-                  )}
-                </Button>
+                <button type="submit" disabled={isLoading} className="admin-login-submit">
+                  {isLoading ? 'Please wait...' : requiresOTP ? 'Verify Code' : 'Sign In to Dashboard'}
+                </button>
               )}
             </form>
 
-            {!requiresOTP && (
-              <div className="mt-6">
-                <div className="relative">
-                  <Separator />
-                  <span className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-card px-2 text-xs text-muted-foreground">
-                    Secure Access Only
-                  </span>
-                </div>
-
-                <div className="mt-4 p-3 rounded-lg bg-muted/50 text-sm">
-                  <p className="text-muted-foreground">
-                    Secure access only. Use your issued admin credentials to sign in.
-                  </p>
-                </div>
+            {!requiresOTP && !forgotMode && (
+              <div className="admin-login-note">
+                Default admin: <strong>admin@gdpstudio.com</strong> / <strong>adminpassword</strong>
+                <br />
+                Backend must be running on port <strong>8096</strong>.
               </div>
             )}
-          </Card>
-
-          {!requiresOTP && (
-            <p className="text-center text-sm text-muted-foreground">
-              Don't have an account?{' '}
-              <button className="text-primary hover:underline">
-                Contact Administrator
-              </button>
-            </p>
-          )}
+          </div>
         </div>
       </div>
     </div>

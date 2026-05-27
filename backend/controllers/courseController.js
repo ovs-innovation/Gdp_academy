@@ -1,6 +1,12 @@
-import Course from "../models/courseModel.js";
-import mongoose from "mongoose";
-import { normalizeLanguageValue, getLanguageValue, transformLanguageFields } from "../utils/languageHelper.js";
+const Program = require("../models/programModel.js");
+const mongoose = require("mongoose");
+const Category = require("../models/danceStyleModel.js");
+
+const {
+  normalizeLanguageValue,
+  getLanguageValue,
+  transformLanguageFields,
+} = require("../utils/languageHelper.js");
 
 const slugify = (text) => {
   if (!text) return "";
@@ -15,7 +21,7 @@ const slugify = (text) => {
     .replace(/-+$/, "");
 };
 
-const ensureCourseSlug = async (courseDoc) => {
+const ensureProgramSlug = async (courseDoc) => {
   if (!courseDoc) return;
   const currentSlug = getLanguageValue(courseDoc.slug);
   if (currentSlug) return;
@@ -26,7 +32,12 @@ const ensureCourseSlug = async (courseDoc) => {
 
   let slugValue = baseSlug;
   let counter = 1;
-  while (await Course.findOne({ "slug.en": slugValue, _id: { $ne: courseDoc._id } })) {
+  while (
+    await Program.findOne({
+      "slug.en": slugValue,
+      _id: { $ne: courseDoc._id },
+    })
+  ) {
     slugValue = `${baseSlug}-${counter}`;
     counter++;
   }
@@ -35,17 +46,75 @@ const ensureCourseSlug = async (courseDoc) => {
   await courseDoc.save();
 };
 
-/**
- * Course Controller
- * Admin-only operations for managing courses
- */
+const mutableProgramFields = [
+  "category",
+  "danceStyle",
+  "level",
+  "duration",
+  "durationUnit",
+  "image",
+  "thumbnail",
+  "previewVideo",
+  "galleryImages",
+  "price",
+  "discountPrice",
+  "currency",
+  "curriculum",
+  "benefits",
+  "faqs",
+  "recordedClasses",
+  "workshopDate",
+  "workshopTime",
+  "workshopEndTime",
+  "zoomLink",
+  "workshopBanner",
+  "status",
+  "type",
+  "metadata",
+];
+
+const buildProgramPayload = (body) => {
+  const payload = {};
+  for (const field of mutableProgramFields) {
+    if (body[field] !== undefined) {
+      payload[field] =
+        field === "workshopDate" && body[field]
+          ? new Date(body[field])
+          : body[field];
+    }
+  }
+
+  if (body.DanceStyle !== undefined && body.danceStyle === undefined) {
+    payload.danceStyle = body.DanceStyle;
+    payload.category = body.DanceStyle;
+  }
+
+  if (body.danceStyle !== undefined && body.category === undefined) {
+    payload.category = body.danceStyle;
+  }
+
+  if (body.workshopBanner && !payload.image) {
+    payload.image = body.workshopBanner;
+  }
+
+  return payload;
+};
+
+const toProgramDto = (course) => {
+  const courseObj = course.toObject ? course.toObject() : course;
+  courseObj.name = getLanguageValue(courseObj.name);
+  courseObj.description = getLanguageValue(courseObj.description);
+  courseObj.slug = getLanguageValue(courseObj.slug);
+  courseObj.DanceStyle = courseObj.danceStyle || courseObj.category || "";
+  return courseObj;
+};
 
 /**
  * Create a new course (Admin only)
  */
-export const createCourse = async (req, res, next) => {
+const createProgram = async (req, res, next) => {
   try {
-    const { name, description, category, image, status, type } = req.body;
+    const { name, description } = req.body;
     const createdBy = req.user.id;
     const role = req.user.role;
 
@@ -53,36 +122,33 @@ export const createCourse = async (req, res, next) => {
     const normalizedDescription = normalizeLanguageValue(description);
     const nameValue = getLanguageValue(normalizedName);
 
-    const existing = await Course.findOne({
+    const existing = await Program.findOne({
       $or: [
         { "name.en": { $regex: new RegExp(`^${nameValue}$`, "i") } },
-        { name: { $regex: new RegExp(`^${nameValue}$`, "i") } }
-      ]
+        { name: { $regex: new RegExp(`^${nameValue}$`, "i") } },
+      ],
     });
     if (existing) {
-      return res.status(409).json({ message: "Course with this name already exists" });
+      return res
+        .status(409)
+        .json({ message: "Program with this name already exists" });
     }
 
     // Teachers can only create pending courses
-    let courseStatus = status || "active";
+    let courseStatus = "active";
     if (role === "teacher") {
       courseStatus = "pending";
     }
 
-    const course = await Course.create({
+    const course = await Program.create({
+      ...buildProgramPayload(req.body),
       name: normalizedName,
       description: normalizedDescription,
-      category,
-      image,
       status: courseStatus,
-      type: type || "program",
       createdBy,
     });
     await course.populate("createdBy", "name email");
-    const courseObj = course.toObject();
-    courseObj.name = getLanguageValue(courseObj.name);
-    courseObj.description = getLanguageValue(courseObj.description);
-    courseObj.slug = getLanguageValue(courseObj.slug);
+    const courseObj = toProgramDto(course);
     res.status(201).json({ course: courseObj });
   } catch (err) {
     next(err);
@@ -92,7 +158,7 @@ export const createCourse = async (req, res, next) => {
 /**
  * Get all courses (Admin)
  */
-export const getCourses = async (req, res, next) => {
+const getPrograms = async (req, res, next) => {
   try {
     const { status, search, category, type } = req.query;
     const query = {};
@@ -106,20 +172,19 @@ export const getCourses = async (req, res, next) => {
     }
 
     if (category) {
-      const Category = (await import("../models/categoryModel.js")).default;
       let categoryDoc;
-      
+
       if (mongoose.Types.ObjectId.isValid(category)) {
         categoryDoc = await Category.findById(category);
       } else {
         categoryDoc = await Category.findOne({ "slug.en": category });
       }
-      
+
       if (categoryDoc) {
         const categoryName = getLanguageValue(categoryDoc.name);
         query.$or = [
           { category: categoryName },
-          { "category.en": categoryName }
+          { "category.en": categoryName },
         ];
       }
     }
@@ -131,39 +196,35 @@ export const getCourses = async (req, res, next) => {
           { "description.en": { $regex: search, $options: "i" } },
           { name: { $regex: search, $options: "i" } },
           { description: { $regex: search, $options: "i" } },
-        ]
+        ],
       };
-      
+
       if (query.$or) {
-        query.$and = [
-          { $or: query.$or },
-          searchQuery
-        ];
+        query.$and = [{ $or: query.$or }, searchQuery];
         delete query.$or;
       } else {
         Object.assign(query, searchQuery);
       }
     }
 
-    const courses = await Course.find(query)
+    const courses = await Program.find(query)
       .populate("createdBy", "name email")
       .sort({ createdAt: -1 });
 
     // Backfill slug for older records created before slug existed
     for (const c of courses) {
       // eslint-disable-next-line no-await-in-loop
-      await ensureCourseSlug(c);
+      await ensureProgramSlug(c);
     }
 
-    const coursesData = courses.map(course => {
-      const courseObj = course.toObject();
-      courseObj.name = getLanguageValue(courseObj.name);
-      courseObj.description = getLanguageValue(courseObj.description);
-      courseObj.slug = getLanguageValue(courseObj.slug);
-      return courseObj;
-    });
+    const coursesData = courses.map(toProgramDto);
 
-    res.json({ courses: coursesData, count: coursesData.length });
+    res.json({
+      courses: coursesData,
+      Programs: coursesData,
+      programs: coursesData,
+      count: coursesData.length,
+    });
   } catch (err) {
     next(err);
   }
@@ -172,28 +233,28 @@ export const getCourses = async (req, res, next) => {
 /**
  * Get a single course by ID or slug
  */
-export const getCourseById = async (req, res, next) => {
+const getProgramById = async (req, res, next) => {
   try {
     const { id } = req.params;
     let course;
 
     if (mongoose.Types.ObjectId.isValid(id)) {
-      course = await Course.findById(id).populate("createdBy", "name email");
+      course = await Program.findById(id).populate("createdBy", "name email");
     } else {
-      course = await Course.findOne({ "slug.en": id }).populate("createdBy", "name email");
+      course = await Program.findOne({ "slug.en": id }).populate(
+        "createdBy",
+        "name email",
+      );
     }
 
     if (!course) {
-      return res.status(404).json({ message: "Course not found" });
+      return res.status(404).json({ message: "Program not found" });
     }
 
-    await ensureCourseSlug(course);
+    await ensureProgramSlug(course);
 
-    const courseObj = course.toObject();
-    courseObj.name = getLanguageValue(courseObj.name);
-    courseObj.description = getLanguageValue(courseObj.description);
-    courseObj.slug = getLanguageValue(courseObj.slug);
-    res.json({ course: courseObj });
+    const courseObj = toProgramDto(course);
+    res.json({ course: courseObj, Program: courseObj, program: courseObj });
   } catch (err) {
     next(err);
   }
@@ -202,18 +263,18 @@ export const getCourseById = async (req, res, next) => {
 /**
  * Update a course (Admin only)
  */
-export const updateCourse = async (req, res, next) => {
+const updateProgram = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid course ID" });
     }
 
-    const { name, description, category, image, status, type } = req.body;
-    const course = await Course.findById(id);
+    const { name, description } = req.body;
+    const course = await Program.findById(id);
 
     if (!course) {
-      return res.status(404).json({ message: "Course not found" });
+      return res.status(404).json({ message: "Program not found" });
     }
 
     if (name !== undefined) {
@@ -222,32 +283,29 @@ export const updateCourse = async (req, res, next) => {
       const currentNameValue = getLanguageValue(course.name);
 
       if (nameValue !== currentNameValue) {
-        const existing = await Course.findOne({
+        const existing = await Program.findOne({
           $or: [
             { "name.en": { $regex: new RegExp(`^${nameValue}$`, "i") } },
-            { name: { $regex: new RegExp(`^${nameValue}$`, "i") } }
+            { name: { $regex: new RegExp(`^${nameValue}$`, "i") } },
           ],
-          _id: { $ne: id }
+          _id: { $ne: id },
         });
         if (existing) {
-          return res.status(409).json({ message: "Course with this name already exists" });
+          return res
+            .status(409)
+            .json({ message: "Program with this name already exists" });
         }
       }
       course.name = normalizedName;
     }
 
-    if (description !== undefined) course.description = normalizeLanguageValue(description);
-    if (category !== undefined) course.category = category;
-    if (image !== undefined) course.image = image;
-    if (status !== undefined) course.status = status;
-    if (type !== undefined) course.type = type;
+    if (description !== undefined)
+      course.description = normalizeLanguageValue(description);
+    Object.assign(course, buildProgramPayload(req.body));
 
     await course.save();
     await course.populate("createdBy", "name email");
-    const courseObj = course.toObject();
-    courseObj.name = getLanguageValue(courseObj.name);
-    courseObj.description = getLanguageValue(courseObj.description);
-    courseObj.slug = getLanguageValue(courseObj.slug);
+    const courseObj = toProgramDto(course);
     res.json({ course: courseObj });
   } catch (err) {
     next(err);
@@ -256,33 +314,37 @@ export const updateCourse = async (req, res, next) => {
 
 /**
  * Delete a course (Admin only)
- * Note: Consider soft delete or checking for existing teacher-course mappings
  */
-export const deleteCourse = async (req, res, next) => {
+const deleteProgram = async (req, res, next) => {
   try {
     const { id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid course ID" });
     }
 
-    const course = await Course.findById(id);
+    const course = await Program.findById(id);
     if (!course) {
-      return res.status(404).json({ message: "Course not found" });
-    }
-
-    // Check if course has any teacher mappings
-    const TeacherCourse = (await import("../models/teacherCourseModel.js")).default;
-    const hasMappings = await TeacherCourse.exists({ courseId: id });
-    if (hasMappings) {
-      return res.status(400).json({
-        message: "Cannot delete course with existing teacher mappings. Deactivate it instead.",
-      });
+      return res.status(404).json({ message: "Program not found" });
     }
 
     await course.deleteOne();
-    res.json({ success: true, message: "Course deleted successfully" });
+    res.json({ success: true, message: "Program deleted successfully" });
   } catch (err) {
     next(err);
   }
 };
 
+// Aliases for compatibility with student/public routes
+const getCourses = getPrograms;
+const getCourseById = getProgramById;
+
+module.exports = {
+  createProgram,
+  getPrograms,
+  getProgramById,
+  updateProgram,
+  deleteProgram,
+  // aliases
+  getCourses,
+  getCourseById,
+};

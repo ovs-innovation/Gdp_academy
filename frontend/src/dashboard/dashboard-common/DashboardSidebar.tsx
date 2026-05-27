@@ -14,86 +14,36 @@ interface DataType {
 };
 
 const sidebar_data: DataType[] = [
-   {
-      id: 1,
-      title: "MEMBER ACCESS",
-      sidebar_details: [
-         {
-            id: 1,
-            link: "/dashboard",
-            icon: "fas fa-home",
-            title: "PORTAL HOME",
-         },
-         {
-            id: 2,
-            link: "/profile",
-            icon: "skillgro-avatar",
-            title: "MY PROFILE",
-         },
-         {
-            id: 3,
-            link: "/programs",
-            icon: "skillgro-book",
-            title: "ENROLLED PROGRAMS",
-         },
-         {
-            id: 4,
-            link: "/wishlist",
-            icon: "skillgro-label",
-            title: "WISHLIST",
-         },
-         {
-            id: 7,
-            link: "/history",
-            icon: "skillgro-satchel",
-            title: "ORDER HISTORY",
-         },
-      ],
-   },
-   {
-      id: 2,
-      title: "DANCE COACH",
-      class_name: "mt-40",
-      sidebar_details: [
-         {
-            id: 1,
-            link: "/coach-programs",
-            icon: "skillgro-video-tutorial",
-            title: "MY PROGRAMS",
-         },
-         {
-            id: 2,
-            link: "/announcements",
-            icon: "skillgro-marketing",
-            title: "ANNOUNCEMENTS",
-         },
-         {
-            id: 4,
-            link: "/assignments",
-            icon: "skillgro-list",
-            title: "ASSIGNMENTS",
-         },
-      ],
-   },
-   {
-      id: 3,
-      title: "ACCOUNT",
-      class_name: "mt-30",
-      sidebar_details: [
-         {
-            id: 1,
-            link: "/settings",
-            icon: "skillgro-settings",
-            title: "SETTINGS",
-         },
-         {
-            id: 2,
-            link: "/",
-            icon: "skillgro-logout",
-            title: "LOGOUT",
-         },
-      ],
-   },
+  {
+    id: 1,
+    title: "MEMBER ACCESS",
+    sidebar_details: [
+      { id: 1, link: "/dashboard", icon: "fas fa-home", title: "PORTAL HOME" },
+      { id: 2, link: "/profile", icon: "skillgro-avatar", title: "MY PROFILE" },
+      { id: 3, link: "/programs", icon: "skillgro-book", title: "ENROLLED PROGRAMS" },
+      { id: 4, link: "/wishlist", icon: "skillgro-label", title: "WISHLIST" },
+      { id: 7, link: "/history", icon: "skillgro-satchel", title: "ORDER HISTORY" },
+    ],
+  },
+  {
+    id: 2,
+    title: "DANCE COACH",
+    class_name: "mt-40",
+    sidebar_details: [
+      { id: 1, link: "/coach-programs", icon: "skillgro-video-tutorial", title: "MY PROGRAMS" },
+      { id: 2, link: "/announcements", icon: "skillgro-marketing", title: "ANNOUNCEMENTS" },
+      { id: 4, link: "/assignments", icon: "skillgro-list", title: "ASSIGNMENTS" },
+    ],
+  },
+  {
+    id: 3,
+    title: "ACCOUNT",
+    class_name: "mt-30",
+    sidebar_details: [
+      { id: 1, link: "/settings", icon: "skillgro-settings", title: "CMS SETTINGS" },
+      { id: 2, link: "/", icon: "skillgro-logout", title: "LOGOUT" },
+    ],
+  },
 ];
 
 const DashboardSidebar = () => {

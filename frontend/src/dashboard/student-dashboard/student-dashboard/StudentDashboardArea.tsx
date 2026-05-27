@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../../contexts/AuthContext'
 import { getMyBookings, cancelBooking, getAvailableSlots, rescheduleBooking } from "../../../services/bookingService"
 import type { Booking } from '../../../services/bookingService'
@@ -9,8 +8,7 @@ import { toast } from 'react-toastify'
 import '../../../styles/dashboard-premium.css'
 
 const StudentDashboardArea = () => {
-  const { t } = useTranslation()
-  const { token, user } = useAuth() as any
+  const { token } = useAuth() as any
   const [bookings, setBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'upcoming' | 'completed' | 'cancelled'>('upcoming')

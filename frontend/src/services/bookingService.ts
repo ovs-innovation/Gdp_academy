@@ -48,6 +48,15 @@ export interface Booking {
     _id: string
     name: string
   }
+  lesson?: {
+    scheduledAt: string
+  }
+  courseId?: string | {
+    _id: string
+    name: string | { en: string }
+    description?: string | { en: string }
+    image?: string
+  }
 }
 
 export const getMyBookings = async (token: string): Promise<Booking[]> => {

@@ -83,7 +83,7 @@ const LoginArea = ({ role }: { role?: string }) => {
                   </motion.div>
                   
                   <div className="text-center mt-20 small opacity-40">
-                    &copy; 2026 Edunyte Learning Platform.
+                    &copy; 2026 GDP Studio.
                   </div>
                </div>
             </div>

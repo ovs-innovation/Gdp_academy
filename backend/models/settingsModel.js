@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const settingsSchema = new mongoose.Schema(
   {
@@ -12,6 +12,7 @@ const settingsSchema = new mongoose.Schema(
     ipWhitelist: { type: Boolean, default: false },
     themeColor: { type: String, default: "#1a73e8" },
     compactMode: { type: Boolean, default: false },
+
     /**
      * Platform fee percentage for bookings.
      *
@@ -20,16 +21,31 @@ const settingsSchema = new mongoose.Schema(
      * - Used by server-side pricing calculation (USD first), then converted for student currency.
      */
     platformFeePercent: { type: Number, default: 4, min: 0, max: 100 },
+
     // CMS Fields
     heroTitle: { type: String, default: "ELEVATE YOUR ARTISTRY" },
-    heroSubtitle: { type: String, default: "Step into the world's most prestigious dance sanctuary. Where passion meets precision, and every move tells a story." },
-    aboutText: { type: String, default: "Garima Dance Production is a sanctuary for artists, where technique meets expression in a cinematic environment." },
-    finalCtaTitle: { type: String, default: "READY TO BEGIN YOUR TRANSFORMATION?" },
-    finalCtaSubtitle: { type: String, default: "Join Garima Dance Production today and unlock your true artistic potential." },
+    heroSubtitle: {
+      type: String,
+      default:
+        "Step into the world's most prestigious dance sanctuary. Where passion meets precision, and every move tells a story.",
+    },
+    aboutText: {
+      type: String,
+      default:
+        "Garima Dance Production is a sanctuary for artists, where technique meets expression in a cinematic environment.",
+    },
+    finalCtaTitle: {
+      type: String,
+      default: "READY TO BEGIN YOUR TRANSFORMATION?",
+    },
+    finalCtaSubtitle: {
+      type: String,
+      default:
+        "Join Garima Dance Production today and unlock your true artistic potential.",
+    },
     whatsappNumber: { type: String, default: "1234567890" },
-
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 settingsSchema.statics.getSettings = async function () {
@@ -40,5 +56,4 @@ settingsSchema.statics.getSettings = async function () {
   return settings;
 };
 
-export default mongoose.model("Settings", settingsSchema);
-
+module.exports = mongoose.model("Settings", settingsSchema);

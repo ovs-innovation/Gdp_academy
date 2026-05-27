@@ -4,13 +4,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import BtnArrow from '../svg/BtnArrow';
 
-interface FormData {
-   name: string;
-   email: string;
-   message: string;
-   web: string;
-}
-
 const schema = yup
    .object({
       name: yup.string().required().label("Name"),
@@ -22,8 +15,8 @@ const schema = yup
 
 const BlogForm = () => {
 
-   const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(schema), });
-   const onSubmit = () => {
+   const { register, handleSubmit, reset, formState: { errors }, } = useForm<any>({ resolver: yupResolver(schema), });
+   const onSubmit = (_data: any) => {
       const notify = () => toast('Comment sent successfully', { position: 'top-center' });
       notify();
       reset();
@@ -38,25 +31,25 @@ const BlogForm = () => {
             </p>
             <div className="comment-field">
                <textarea placeholder="Comment" {...register("message")}></textarea>
-               <p className="form_error">{errors.message?.message}</p>
+               <p className="form_error">{errors.message?.message as any}</p>
             </div>
             <div className="row">
                <div className="col-lg-4">
                   <div className="comment-field">
                      <input type="text" {...register("name")} placeholder="Name" />
-                     <p className="form_error">{errors.name?.message}</p>
+                     <p className="form_error">{errors.name?.message as any}</p>
                   </div>
                </div>
                <div className="col-lg-4">
                   <div className="comment-field">
                      <input type="email" {...register("email")} placeholder="Email" />
-                     <p className="form_error">{errors.email?.message}</p>
+                     <p className="form_error">{errors.email?.message as any}</p>
                   </div>
                </div>
                <div className="col-lg-4">
                   <div className="comment-field">
                      <input type="url" {...register("web")} placeholder="Website" />
-                     <p className="form_error">{errors.web?.message}</p>
+                     <p className="form_error">{errors.web?.message as any}</p>
                   </div>
                </div>
             </div>

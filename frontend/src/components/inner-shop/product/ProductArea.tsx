@@ -8,7 +8,7 @@ import UseProducts from "../../../hooks/UseProducts";
 import { addToCart } from "../../../redux/features/cartSlice";
 import { addToWishlist } from "../../../redux/features/wishlistSlice";
 import { Link } from "react-router-dom";
-import { Product } from "../../../redux/features/productSlice";
+import type { Product } from "../../../redux/features/productSlice";
 import { usePriceFormatter } from "../../../hooks/usePriceFormatter";
 
 const ProductArea = () => {

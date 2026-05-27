@@ -1,0 +1,126 @@
+/* Workshops page — hero text position */
+.workshops-hero.section-padding {
+  text-align: center;
+  padding-top: 125px;
+  padding-bottom: 100px;
+}
+
+.workshops-hero .container {
+  padding-top: 20px;
+}
+
+.workshops-hero .hero-subtitle {
+  margin-bottom: 24px;
+}
+
+/* Shared workshop cards (Home + Workshops page) */
+.workshops-list {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.workshop-card {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 40px;
+  padding: 30px;
+  align-items: center;
+}
+
+.workshop-image {
+  height: 300px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.workshop-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.workshop-meta {
+  color: var(--accent-color);
+  font-size: 12px;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+
+.workshop-title {
+  font-size: 28px;
+  margin: 15px 0;
+  color: #fff;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+}
+
+.workshop-desc {
+  color: var(--text-gray);
+  margin-bottom: 25px;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.workshop-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.workshop-price {
+  font-size: 24px;
+  color: var(--accent-color);
+  font-weight: 700;
+}
+
+.workshops-explore-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 48px;
+}
+
+.workshops-explore-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  padding: 14px 36px;
+}
+
+@media (max-width: 768px) {
+  .workshops-hero.section-padding {
+    padding-top: 105px;
+    padding-bottom: 40px;
+  }
+
+  .workshops-hero .container {
+    padding-top: 12px;
+  }
+
+  .workshop-card {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 20px;
+  }
+
+  .workshop-image {
+    height: 220px;
+  }
+
+  .workshop-title {
+    font-size: 22px;
+  }
+
+  .workshop-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .workshop-footer .join-btn {
+    width: 100%;
+    text-align: center;
+  }
+}

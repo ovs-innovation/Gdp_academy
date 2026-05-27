@@ -3,7 +3,7 @@ interface DataType {
    page: string;
    question: string;
    answer: string;
-   category: "general" | "student" | "tutor";
+   category: "general" | "student" | "tutor" | "member" | "coach";
 };
 
 const faq_data: DataType[] = [

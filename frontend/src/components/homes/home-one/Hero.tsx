@@ -1,36 +1,71 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import type { SiteSettings } from '../../../services/settingsService';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const uniqueVideos = [
-    '/hero.mp4', 
-    '/services.mp4', 
-    '/services4.mp4', 
-    '/service3.mp4'
-];
+interface HeroProps {
+  settings?: SiteSettings;
+  homeContent?: any;
+}
 
-const gridItems = [
-    { type: 'video', src: '/hero.mp4' },
-    { type: 'image', src: '/svc-stage.png' },
-    { type: 'video', src: '/services4.mp4' },
-    { type: 'image', src: '/svc-wedding.jpg' },
-    { type: 'video', src: '/service3.mp4' },
-    { type: 'image', src: '/svc-hiphop.png' },
-    { type: 'video', src: '/services.mp4' },
-    { type: 'image', src: '/laptop.png' },
-    { type: 'video', src: '/hero.mp4' }
-];
+const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent }) => {
+    const defaultVideos = [
+        '/hero.mp4', 
+        '/services.mp4', 
+        '/services4.mp4', 
+        '/service3.mp4'
+    ];
 
-const Hero = () => {
-    // 1 = Grid (3s), 2 = Single Zoom (4s), 3 = 2-Split (5s)
+    const dynamicVideos = homeContent?.heroVideos && homeContent.heroVideos.length > 0
+        ? homeContent.heroVideos.map((v: any) => typeof v === 'string' ? v : v.url)
+        : defaultVideos;
+
+    const defaultGridItems = [
+        { type: 'video', src: '/hero.mp4' },
+        { type: 'image', src: '/svc-stage.png' },
+        { type: 'video', src: '/services4.mp4' },
+        { type: 'image', src: '/svc-wedding.jpg' },
+        { type: 'video', src: '/service3.mp4' },
+        { type: 'image', src: '/svc-hiphop.png' },
+        { type: 'video', src: '/services.mp4' },
+        { type: 'image', src: '/laptop.png' },
+        { type: 'video', src: '/hero.mp4' }
+    ];
+
+    const gridItems = homeContent?.heroGridItems?.length > 0
+        ? homeContent.heroGridItems
+            .filter((item: { url?: string; src?: string }) => (item.url || item.src || "").trim())
+            .map((item: { type?: string; url?: string; src?: string }) => ({
+            type: item.type === 'image' ? 'image' : 'video',
+            src: item.url || item.src || '',
+          }))
+        : homeContent?.heroVideos && homeContent.heroVideos.length > 0
+        ? [
+            { type: 'video', src: dynamicVideos[0] || '/hero.mp4' },
+            { type: 'image', src: '/svc-stage.png' },
+            { type: 'video', src: dynamicVideos[1] || dynamicVideos[0] || '/services4.mp4' },
+            { type: 'image', src: '/svc-wedding.jpg' },
+            { type: 'video', src: dynamicVideos[2] || dynamicVideos[0] || '/service3.mp4' },
+            { type: 'image', src: '/svc-hiphop.png' },
+            { type: 'video', src: dynamicVideos[3] || dynamicVideos[0] || '/services.mp4' },
+            { type: 'image', src: '/laptop.png' },
+            { type: 'video', src: dynamicVideos[0] || '/hero.mp4' }
+          ]
+        : defaultGridItems;
+
+    const uniqueVideos = dynamicVideos;
     const [state, setState] = useState(1);
-    
-    // Independent video indexes for completely gapless CSS cuts
+
+    const heroTitle = homeContent?.heroTitle || propSettings?.heroTitle || 'ELEVATE YOUR ARTISTRY';
+    const heroSubtitle = homeContent?.heroSubtitle || propSettings?.heroSubtitle || 'Step into the world\'s most prestigious dance sanctuary. Where passion meets precision, and every move tells a story.';
+    const heroBadge = homeContent?.heroBadge || homeContent?.heroBadgeText || propSettings?.heroBadge || null;
+    const heroStats = homeContent?.heroStatistics || homeContent?.statistics || propSettings?.heroStatistics || '';
+    const ctaButton = (homeContent?.heroCTAButtons && homeContent.heroCTAButtons[0]) || (homeContent?.ctaText ? { label: homeContent.ctaText, url: homeContent.ctaUrl || '/programs' } : null) || propSettings?.heroCTAButtons?.[0] || { label: 'GET STARTED', url: '/programs' };
+
     const [singleIndex, setSingleIndex] = useState(0);
     const [leftIndex, setLeftIndex] = useState(1);
     const [rightIndex, setRightIndex] = useState(2);
 
-    // Master State Machine Loop
     useEffect(() => {
         let timeout: ReturnType<typeof setTimeout>;
         if (state === 1) {
@@ -43,7 +78,6 @@ const Hero = () => {
         return () => clearTimeout(timeout);
     }, [state]);
 
-    // Hard Cuts for State 2 (Single video cuts every 3s)
     useEffect(() => {
         let interval: ReturnType<typeof setInterval>;
         if (state === 2) {
@@ -54,7 +88,6 @@ const Hero = () => {
         return () => clearInterval(interval);
     }, [state]);
 
-    // Hard Cuts for State 3 (Left 3.2s, Right 3.7s - completely independent)
     useEffect(() => {
         let leftInterval: ReturnType<typeof setInterval>;
         let rightInterval: ReturnType<typeof setInterval>;
@@ -75,7 +108,6 @@ const Hero = () => {
     return (
         <>
             <style>{`
-                /* NAVBAR OVERRIDE */
                 .tg-header__area {
                     height: 96px;
                     background: #060606 !important;
@@ -88,7 +120,6 @@ const Hero = () => {
                     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
                 }
 
-                /* Outer Wrapper */
                 .hero-wrapper {
                     background-color: #060606;
                     width: 100%;
@@ -96,10 +127,9 @@ const Hero = () => {
                     display: flex;
                     justify-content: center;
                     align-items: center;
-                    padding: 130px 2vw 40px 2vw; 
+                    padding: 118px 2vw 40px 2vw; 
                 }
 
-                /* The Parent Box */
                 .steezy-complex-hero {
                     display: grid;
                     grid-template-columns: 2fr 1fr; 
@@ -113,12 +143,13 @@ const Hero = () => {
                     background: #060606; 
                     gap: 8px; 
                     font-family: 'Montserrat', sans-serif;
+                    align-items: stretch;
                 }
 
-                /* LEFT PANEL */
                 .left-video-area {
                     position: relative;
                     overflow: hidden;
+                    min-height: 0;
                     height: 100%;
                     width: 100%;
                     background: #000;
@@ -138,7 +169,6 @@ const Hero = () => {
                     object-fit: cover;
                 }
 
-                /* STATE 1: Grid */
                 .grid-3x3 {
                     display: grid;
                     grid-template-columns: repeat(3, 1fr);
@@ -146,41 +176,42 @@ const Hero = () => {
                     gap: 8px;
                 }
 
-                /* STATE 3: Split */
                 .split-2x1 {
                     display: grid;
                     grid-template-columns: 1fr 1fr;
                     gap: 8px;
                 }
 
-                /* RIGHT PANEL */
                 .content-panel {
                     background: #0A0A0A;
                     display: flex;
                     flex-direction: column;
-                    justify-content: center;
-                    padding: 48px 40px;
+                    justify-content: flex-start;
+                    align-items: stretch;
+                    padding: 28px 36px 36px;
                     height: 100%;
+                    min-height: 0;
                     z-index: 10;
                     border-radius: 0 24px 24px 0;
+                    overflow: hidden;
                 }
 
                 .content-headline {
                     font-family: 'Krona One', sans-serif;
-                    font-size: clamp(36px, 4vw, 75px);
+                    font-size: clamp(26px, 2.9vw, 54px);
                     color: #FFFFFF;
-                    line-height: 1;
+                    line-height: 1.05;
                     font-weight: 900;
-                    margin-bottom: 16px;
+                    margin: 0 0 14px 0;
                     text-transform: uppercase;
                 }
 
                 .content-subtext {
                     font-family: 'Montserrat', sans-serif;
                     color: rgba(255, 255, 255, 0.6);
-                    font-size: clamp(16px, 1.2vw, 20px);
-                    line-height: 1.5;
-                    margin-bottom: 40px;
+                    font-size: clamp(15px, 1.15vw, 19px);
+                    line-height: 1.55;
+                    margin: 0 0 28px 0;
                 }
 
                 .content-btn {
@@ -189,7 +220,7 @@ const Hero = () => {
                     color: #FFFFFF;
                     font-family: 'Montserrat', sans-serif;
                     font-weight: 700;
-                    height: 64px;
+                    height: 60px;
                     border-radius: 4px;
                     text-transform: uppercase;
                     letter-spacing: 2px;
@@ -197,9 +228,10 @@ const Hero = () => {
                     align-items: center;
                     justify-content: center;
                     text-decoration: none;
-                    font-size: 1.1rem;
+                    font-size: 1rem;
                     border: none;
                     transition: background 0.3s ease;
+                    flex-shrink: 0;
                 }
 
                 .content-btn:hover {
@@ -207,17 +239,31 @@ const Hero = () => {
                     color: #ffffff;
                 }
 
+                .hero-stats {
+                    margin-top: 28px;
+                    padding-top: 22px;
+                    border-top: 1px solid rgba(255, 255, 255, 0.08);
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 12px;
+                    align-items: start;
+                }
+
+                .hero-stats .stat-item {
+                    text-align: left;
+                }
+
                 .content-logos-wrapper {
-                    margin-top: 50px;
+                    margin-top: 28px;
                     display: flex;
-                    gap: 30px;
+                    gap: 28px;
                     align-items: center;
                     flex-wrap: wrap;
                 }
 
                 .content-logos-wrapper a {
                     color: rgba(255, 255, 255, 0.7);
-                    font-size: 1rem;
+                    font-size: 0.95rem;
                     font-family: 'Montserrat', sans-serif;
                     font-weight: 600;
                     display: flex;
@@ -226,15 +272,16 @@ const Hero = () => {
                     text-decoration: none;
                     transition: all 0.3s ease;
                 }
+
                 .content-logos-wrapper a:hover {
                     color: #ffffff;
                     transform: translateY(-2px);
                 }
+
                 .content-logos-wrapper i {
-                    font-size: 1.4rem;
+                    font-size: 1.35rem;
                 }
 
-                /* Responsive Mobile */
                 @media (max-width: 992px) {
                     .steezy-complex-hero {
                         grid-template-columns: 1fr;
@@ -250,8 +297,11 @@ const Hero = () => {
                     .content-panel {
                         height: auto;
                         min-height: 50vh;
-                        padding: 60px 24px;
+                        padding: 32px 28px 40px;
                         border-radius: 0 0 24px 24px;
+                    }
+                    .left-video-area {
+                        min-height: 50vh;
                     }
                 }
                 
@@ -266,10 +316,8 @@ const Hero = () => {
 
             <section className="hero-wrapper">
                 <div className="steezy-complex-hero">
-                    {/* LEFT SIDE: Dynamic Video Area */}
                     <div className="left-video-area">
                         <AnimatePresence initial={false}>
-                            {/* STATE 1: 3x3 Grid Collage */}
                             {state === 1 && (
                                 <motion.div 
                                     key="state-1"
@@ -290,7 +338,6 @@ const Hero = () => {
                                 </motion.div>
                             )}
 
-                            {/* STATE 2: Single Video Zoom */}
                             {state === 2 && (
                                 <motion.div 
                                     key="state-2"
@@ -309,14 +356,13 @@ const Hero = () => {
                                             style={{
                                                 position: 'absolute', inset: 0,
                                                 opacity: singleIndex === i ? 1 : 0,
-                                                transition: 'none' // Instant zero-gap cut
+                                                transition: 'none' 
                                             }}
                                         />
                                     ))}
                                 </motion.div>
                             )}
 
-                            {/* STATE 3: 2-Split Panel */}
                             {state === 3 && (
                                 <motion.div 
                                     key="state-3"
@@ -327,7 +373,6 @@ const Hero = () => {
                                     transition={{ duration: 0.8 }}
                                     style={{ zIndex: 2 }}
                                 >
-                                    {/* LEFT COLUMN */}
                                     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                                         {uniqueVideos.map((vid, i) => (
                                             <video 
@@ -343,7 +388,6 @@ const Hero = () => {
                                         ))}
                                     </div>
                                     
-                                    {/* RIGHT COLUMN */}
                                     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
                                         {uniqueVideos.map((vid, i) => (
                                             <video 
@@ -363,22 +407,56 @@ const Hero = () => {
                         </AnimatePresence>
                     </div>
 
-                    {/* RIGHT SIDE: Static Content Panel */}
                     <div className="content-panel">
-                        <h1 className="content-headline">
-                            MASTER THE <br/> ART OF DANCE
-                        </h1>
-                        
-                        <p className="content-subtext">
-                            With 1500+ online classes, live workshops, and structured programs designed by Garima Dance Production.
-                        </p>
-                        
-                        <Link to="/programs" className="content-btn">
-                            GET STARTED
+                        {heroBadge && (
+                            <span
+                                className="hero-badge"
+                                style={{
+                                    display: 'inline-block',
+                                    padding: '6px 14px',
+                                    background: 'rgba(99, 75, 250, 0.1)',
+                                    border: '1px solid rgba(99, 75, 250, 0.3)',
+                                    color: '#634BFA',
+                                    borderRadius: '20px',
+                                    fontSize: '10px',
+                                    fontWeight: 700,
+                                    letterSpacing: '1.2px',
+                                    marginBottom: '12px',
+                                    alignSelf: 'flex-start',
+                                    textTransform: 'uppercase',
+                                }}
+                            >
+                                {heroBadge}
+                            </span>
+                        )}
+
+                        <h1 className="content-headline">{heroTitle}</h1>
+
+                        <p className="content-subtext">{heroSubtitle}</p>
+
+                        <Link to={ctaButton.url} className="content-btn">
+                            {ctaButton.label}
                         </Link>
 
+                        {heroStats && (
+                            <div className="hero-stats">
+                                {heroStats.split(',').map((stat: string, i: number) => {
+                                    const trimmed = stat.trim();
+                                    const firstSpaceIdx = trimmed.indexOf(' ');
+                                    const num = firstSpaceIdx !== -1 ? trimmed.slice(0, firstSpaceIdx) : trimmed;
+                                    const label = firstSpaceIdx !== -1 ? trimmed.slice(firstSpaceIdx + 1) : '';
+                                    return (
+                                        <div key={i} className="stat-item">
+                                            <div style={{ fontSize: '18px', fontWeight: 900, color: '#634BFA', fontFamily: 'Krona One, sans-serif' }}>{num}</div>
+                                            <div style={{ fontSize: '10px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginTop: '4px', fontWeight: 600 }}>{label}</div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
+
                         <div className="content-logos-wrapper">
-                            <a href="https://wa.me/919711384768" target="_blank" rel="noopener noreferrer">
+                            <a href={`https://wa.me/${propSettings?.whatsappNumber || '9711384768'}`} target="_blank" rel="noopener noreferrer">
                                 <i className="fab fa-whatsapp" style={{ color: '#25D366' }}></i> WhatsApp
                             </a>
                             <a href="https://youtube.com/@garimadanceproductions1146?si=XEMV40bqEVW6JM71" target="_blank" rel="noopener noreferrer">

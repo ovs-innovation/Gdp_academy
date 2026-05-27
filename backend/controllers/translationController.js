@@ -1,7 +1,8 @@
-import axios from "axios";
+const axios = require("axios");
 
 const GOOGLE_TRANSLATE_API_KEY = process.env.GOOGLE_TRANSLATE_API_KEY;
-const TRANSLATE_API_URL = "https://translation.googleapis.com/language/translate/v2";
+const TRANSLATE_API_URL =
+  "https://translation.googleapis.com/language/translate/v2";
 
 const translateWithGoogle = async (text, targetLang, sourceLang = "en") => {
   try {
@@ -17,17 +18,20 @@ const translateWithGoogle = async (text, targetLang, sourceLang = "en") => {
         target: targetLang,
         source: sourceLang,
         format: "text",
-      }
+      },
     );
 
     return response.data.data.translations[0].translatedText;
   } catch (error) {
-    console.error("Google Translate error:", error.response?.data || error.message);
+    console.error(
+      "Google Translate error:",
+      error?.response?.data || error?.message,
+    );
     throw error;
   }
 };
 
-export const translateText = async (req, res, next) => {
+const translateText = async (req, res, next) => {
   try {
     const { text, sourceLang = "en", targetLang } = req.body;
 
@@ -48,16 +52,20 @@ export const translateText = async (req, res, next) => {
     }
 
     try {
-      const translatedText = await translateWithGoogle(text, targetLang, sourceLang);
-      res.json({
+      const translatedText = await translateWithGoogle(
+        text,
+        targetLang,
+        sourceLang,
+      );
+      return res.json({
         success: true,
         translatedText,
         sourceLang,
         targetLang,
       });
     } catch (error) {
-      console.error('Translation error:', error);
-      res.json({
+      console.error("Translation error:", error);
+      return res.json({
         success: true,
         translatedText: text,
         sourceLang,
@@ -70,7 +78,7 @@ export const translateText = async (req, res, next) => {
   }
 };
 
-export const translateBatch = async (req, res, next) => {
+const translateBatch = async (req, res, next) => {
   try {
     const { texts, sourceLang = "en", targetLang } = req.body;
 
@@ -99,18 +107,18 @@ export const translateBatch = async (req, res, next) => {
             console.error(`Translation error for text: ${text}`, error);
             return text;
           }
-        })
+        }),
       );
 
-      res.json({
+      return res.json({
         success: true,
         translatedTexts,
         sourceLang,
         targetLang,
       });
     } catch (error) {
-      console.error('Batch translation error:', error);
-      res.json({
+      console.error("Batch translation error:", error);
+      return res.json({
         success: true,
         translatedTexts: texts,
         sourceLang,
@@ -123,3 +131,7 @@ export const translateBatch = async (req, res, next) => {
   }
 };
 
+module.exports = {
+  translateText,
+  translateBatch,
+};

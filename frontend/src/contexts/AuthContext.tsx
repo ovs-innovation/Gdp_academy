@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react'
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react'
+import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   login as loginAPI,
@@ -20,6 +21,8 @@ import type {
 interface User {
   id: string
   name: string
+  firstName?: string
+  lastName?: string
   email: string
   role: string
   permissions: string[]
@@ -40,6 +43,7 @@ interface AuthContextType {
 //   firebaseLogin: (token: string, role?: string) => Promise<void>
   logout: () => void
   updateUserProfile: (data: any) => Promise<void>
+  uploadProfilePhoto: (file: File) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -242,6 +246,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
   }, []);
 
+  const uploadProfilePhoto = useCallback(async (file: File) => {
+      try {
+          const { uploadProfilePhotoToServer } = await import('../services/authService');
+          const updatedUser = await uploadProfilePhotoToServer(file);
+          setStoredUser(updatedUser);
+          setUser(updatedUser);
+      } catch (err) {
+          console.error("Failed to upload profile photo", err);
+          throw err;
+      }
+  }, []);
+
   return (
     <AuthContext.Provider
       value={{
@@ -255,6 +271,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 //         firebaseLogin,
         logout,
         updateUserProfile,
+        uploadProfilePhoto,
       }}
     >
       {children}

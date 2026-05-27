@@ -1,46 +1,49 @@
-import express from "express";
-import {
-  createCourse,
-  getCourses,
-  getCourseById,
-  updateCourse,
-  deleteCourse,
-} from "../../controllers/courseController.js";
-import { verifyToken } from "../../middlewares/authMiddleware.js";
-import { requirePermission } from "../../middlewares/permissionMiddleware.js";
-import { validateRequest } from "../../middlewares/validateRequest.js";
-import { createCourseSchema, updateCourseSchema } from "../../validations/courseValidation.js";
+const express = require("express");
+const {
+  createProgram,
+  getPrograms,
+  getProgramById,
+  updateProgram,
+  deleteProgram,
+} = require("../../controllers/courseController.js");
+const { verifyToken } = require("../../middlewares/authMiddleware.js");
+const {
+  requirePermission,
+} = require("../../middlewares/permissionMiddleware.js");
+const { validateRequest } = require("../../middlewares/validateRequest.js");
+const {
+  createCourseSchema,
+  updateCourseSchema,
+} = require("../../validations/courseValidation.js");
 
 const router = express.Router();
 
 // All routes require admin authentication
 router.use(verifyToken);
 
-// Create course (Admin only)
+// Create program (Admin only)
 router.post(
   "/",
-  requirePermission("courses.create"),
+  requirePermission("programs.create"),
   validateRequest(createCourseSchema),
-  createCourse
+  createProgram,
 );
 
-// Get all courses (Admin)
-router.get("/", requirePermission("courses.view"), getCourses);
+// Get all programs (Admin)
+router.get("/", requirePermission("programs.view"), getPrograms);
 
-// Get single course (Admin)
-router.get("/:id", requirePermission("courses.view"), getCourseById);
+// Get single program (Admin)
+router.get("/:id", requirePermission("programs.view"), getProgramById);
 
-// Update course (Admin only)
+// Update program (Admin only)
 router.patch(
   "/:id",
-  requirePermission("courses.edit"),
+  requirePermission("programs.edit"),
   validateRequest(updateCourseSchema),
-  updateCourse
+  updateProgram,
 );
 
-// Delete course (Admin only)
-router.delete("/:id", requirePermission("courses.delete"), deleteCourse);
+// Delete program (Admin only)
+router.delete("/:id", requirePermission("programs.delete"), deleteProgram);
 
-export default router;
-
-
+module.exports = router;

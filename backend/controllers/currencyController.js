@@ -1,13 +1,16 @@
-import { getExchangeRates, convertCurrency as convertCurrencyService } from '../services/exchangeRateService.js';
+const {
+  getExchangeRates,
+  convertCurrency: convertCurrencyService,
+} = require("../services/exchangeRateService.js");
 
 /**
  * GET /api/exchange-rates
  * Returns cached exchange rates from Redis
  */
-export const getExchangeRatesController = async (req, res, next) => {
+const getExchangeRatesController = async (req, res, next) => {
   try {
     const { forceRefresh } = req.query;
-    const ratesData = await getExchangeRates(forceRefresh === 'true');
+    const ratesData = await getExchangeRates(forceRefresh === "true");
 
     res.json({
       success: true,
@@ -26,25 +29,29 @@ export const getExchangeRatesController = async (req, res, next) => {
  * POST /api/currency/convert
  * Convert amount from one currency to another
  */
-export const convertCurrency = async (req, res, next) => {
+const convertCurrency = async (req, res, next) => {
   try {
     const { amount, fromCurrency, toCurrency } = req.body;
 
-    if (!amount || typeof amount !== 'number') {
+    if (!amount || typeof amount !== "number") {
       return res.status(400).json({
         success: false,
-        message: 'Amount is required and must be a number',
+        message: "Amount is required and must be a number",
       });
     }
 
     if (!fromCurrency || !toCurrency) {
       return res.status(400).json({
         success: false,
-        message: 'fromCurrency and toCurrency are required',
+        message: "fromCurrency and toCurrency are required",
       });
     }
 
-    const convertedAmount = await convertCurrencyService(amount, fromCurrency.toUpperCase(), toCurrency.toUpperCase());
+    const convertedAmount = await convertCurrencyService(
+      amount,
+      fromCurrency.toUpperCase(),
+      toCurrency.toUpperCase(),
+    );
 
     res.json({
       success: true,
@@ -58,3 +65,7 @@ export const convertCurrency = async (req, res, next) => {
   }
 };
 
+module.exports = {
+  getExchangeRatesController,
+  convertCurrency,
+};

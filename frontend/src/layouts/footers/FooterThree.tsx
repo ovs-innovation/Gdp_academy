@@ -14,7 +14,7 @@ const FooterThree = () => {
                   <div className="col-xl-2 col-lg-4 col-md-6">
                      <div className="footer__widget">
                         <div className="logo mb-35">
-                           <Link to=""><img src="/assets/img/logo/edunyte-light.png" height="100" width="100" alt="img" /></Link>
+                           <Link to=""><img src="/logo.png" style={{ height: '60px', width: 'auto' }} alt="GDP logo" /></Link>
                         </div>
                         <div className="footer__content footer__content-two">
                            <p>201 S. Grand Ave., 1st Floor New York City, NY 28020</p>
@@ -48,10 +48,10 @@ const FooterThree = () => {
                         <div className="footer__link">
                            <ul className="list-wrap">
                               <li><Link to="/contact">Contact Us</Link></li>
-                              <li><Link to="/instructor-details">Become Teacher</Link></li>
+                              <li><Link to="/membership">Become Member</Link></li>
                               <li><Link to="/blog">Blog</Link></li>
-                              <li><Link to="/instructor-details">Instructor</Link></li>
-                              <li><Link to="/events-details">Events</Link></li>
+                              <li><Link to="/programs">Programs</Link></li>
+                              <li><Link to="/workshops">Workshops</Link></li>
                            </ul>
                         </div>
                      </div>
@@ -84,7 +84,7 @@ const FooterThree = () => {
                <div className="row align-items-center">
                   <div className="col-md-7">
                      <div className="copy-right-text">
-                        <p>© 2010-2026 Edunyte.com. All rights reserved.</p>
+                        <p>© 2010-2026 GDP Studio. All rights reserved.</p>
                      </div>
                   </div>
                   <div className="col-md-5">

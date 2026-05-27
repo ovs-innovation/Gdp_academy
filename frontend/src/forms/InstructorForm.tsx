@@ -4,14 +4,6 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import BtnArrow from '../svg/BtnArrow';
 
-interface FormData {
-   name: string;
-   email: string;
-   phone: number;
-   topic: string;
-   message: string;
-}
-
 const schema = yup
    .object({
       name: yup.string().required().label("Name"),
@@ -30,8 +22,8 @@ const schema = yup
 
 const InstructorForm = () => {
 
-   const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(schema), });
-   const onSubmit = () => {
+   const { register, handleSubmit, reset, formState: { errors }, } = useForm<any>({ resolver: yupResolver(schema), });
+   const onSubmit = (_data: any) => {
       const notify = () => toast('Message Send successfully', { position: 'top-center' });
       notify();
       reset();
@@ -41,23 +33,23 @@ const InstructorForm = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
          <div className="form-grp">
             <input type="text" {...register("name")} placeholder="Name" />
-            <p className="form_error">{errors.name?.message}</p>
+            <p className="form_error">{errors.name?.message as any}</p>
          </div>
          <div className="form-grp">
             <input type="email" {...register("email")} placeholder="E-mail" />
-            <p className="form_error">{errors.email?.message}</p>
+            <p className="form_error">{errors.email?.message as any}</p>
          </div>
          <div className="form-grp">
             <input type="text" {...register("topic")} placeholder="Topic" />
-            <p className="form_error">{errors.topic?.message}</p>
+            <p className="form_error">{errors.topic?.message as any}</p>
          </div>
          <div className="form-grp">
             <input type="number" {...register("phone")} placeholder="Phone" />
-            <p className="form_error">{errors.phone?.message}</p>
+            <p className="form_error">{errors.phone?.message as any}</p>
          </div>
          <div className="form-grp">
             <textarea {...register("message")} placeholder="Type Message"></textarea>
-            <p className="form_error">{errors.message?.message}</p>
+            <p className="form_error">{errors.message?.message as any}</p>
          </div>
          <button type="submit" className="btn arrow-btn">Send Message <BtnArrow /></button>
       </form>

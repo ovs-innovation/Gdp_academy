@@ -1,6 +1,6 @@
-import jwt from "jsonwebtoken";
+const jwt = require("jsonwebtoken");
 
-export const generateToken = (user) => {
+const generateToken = (user) => {
   if (!process.env.JWT_SECRET) {
     throw new Error("JWT_SECRET is not defined in environment variables");
   }
@@ -10,3 +10,5 @@ export const generateToken = (user) => {
   };
   return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1d" });
 };
+
+module.exports = { generateToken };

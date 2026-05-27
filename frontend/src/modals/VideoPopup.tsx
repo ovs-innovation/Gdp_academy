@@ -1,5 +1,5 @@
 import ModalVideo from "react-modal-video";
-import { Dispatch, SetStateAction } from "react";
+import type { Dispatch, SetStateAction } from "react";
 
 interface VideoPopupProps {
   isVideoOpen: boolean;

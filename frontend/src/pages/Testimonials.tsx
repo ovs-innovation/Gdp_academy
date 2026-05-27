@@ -1,9 +1,52 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Layout from '../components/layout/Layout';
 import { motion } from 'framer-motion';
 import testimonial_data from '../data/home-data/TestimonialData';
+import { getTestimonials, type Testimonial } from '../services/testimonialService';
+import { getLocalizedValue } from '../utils/contentHelper';
+import { usePageContent, renderSplitHeroTitle } from '../hooks/usePageContent';
+
+type TestimonialCard = {
+  title: string;
+  designation: string;
+  desc: string;
+  avatar?: string;
+};
+
+const mapApiToCard = (t: Testimonial): TestimonialCard => ({
+  title: t.name,
+  designation: t.position || 'Member',
+  desc: getLocalizedValue(t.message, ''),
+  avatar: t.image,
+});
+
+const mapFallbackToCard = (t: (typeof testimonial_data)[number]): TestimonialCard => ({
+  title: t.title,
+  designation: t.designation,
+  desc: t.desc,
+  avatar: t.avatar,
+});
 
 const Testimonials: React.FC = () => {
+  const { content } = usePageContent('testimonials');
+  const hero = renderSplitHeroTitle(content, { before: 'ARTISTIC ', highlight: 'VOICES' });
+  const heroSubtitle =
+    (content.heroSubtitle as string) ||
+    'Real stories of transformation and excellence from the GDP Studio community.';
+  const [cards, setCards] = useState<TestimonialCard[]>(
+    testimonial_data.map(mapFallbackToCard),
+  );
+
+  useEffect(() => {
+    getTestimonials({ isActive: true, limit: 50 })
+      .then((data) => {
+        if (data.testimonials && data.testimonials.length > 0) {
+          setCards(data.testimonials.map(mapApiToCard));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   return (
     <Layout>
       <section className="testimonials-hero section-padding">
@@ -13,16 +56,16 @@ const Testimonials: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             className="section-title"
           >
-            ARTISTIC <span className="gradient-text">VOICES</span>
+            {hero.before}<span className="gradient-text">{hero.highlight}</span>
           </motion.h1>
-          <p className="hero-subtitle">Real stories of transformation and excellence from the GDP Academy community.</p>
+          <p className="hero-subtitle">{heroSubtitle}</p>
         </div>
       </section>
 
       <section className="testimonials-content section-padding" style={{ paddingTop: '0' }}>
         <div className="container">
           <div className="testimonials-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '40px' }}>
-            {testimonial_data.map((t, i) => (
+            {cards.map((t, i) => (
               <motion.div 
                 key={i}
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -38,11 +81,19 @@ const Testimonials: React.FC = () => {
                     {t.desc}
                   </p>
                   <div className="testimonial-author" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                    <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', fontWeight: '800' }}>
-                      {t.name.charAt(0)}
-                    </div>
+                    {t.avatar ? (
+                      <img
+                        src={t.avatar}
+                        alt={t.title}
+                        style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <div style={{ width: '60px', height: '60px', borderRadius: '50%', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', fontWeight: '800' }}>
+                        {t.title.charAt(0)}
+                      </div>
+                    )}
                     <div>
-                      <h4 style={{ fontSize: '18px', fontWeight: '700', margin: 0 }}>{t.name}</h4>
+                      <h4 style={{ fontSize: '18px', fontWeight: '700', margin: 0 }}>{t.title}</h4>
                       <span style={{ color: 'var(--accent-color)', fontSize: '14px', fontWeight: '600' }}>{t.designation}</span>
                     </div>
                   </div>

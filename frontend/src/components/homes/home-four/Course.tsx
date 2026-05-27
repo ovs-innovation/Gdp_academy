@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import InjectableSvg from "../../../hooks/InjectableSvg";
 import { fetchPrograms, type Program } from "../../../services/programService";
+import { TranslatedContent } from "../../common/TranslatedContent";
 const Course = () => {
    const dispatch = useDispatch();
    const { t } = useTranslation();
@@ -32,11 +33,11 @@ const Course = () => {
    const handleAddToWishlist = (item: Program) => {
       const wishlistItem = {
          id: parseInt(item._id.slice(-8), 16) || Math.floor(Math.random() * 1000000),
-         title: item.name,
+         title: typeof item.name === 'string' ? item.name : (item.name as any)?.en || 'Dance Program',
          thumb: item.image || '/assets/img/courses/course_default.jpg',
          price: 0,
       };
-      dispatch(addToWishlist(wishlistItem));
+      dispatch(addToWishlist(wishlistItem as any));
    };
 
    if (loading) {
@@ -89,7 +90,7 @@ const Course = () => {
                          <div className="courses__item-five shine__animate-item">
                             <div className="courses__item-thumb-four shine__animate-link">
                                    <Link to={`/program/${item.slug || item._id}`}>
-                                      <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name} />
+                                      <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name as any} />
                                    </Link>
                                   <a onClick={() => handleAddToWishlist(item)} className="courses__wishlist-two course-heart-btn" style={{ cursor: "pointer" }}>
                                      <InjectableSvg src="/assets/img/icons/heart02.svg" alt="" className="injectable" />
@@ -102,8 +103,8 @@ const Course = () => {
                                       </li>
                                       <li className="avg-rating"><i className="fas fa-star"></i> (5.0 {t('common.reviews')})</li>
                                    </ul>
-                                   <h2 className="title"><Link to={`/program/${item.slug || item._id}`}>{item.name}</Link></h2>
-                                  {item.description && <p className="info">{item.description}</p>}
+                                   <h2 className="title"><Link to={`/program/${item.slug || item._id}`}><TranslatedContent>{item.name}</TranslatedContent></Link></h2>
+                                  {item.description && <p className="info"><TranslatedContent>{item.description}</TranslatedContent></p>}
                                    <div className="courses__item-bottom-three">
                                       <div className="button">
                                          <Link to={`/program/${item.slug || item._id}`}>

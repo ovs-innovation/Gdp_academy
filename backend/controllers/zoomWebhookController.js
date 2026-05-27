@@ -1,11 +1,15 @@
-import crypto from "crypto";
-import { processRecordingByMeetingId } from "../services/recordingService.js";
+const crypto = require("crypto");
+const {
+  processRecordingByMeetingId,
+} = require("../services/recordingService.js");
 
 const verifyWebhookSignature = (requestBody, signature, timestamp) => {
   const webhookSecret = process.env.ZOOM_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
-    console.warn("⚠️  ZOOM_WEBHOOK_SECRET not set - webhook validation disabled");
+    console.warn(
+      "⚠️  ZOOM_WEBHOOK_SECRET not set - webhook validation disabled",
+    );
     return true;
   }
 
@@ -19,11 +23,11 @@ const verifyWebhookSignature = (requestBody, signature, timestamp) => {
 
   return crypto.timingSafeEqual(
     Buffer.from(signature),
-    Buffer.from(expectedSignature)
+    Buffer.from(expectedSignature),
   );
 };
 
-export const handleZoomWebhook = async (req, res, next) => {
+const handleZoomWebhook = async (req, res, next) => {
   try {
     const event = req.body.event;
     const payload = req.body.payload;
@@ -70,13 +74,20 @@ export const handleZoomWebhook = async (req, res, next) => {
       processRecordingByMeetingId(String(meetingId))
         .then((success) => {
           if (success) {
-            console.log(`✅ Recording processed successfully for meeting ${meetingId}`);
+            console.log(
+              `✅ Recording processed successfully for meeting ${meetingId}`,
+            );
           } else {
-            console.log(`⚠️  Recording processing pending for meeting ${meetingId}`);
+            console.log(
+              `⚠️  Recording processing pending for meeting ${meetingId}`,
+            );
           }
         })
         .catch((error) => {
-          console.error(`✗ Recording processing failed for meeting ${meetingId}:`, error.message);
+          console.error(
+            `✗ Recording processing failed for meeting ${meetingId}:`,
+            error.message,
+          );
         });
 
       return res.status(200).json({ message: "Webhook received" });
@@ -84,14 +95,13 @@ export const handleZoomWebhook = async (req, res, next) => {
 
     console.log(`ℹ️  Unhandled webhook event: ${event}`);
     return res.status(200).json({ message: "Event ignored" });
-
   } catch (error) {
     console.error("✗ Webhook error:", error.message);
     return res.status(200).json({ message: "Error logged" });
   }
 };
 
-export const manualTriggerRecording = async (req, res, next) => {
+const manualTriggerRecording = async (req, res, next) => {
   try {
     const { meetingId, bookingId } = req.body;
 
@@ -101,13 +111,16 @@ export const manualTriggerRecording = async (req, res, next) => {
       });
     }
 
-    console.log(`\n🔧 Manual trigger: meetingId=${meetingId}, bookingId=${bookingId}`);
+    console.log(
+      `\n🔧 Manual trigger: meetingId=${meetingId}, bookingId=${bookingId}`,
+    );
 
     let success;
     if (meetingId) {
       success = await processRecordingByMeetingId(String(meetingId));
     } else {
-      const { processRecording } = await import("../services/recordingService.js");
+      const { processRecording } =
+        await import("../services/recordingService.js");
       const Booking = (await import("../models/bookingModel.js")).default;
       const booking = await Booking.findById(bookingId);
       if (!booking) {

@@ -4,8 +4,8 @@ import { Rating } from "react-simple-star-rating";
 import Reviews from "./Reviews";
 import RelatedProduct from "./RelatedProduct";
 import { addToCart, decrease_quantity } from "../../../redux/features/cartSlice";
-import { RootState } from "../../../redux/store";
-import { Product } from "../../../redux/features/productSlice";
+import type { RootState } from "../../../redux/store";
+import type { Product } from "../../../redux/features/productSlice";
 import { Link } from "react-router-dom";
 
 const nav_data: string[] = [

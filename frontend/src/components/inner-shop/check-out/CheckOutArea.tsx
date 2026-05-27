@@ -1,7 +1,7 @@
 import CheckOutForm from "./CheckOutForm"
 import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { RootState } from "../../../redux/store";
+import type { RootState } from "../../../redux/store";
 import UseCartInfo from "../../../hooks/UseCartInfo";
 import { Link } from "react-router-dom";
 import { usePriceFormatter } from "../../../hooks/usePriceFormatter";

@@ -6,14 +6,6 @@ import emailjs from '@emailjs/browser';
 import { useTranslation } from "react-i18next";
 import { useRef, useState } from 'react';
 
-interface FormData {
-   user_name: string;
-   user_email: string;
-   phone_number?: string;
-   role: string;
-   message: string;
-}
-
 const ContactForm = () => {
    const { t } = useTranslation();
    const [isSending, setIsSending] = useState(false);
@@ -28,7 +20,7 @@ const ContactForm = () => {
       })
       .required();
 
-   const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(schema), });
+   const { register, handleSubmit, reset, formState: { errors }, } = useForm<any>({ resolver: yupResolver(schema), });
 
    const form = useRef<HTMLFormElement>(null);
 
@@ -36,11 +28,11 @@ const ContactForm = () => {
       if (form.current) {
          setIsSending(true);
          emailjs.sendForm('eaglesthemes', 'template_lojvsvb', form.current, 'mtLgOuG25NnIwGeKm')
-            .then((result) => {
+            .then(() => {
                toast.success(t('contact.form.success') || "Message sent successfully!", { position: 'top-center' });
                reset();
                setIsSending(false);
-            }, (error) => {
+            }, () => {
                toast.error("Failed to send message. Please try again later.", { position: 'top-center' });
                setIsSending(false);
             });
@@ -59,7 +51,7 @@ const ContactForm = () => {
                      placeholder={t('contact.form.name')} 
                      style={{ width: '100%', padding: '14px 20px', background: 'rgba(255,255,255,0.8)', border: '1px solid var(--glass-border)', borderRadius: '12px', outline: 'none' }}
                   />
-                  <p className="form_error text-danger small mt-1">{errors.user_name?.message}</p>
+                  <p className="form_error text-danger small mt-1">{errors.user_name?.message as any}</p>
                </div>
             </div>
             <div className="col-md-6">
@@ -71,7 +63,7 @@ const ContactForm = () => {
                      placeholder={t('contact.form.email')} 
                      style={{ width: '100%', padding: '14px 20px', background: 'rgba(255,255,255,0.8)', border: '1px solid var(--glass-border)', borderRadius: '12px', outline: 'none' }}
                   />
-                  <p className="form_error text-danger small mt-1">{errors.user_email?.message}</p>
+                  <p className="form_error text-danger small mt-1">{errors.user_email?.message as any}</p>
                </div>
             </div>
             <div className="col-md-6">
@@ -83,7 +75,7 @@ const ContactForm = () => {
                      placeholder={t('contact.form.phone')} 
                      style={{ width: '100%', padding: '14px 20px', background: 'rgba(255,255,255,0.8)', border: '1px solid var(--glass-border)', borderRadius: '12px', outline: 'none' }}
                   />
-                  <p className="form_error text-danger small mt-1">{errors.phone_number?.message}</p>
+                  <p className="form_error text-danger small mt-1">{errors.phone_number?.message as any}</p>
                </div>
             </div>
             <div className="col-md-6">
@@ -96,10 +88,10 @@ const ContactForm = () => {
                   >
                      <option value="">{t('contact.form.role_placeholder')}</option>
                      <option value="Student">{t('contact.form.role_student')}</option>
-                     <option value="Teacher">{t('contact.form.role_teacher')}</option>
+                     <option value="Parent">Parent/Guardian</option>
                      <option value="Partner">{t('contact.form.role_partner')}</option>
                   </select>
-                  <p className="form_error text-danger small mt-1">{errors.role?.message}</p>
+                  <p className="form_error text-danger small mt-1">{errors.role?.message as any}</p>
                </div>
             </div>
          </div>
@@ -110,7 +102,7 @@ const ContactForm = () => {
                placeholder={t('contact.form.message')} 
                style={{ width: '100%', height: '150px', padding: '20px', background: 'rgba(255,255,255,0.8)', border: '1px solid var(--glass-border)', borderRadius: '12px', outline: 'none', resize: 'none' }}
             ></textarea>
-            <p className="form_error text-danger small mt-1">{errors.message?.message}</p>
+            <p className="form_error text-danger small mt-1">{errors.message?.message as any}</p>
          </div>
          <button type="submit" className="btn-neon-primary w-100 py-3 mt-4" disabled={isSending}>
             {isSending ? <div className="spinner-border spinner-border-sm" role="status"></div> : t('contact.form.submit')}

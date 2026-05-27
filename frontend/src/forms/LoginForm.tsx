@@ -3,15 +3,11 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useTranslation } from 'react-i18next';
-import BtnArrow from '../svg/BtnArrow';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useState } from 'react';
 
-interface FormData {
-   email: string;
-   password: string;
-}
+
 
 const LoginForm = () => {
    const { t } = useTranslation();
@@ -25,9 +21,9 @@ const LoginForm = () => {
       })
       .required();
 
-   const { register, handleSubmit, reset, formState: { errors }, } = useForm<FormData>({ resolver: yupResolver(schema), });
+   const { register, handleSubmit, reset, formState: { errors }, } = useForm<any>({ resolver: yupResolver(schema), });
 
-   const onSubmit = async (data: FormData) => {
+   const onSubmit = async (data: any) => {
       setIsLoading(true);
       try {
          await login(data);
@@ -64,7 +60,7 @@ const LoginForm = () => {
                     }} 
                 />
             </div>
-            <p className="form_error text-danger small mt-1">{errors.email?.message}</p>
+            <p className="form_error text-danger small mt-1">{errors.email?.message as any}</p>
          </div>
          <div className="form-grp mb-15">
             <label htmlFor="password" className="fw-bold small opacity-50 mb-2">{t("common.password")}</label>
@@ -82,7 +78,7 @@ const LoginForm = () => {
                     fontSize: '0.95rem'
                 }} 
             />
-            <p className="form_error text-danger small mt-1">{errors.password?.message}</p>
+            <p className="form_error text-danger small mt-1">{errors.password?.message as any}</p>
          </div>
          <div className="account__check d-flex justify-content-between align-items-center mb-20">
             <div className="account__check-remember d-flex align-items-center gap-2">

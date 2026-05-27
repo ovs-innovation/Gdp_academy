@@ -3,7 +3,6 @@ import Features from "./Features"
 import Choose from "./Choose"
 import Course from "./Course"
 import Video from "./Video"
-import Instructor from "./Instructor"
 import Event from "./Event"
 import Blog from "./Blog"
 import Cta from "./Cta"
@@ -22,7 +21,6 @@ const HomeFour = () => {
             <Choose />
             <Course />
             <Video />
-            <Instructor />
             <BrandOne />
             <Event />
             <Testimonial />

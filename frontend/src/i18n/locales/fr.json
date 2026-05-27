@@ -134,14 +134,14 @@
       "title": "Développez vos compétences avec des mentors mondiaux de confiance",
       "description": "Des cours dispensés par des experts conçus pour vous aider à progresser plus vite et plus intelligemment.",
       "questions": {
-        "q1": "Pourquoi devrais-je choisir Edunyte pour apprendre ?",
-        "a1": "Parce qu'Edunyte propose des cours flexibles et basés sur les compétences, dispensés par des formateurs experts dans plusieurs langues.",
+        "q1": "Pourquoi devrais-je choisir GDP Studio pour apprendre ?",
+        "a1": "Parce qu'GDP Studio propose des cours flexibles et basés sur les compétences, dispensés par des formateurs experts dans plusieurs langues.",
         "q2": "Puis-je apprendre des compétences dans ma langue maternelle ?",
         "a2": "Oui, les cours sont disponibles en hindi, en anglais et dans d'autres langues régionales pour une compréhension facile.",
         "q3": "Les cours sont-ils dispensés par des experts certifiés ?",
         "a3": "Absolument. Tous les cours sont dispensés par des professionnels vérifiés et expérimentés.",
-        "q4": "Edunyte est-elle abordable pour les étudiants ?",
-        "a4": "Oui, Edunyte offre une éducation de haute qualité à des prix abordables et adaptés aux étudiants."
+        "q4": "GDP Studio est-elle abordable pour les étudiants ?",
+        "a4": "Oui, GDP Studio offre une éducation de haute qualité à des prix abordables et adaptés aux étudiants."
       }
     },
     "features": {
@@ -150,8 +150,8 @@
       "description": "Une expérience d'apprentissage simple qui rassemble étudiants et mentors pour apprendre, suivre les progrès et réussir.",
       "home_2_header": {
         "subtitle": "Nos meilleures fonctionnalités",
-        "title": "Atteignez votre objectif avec Edunyte",
-        "description": "Edunyte vous aide à atteindre vos objectifs personnels et professionnels grâce à des parcours clairs, des conseils d'experts et des résultats prouvés."
+        "title": "Atteignez votre objectif avec GDP Studio",
+        "description": "GDP Studio vous aide à atteindre vos objectifs personnels et professionnels grâce à des parcours clairs, des conseils d'experts et des résultats prouvés."
       },
       "items": {
         "home_1": {
@@ -234,13 +234,13 @@
     "become_partner": "Devenir partenaire",
     "work_at": "Travailler chez Future Learn",
     "quizlet_plus": "Quizlet Plus",
-    "copyright": "© 2010-2024 Edunyte.com. Tous droits réservés."
+    "copyright": "© 2010-2024 GDP Studio.com. Tous droits réservés."
   },
   "about_page": {
     "hero": {
       "title": "Où les étudiants apprennent mieux et les enseignants grandissent plus forts",
-      "description": "Edunyte est une plateforme éducative moderne conçue pour rassembler étudiants et enseignants dans un écosystème d'apprentissage significatif. Nous pensons que l'éducation fonctionne mieux lorsqu'elle est personnelle, flexible et menée par l'humain.",
-      "button": "Rejoignez la communauté Edunyte"
+      "description": "GDP Studio est une plateforme éducative moderne conçue pour rassembler étudiants et enseignants dans un écosystème d'apprentissage significatif. Nous pensons que l'éducation fonctionne mieux lorsqu'elle est personnelle, flexible et menée par l'humain.",
+      "button": "Rejoignez la communauté GDP Studio"
     },
     "breadcrumb": {
       "title": "Qui sommes-nous",
@@ -267,19 +267,19 @@
     },
     "platform": {
       "title": "Une plateforme pour tous",
-      "description": "Que vous soyez ici pour apprendre, enseigner ou grandir - Edunyte vous souhaite la bienvenue.",
+      "description": "Que vous soyez ici pour apprendre, enseigner ou grandir - GDP Studio vous souhaite la bienvenue.",
       "tabs": {
         "teachers": {
           "name": "enseignants",
           "badge": "Enseigner",
           "title": "Enseignez en toute liberté. Grandissez avec un but. Inspirez avec impact.",
-          "text": "Les enseignants sont la fondation d'Edunyte. Nous donnons aux éducateurs les moyens d'agir en leur offrant une plateforme où leurs compétences sont valorisées et leur croissance compte. Que vous soyez un professionnel expérimenté ou un éducateur passionné, Edunyte offre la flexibilité, le soutien et le respect que vous méritez. Nous proposons des horaires d'enseignement flexibles, l'accès à des étudiants motivés, des revenus équitables et des opportunités de croissance à long terme."
+          "text": "Les enseignants sont la fondation d'GDP Studio. Nous donnons aux éducateurs les moyens d'agir en leur offrant une plateforme où leurs compétences sont valorisées et leur croissance compte. Que vous soyez un professionnel expérimenté ou un éducateur passionné, GDP Studio offre la flexibilité, le soutien et le respect que vous méritez. Nous proposons des horaires d'enseignement flexibles, l'accès à des étudiants motivés, des revenus équitables et des opportunités de croissance à long terme."
         },
         "students": {
           "name": "étudiants",
           "badge": "Apprendre",
           "title": "Apprenez plus intelligemment. Progressez plus vite. Réussissez avec confiance.",
-          "text": "Edunyte est conçu autour des étudiants - votre rythme, vos objectifs, votre avenir. Nous connectons les apprenants avec des éducateurs experts qui se concentrent sur la compréhension, pas seulement sur l'achèvement du programme. Que vous amélioriez vos notes, prépariez des examens ou développiez des compétences, Edunyte garantit que l'apprentissage soit clair, soutenu et efficace avec des parcours d'apprentissage personnalisés et des enseignants certifiés."
+          "text": "GDP Studio est conçu autour des étudiants - votre rythme, vos objectifs, votre avenir. Nous connectons les apprenants avec des éducateurs experts qui se concentrent sur la compréhension, pas seulement sur l'achèvement du programme. Que vous amélioriez vos notes, prépariez des examens ou développiez des compétences, GDP Studio garantit que l'apprentissage soit clair, soutenu et efficace avec des parcours d'apprentissage personnalisés et des enseignants certifiés."
         },
         "values": {
           "name": "Nos valeurs",
@@ -296,7 +296,7 @@
       "join_link": "Rejoindre en tant que {{role}}"
     },
     "numbers": {
-      "title": "Edunyte en chiffres",
+      "title": "GDP Studio en chiffres",
       "description": "Nous sommes fiers d'être une plateforme leader sur le marché mondial de l'éducation en ligne.",
       "items": {
         "tutors": {
@@ -319,10 +319,10 @@
     },
     "story": {
       "title": "Bâtir l'avenir de l'apprentissage",
-      "subtitle": "Edunyte est plus qu'une plateforme - c'est une communauté croissante d'apprenants et d'éducateurs.",
-      "p1": "Edunyte est une plateforme éducative moderne conçue pour rassembler étudiants et enseignants dans un écosystème d'apprentissage significatif. Nous pensons que l'éducation fonctionne mieux lorsqu'elle est personnelle, flexible et menée par l'humain.",
-      "p2": "Que vous soyez ici pour apprendre, enseigner ou grandir - Edunyte vous souhaite la bienvenue. Le succès chez Edunyte se construit ensemble.",
-      "box_title": "Comment fonctionne Edunyte",
+      "subtitle": "GDP Studio est plus qu'une plateforme - c'est une communauté croissante d'apprenants et d'éducateurs.",
+      "p1": "GDP Studio est une plateforme éducative moderne conçue pour rassembler étudiants et enseignants dans un écosystème d'apprentissage significatif. Nous pensons que l'éducation fonctionne mieux lorsqu'elle est personnelle, flexible et menée par l'humain.",
+      "p2": "Que vous soyez ici pour apprendre, enseigner ou grandir - GDP Studio vous souhaite la bienvenue. Le succès chez GDP Studio se construit ensemble.",
+      "box_title": "Comment fonctionne GDP Studio",
       "list": {
         "1": "Les étudiants choisissent les matières et les objectifs",
         "2": "Les enseignants apportent leur expertise et leurs conseils",
@@ -332,12 +332,12 @@
     },
     "testimonials": {
       "subtitle": "Nos témoignages",
-      "title": "Ce que les étudiants pensent et disent d'Edunyte",
-      "description": "Découvrez notre communauté d'apprenants qui ont transformé leur vie avec Edunyte.",
+      "title": "Ce que les étudiants pensent et disent d'GDP Studio",
+      "description": "Découvrez notre communauté d'apprenants qui ont transformé leur vie avec GDP Studio.",
       "items": {
         "1": {
           "name": "Wade Warren",
-          "desc": "Edunyte ha complètement changé ma façon d'apprendre. Les tuteurs sont fantastiques et la flexibilité est exactement ce dont j'avais besoin."
+          "desc": "GDP Studio ha complètement changé ma façon d'apprendre. Les tuteurs sont fantastiques et la flexibilité est exactement ce dont j'avais besoin."
         },
         "2": {
           "name": "Jenny Wilson",
@@ -357,7 +357,7 @@
   "become_instructor_page": {
     "breadcrumb_title": "Devenez Instructeur",
     "hero": {
-      "title": "Apprenez correctement, parlez clairement et entrez dans un avenir mondial avec Edunyte.",
+      "title": "Apprenez correctement, parlez clairement et entrez dans un avenir mondial avec GDP Studio.",
       "cta": "Créez un profil de tuteur maintenant"
     },
     "steps": {
@@ -390,8 +390,8 @@
     },
     "global": {
       "title": "Inspirez les Esprits. Enseignez Mondialement. Grandissez Avec Nous.",
-      "desc_p1": "Chez Edunyte, nous croyons que les grands enseignants créent de grands avenirs.",
-      "desc_p2": "Si vous êtes passionné par l'enseignement et souhaitez avoir un impact réel, Edunyte recrute des éducateurs dans plusieurs matières et niveaux.",
+      "desc_p1": "Chez GDP Studio, nous croyons que les grands enseignants créent de grands avenirs.",
+      "desc_p2": "Si vous êtes passionné par l'enseignement et souhaitez avoir un impact réel, GDP Studio recrute des éducateurs dans plusieurs matières et niveaux.",
       "list": {
         "1": "Enseignez à des étudiants de n'importe où",
         "2": "Horaires d'enseignement flexibles",
@@ -403,7 +403,7 @@
       "cta": "Créez un profil de tuteur maintenant"
     },
     "testimonial": {
-      "quote": "Edunyte m'a permis de gagner ma vie sans quitter la maison !",
+      "quote": "GDP Studio m'a permis de gagner ma vie sans quitter la maison !",
       "name": "Krista A.",
       "role": "Tutrice d'anglais",
       "cta": "Créez un profil de tuteur maintenant"
@@ -412,7 +412,7 @@
       "title": "Questions fréquemment posées",
       "items": {
         "1": {
-          "question": "Quel type de tuteurs Edunyte recherche-t-il ?",
+          "question": "Quel type de tuteurs GDP Studio recherche-t-il ?",
           "answer": "Aucune certification spécifique n'est requise ! Nous recherchons des tuteurs passionnés qui ont d'excellentes compétences en communication et sont experts dans leurs matières. Bien que l'expérience d'enseignement ou les certifications soient un plus, elles ne sont pas obligatoires pour toutes les matières."
         },
         "2": {
@@ -420,7 +420,7 @@
           "answer": "Vous pouvez enseigner plus de 100 matières, y compris les langues, les matières scolaires K-12, les cours universitaires, la programmation, les loisirs et l'art. Si votre matière n'est pas répertoriée, vous pouvez la suggérer lors de l'inscription."
         },
         "3": {
-          "question": "Comment devenir tuteur en ligne chez Edunyte ?",
+          "question": "Comment devenir tuteur en ligne chez GDP Studio ?",
           "answer": "Le processus est simple : Inscrivez-vous, créez votre profil, téléchargez une photo/vidéo de présentation professionnelle et soumettez pour examen. Notre équipe approuve les profils dans les 3-5 jours ouvrables."
         },
         "4": {
@@ -428,19 +428,19 @@
           "answer": "Assurez-vous que votre profil est complet avec une photo de haute qualité, une description bien rédigée et une vidéo de présentation claire. Vérifiez votre identité et vos qualifications pour accélérer le processus."
         },
         "5": {
-          "question": "Pourquoi devrais-je enseigner sur Edunyte ?",
-          "answer": "Edunyte offre la flexibilité de fixer vos propres tarifs et horaires, l'accès à une base d'étudiants mondiale, des paiements sécurisés, des ressources de développement professionnel et une communauté de soutien."
+          "question": "Pourquoi devrais-je enseigner sur GDP Studio ?",
+          "answer": "GDP Studio offre la flexibilité de fixer vos propres tarifs et horaires, l'accès à une base d'étudiants mondiale, des paiements sécurisés, des ressources de développement professionnel et une communauté de soutien."
         },
         "6": {
-          "question": "Quel équipement informatique ai-je besoin pour enseigner sur Edunyte ?",
+          "question": "Quel équipement informatique ai-je besoin pour enseigner sur GDP Studio ?",
           "answer": "Vous avez besoin d'un ordinateur de bureau ou portable avec une connexion Internet stable, une webcam fonctionnelle et un casque avec microphone pour un son clair."
         },
         "7": {
-          "question": "Est-il gratuit de créer un profil de tuteur sur Edunyte ?",
-          "answer": "Oui, créer un profil de tuteur et être répertorié sur Edunyte est entièrement gratuit. Nous ne facturons qu'une petite commission sur les leçons que vous enseignez."
+          "question": "Est-il gratuit de créer un profil de tuteur sur GDP Studio ?",
+          "answer": "Oui, créer un profil de tuteur et être répertorié sur GDP Studio est entièrement gratuit. Nous ne facturons qu'une petite commission sur les leçons que vous enseignez."
         },
         "8": {
-          "question": "Combien puis-je gagner sur Edunyte ?",
+          "question": "Combien puis-je gagner sur GDP Studio ?",
           "answer": "Vous fixez votre propre taux horaire. Les gains dépendent de votre tarif et du nombre d'heures que vous enseignez. Les meilleurs tuteurs peuvent gagner considérablement en construisant une solide base d'étudiants."
         }
       }
@@ -458,19 +458,19 @@
       "student_support": {
         "title": "Support Étudiant",
         "text": "Besoin d'aide avec les cours ou le compte?",
-        "email": "support@edunyte.com",
+        "email": "support@GDP Studio.com",
         "hours": "Lun – Ven, 9h - 18h (IST)"
       },
       "teacher_support": {
         "title": "Support Enseignant",
         "text": "Questions sur l'adhésion ou l'intégration?",
-        "email": "careers@edunyte.com",
+        "email": "careers@GDP Studio.com",
         "hours": "Lun – Ven, 9h - 18h (IST)"
       },
       "partnerships": {
         "title": "Partenariats",
         "text": "Opportunités commerciales?",
-        "email": "partnerships@edunyte.com"
+        "email": "partnerships@GDP Studio.com"
       }
     },
     "form": {

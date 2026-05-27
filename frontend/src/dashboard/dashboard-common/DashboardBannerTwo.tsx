@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom"
 import { useState } from "react"
-import { useTranslation } from "react-i18next"
 import { useAuth } from "../../contexts/AuthContext"
 
 interface DashboardBannerTwoProps {
@@ -10,7 +9,6 @@ interface DashboardBannerTwoProps {
 
 const DashboardBannerTwo = ({ totalSessions = 0, completedSessions = 0 }: DashboardBannerTwoProps) => {
   const { user, updateUserProfile } = useAuth() as any
-  const { t } = useTranslation()
   const [uploading, setUploading] = useState(false)
 
   const getMemberName = () => {
@@ -56,9 +54,12 @@ const DashboardBannerTwo = ({ totalSessions = 0, completedSessions = 0 }: Dashbo
           </div>
           <div className="content">
             <h2 className="title mb-1 text-white" style={{ fontSize: '28px' }}>{getMemberName()}</h2>
-            <div className="d-flex gap-3 align-items-center opacity-75">
+            <div className="d-flex gap-3 align-items-center opacity-75 flex-wrap">
                <span className="small"><i className="fas fa-graduation-cap me-2 text-primary"></i>Member</span>
                <span className="small"><i className="fas fa-map-marker-alt me-2 text-primary"></i>Elite Academy</span>
+               {totalSessions > 0 && (
+                 <span className="small"><i className="fas fa-calendar-check me-2 text-success"></i>{completedSessions}/{totalSessions} Sessions Completed</span>
+               )}
             </div>
           </div>
         </div>

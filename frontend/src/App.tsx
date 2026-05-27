@@ -1,5 +1,5 @@
 import { HelmetProvider } from 'react-helmet-async'
-import { BrowserRouter } from 'react-router-dom'
+
 import AppNavigation from './navigation/Navigation'
 import { Provider } from 'react-redux'
 import store from './redux/store'
@@ -12,12 +12,12 @@ import 'react-toastify/dist/ReactToastify.css'
 function App() {
   return (
     <Provider store={store}>
-      <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      
         <AuthProvider>
           <WishlistProvider>
             <CurrencyProvider>
               <HelmetProvider>
-                <div className="dance-academy-app">
+                <div className="dance-studio-app">
                   <AppNavigation />
                   <ToastContainer position="bottom-right" theme="dark" />
                 </div>
@@ -25,7 +25,7 @@ function App() {
             </CurrencyProvider>
           </WishlistProvider>
         </AuthProvider>
-      </BrowserRouter>
+      
     </Provider>
   )
 }

@@ -1,6 +1,16 @@
-import express from "express";
-import { login, me, register, forgotPassword, resetPassword, changePassword, googleLogin } from "../controllers/authController.js";
-import { verifyToken } from "../middlewares/authMiddleware.js";
+const express = require("express");
+
+const {
+  login,
+  me,
+  register,
+  forgotPassword,
+  resetPassword,
+  changePassword,
+  googleLogin,
+} = require("../controllers/authController.js");
+
+const { verifyToken } = require("../middlewares/authMiddleware.js");
 
 const router = express.Router();
 
@@ -13,5 +23,4 @@ router.post("/reset", resetPassword);
 router.get("/me", verifyToken, me);
 router.post("/change-password", verifyToken, changePassword);
 
-export default router;
-
+module.exports = router;

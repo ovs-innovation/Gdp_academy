@@ -8,7 +8,7 @@ const StudentWishlistArea = () => {
    return (
       <section className="dashboard__area section-pb-120">
          <div className="container">
-            <DashboardBannerTwo totalClasses={totalClasses} completedClasses={completedClasses} />
+            <DashboardBannerTwo totalSessions={totalClasses} completedSessions={completedClasses} />
             <div className="dashboard__inner-wrap">
                <div className="row">
                   <DashboardSidebarTwo />

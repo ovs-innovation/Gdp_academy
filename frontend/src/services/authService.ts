@@ -1,4 +1,4 @@
-const API_BASE_URL = "/api";
+import { API_BASE_URL } from "../lib/apiConfig";
 
 // ================= TYPES =================
 export interface LoginCredentials {
@@ -124,26 +124,68 @@ export const removeStoredUser = (): void => {
 };
 
 // ================= PROFILE =================
-export const updateProfile = async (data: any) => {
-  const token = getStoredToken();
+export const updateProfile = async (data: Record<string, unknown>) => {
+  const token = getStoredToken()
+  const currentUser = getStoredUser()
 
-  const response = await fetch(`${API_BASE_URL}/student-profiles/me`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(data),
-  });
-
-  const resData = await response.json();
-
-  if (!response.ok) {
-    throw new Error(resData.message || "Update failed");
+  if (!token) {
+    throw new Error('You must be logged in to update your profile.')
   }
 
-  return resData;
-};
+  const payload: Record<string, unknown> = {}
+  if (data.photo !== undefined) payload.photo = data.photo
+  if (data.phone !== undefined) payload.phone = data.phone
+  if (data.timezone !== undefined) payload.timezone = data.timezone
+  if (data.location !== undefined) {
+    const loc = String(data.location)
+    const parts = loc.split(',').map((p) => p.trim())
+    if (parts[0]) payload.city = parts[0]
+    if (parts[1]) payload.country = parts[1]
+  }
+
+  const response = await fetch(`${API_BASE_URL}/student-profiles/me`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  })
+
+  const resData = await response.json()
+
+  if (!response.ok) {
+    throw new Error(resData.message || 'Update failed')
+  }
+
+  const profile = resData.profile ?? resData
+  const photo =
+    resData.photo ||
+    (profile && typeof profile === 'object' && 'photo' in profile
+      ? (profile as { photo?: string }).photo
+      : undefined) ||
+    (data.photo as string | undefined)
+
+  const updatedUser = {
+    ...currentUser,
+    ...data,
+    photo,
+    profile,
+  }
+
+  setStoredUser(updatedUser as AuthResponse['user'])
+  return updatedUser as AuthResponse['user']
+}
+
+export const uploadProfilePhotoToServer = async (file: File) => {
+  const { uploadProfilePhoto } = await import('../utils/uploadProfilePhoto')
+  await uploadProfilePhoto(file)
+  const currentUser = getStoredUser()
+  if (!currentUser) {
+    throw new Error('Could not refresh user after upload.')
+  }
+  return currentUser as AuthResponse['user']
+}
 
 // ================= VALIDATE TOKEN =================
 export const validateToken = async () => {

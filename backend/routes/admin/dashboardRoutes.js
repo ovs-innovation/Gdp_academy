@@ -1,10 +1,19 @@
-import express from "express";
-import { getDashboardStats } from "../../controllers/admin/dashboardController.js";
-import { verifyToken } from "../../middlewares/authMiddleware.js";
-import { requirePermission } from "../../middlewares/permissionMiddleware.js";
+const express = require("express");
+const {
+  getDashboardStats,
+} = require("../../controllers/admin/dashboardController.js");
+const { verifyToken } = require("../../middlewares/authMiddleware.js");
+const {
+  requirePermission,
+} = require("../../middlewares/permissionMiddleware.js");
 
 const router = express.Router();
 
-router.get("/stats", verifyToken, requirePermission("dashboard.view"), getDashboardStats);
+router.get(
+  "/stats",
+  verifyToken,
+  requirePermission("dashboard.view"),
+  getDashboardStats,
+);
 
-export default router;
+module.exports = router;

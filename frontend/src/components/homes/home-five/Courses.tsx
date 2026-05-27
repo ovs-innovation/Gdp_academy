@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { fetchPrograms, type Program } from "../../../services/programService";
 import { fetchDanceStyles, type DanceStyle } from "../../../services/danceStyleService";
+import { TranslatedContent } from "../../common/TranslatedContent";
 
 const Courses = () => {
    const dispatch = useDispatch();
@@ -57,11 +58,11 @@ const Courses = () => {
    const handleAddToWishlist = (item: Program) => {
       const wishlistItem = {
          id: parseInt(item._id.slice(-8), 16) || Math.floor(Math.random() * 1000000),
-         title: item.name,
+         title: typeof item.name === 'string' ? item.name : (item.name as any)?.en || 'Dance Program',
          thumb: item.image || '/assets/img/courses/course_default.jpg',
          price: 0,
       };
-      dispatch(addToWishlist(wishlistItem));
+      dispatch(addToWishlist(wishlistItem as any));
    };
 
    if (loading) {
@@ -202,7 +203,7 @@ const Courses = () => {
                         <div className="courses__item-six shine__animate-item">
                            <div className="courses__item-thumb-five shine__animate-link">
                               <Link to={`/program/${courseSlug}`}>
-                                 <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name} />
+                                 <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name as any} />
                               </Link>
                               <a onClick={() => handleAddToWishlist(item)} className="courses__wishlist-two course-heart-btn" style={{ cursor: "pointer" }}>
                                  <InjectableSvg src="/assets/img/icons/heart02.svg" alt="" className="injectable" />
@@ -222,9 +223,9 @@ const Courses = () => {
                                  </li>
                               </ul>
                               <h2 className="title">
-                                 <Link to={`/program/${courseSlug}`}>{item.name}</Link>
+                                 <Link to={`/program/${courseSlug}`}><TranslatedContent>{item.name}</TranslatedContent></Link>
                               </h2>
-                              <p>{item.description || ''}</p>
+                              <p><TranslatedContent>{item.description || ''}</TranslatedContent></p>
                               <div className="courses__item-content-bottom-two">
                                  <div className="button">
                                     <Link to={`/program/${courseSlug}`}>

@@ -29,7 +29,7 @@
   margin-left: -40px; /* Shifted more to the left */
 }
 .site-logo {
-  height: 110px; /* Increased from 90px */
+  height: 82px;
   width: auto;
   object-fit: contain;
 }
@@ -38,12 +38,12 @@
   flex-direction: column;
   line-height: 1.1;
   font-family: 'Krona One', sans-serif;
-  margin-left: -8px; /* Increased negative margin */
+  margin-left: -6px;
 }
 .site-text span {
-  font-size: 8.5px; /* Slightly smaller */
-  font-weight: 400; /* Reduced */
-  color: #ffffff; /* Requested color */
+  font-size: 9.5px;
+  font-weight: 400;
+  color: #ffffff;
   text-transform: uppercase;
   letter-spacing: 1.2px;
 }

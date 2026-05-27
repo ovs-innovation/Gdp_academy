@@ -1,6 +1,6 @@
 import { Permission, Role } from "./rbac";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8085/api";
+const API_URL = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
 export const TOKEN_KEY = "admin-auth-token";
 export const ROLE_KEY = "admin-role";
 
@@ -312,7 +312,9 @@ export interface ApiProgram {
   category: string;
   image: string;
   slug?: string;
-  status: "active" | "inactive";
+  status: "active" | "inactive" | "pending";
+  danceStyle?: string;
+  DanceStyle?: string;
   type: "program" | "workshop";
   createdBy: ApiUser | string;
   createdAt?: string;
@@ -322,7 +324,7 @@ export interface ApiProgram {
 export const ProgramsAPI = {
   list: (type?: "program" | "workshop") => {
     const query = type ? `?type=${type}` : "";
-    return apiFetch<{ courses: ApiProgram[]; count: number }>(`/admin/courses${query}`);
+    return apiFetch<{ courses: ApiProgram[]; Programs?: ApiProgram[]; programs?: ApiProgram[]; count: number }>(`/admin/courses${query}`);
   },
   get: (id: string) => apiFetch<{ course: ApiProgram }>(`/admin/courses/${id}`),
   create: (payload: {
@@ -330,7 +332,8 @@ export const ProgramsAPI = {
     description?: string | { en: string };
     category?: string;
     image?: string;
-    status?: "active" | "inactive";
+    status?: "active" | "inactive" | "pending";
+    danceStyle?: string;
     type?: "program" | "workshop";
   }) =>
     apiFetch<{ course: ApiProgram }>("/admin/courses", {
@@ -342,7 +345,8 @@ export const ProgramsAPI = {
     description?: string | { en: string };
     category?: string;
     image?: string;
-    status?: "active" | "inactive";
+    status?: "active" | "inactive" | "pending";
+    danceStyle?: string;
     type?: "program" | "workshop";
   }) =>
     apiFetch<{ course: ApiProgram }>(`/admin/courses/${id}`, {
@@ -397,6 +401,72 @@ export const DanceStylesAPI = {
     }),
   delete: (id: string) =>
     apiFetch<{ success: boolean; message: string }>(`/admin/categories/${id}`, {
+      method: "DELETE",
+    }),
+};
+
+export interface ApiEnquiry {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  message: string;
+  subject?: string;
+  whatsappConsent?: boolean;
+  source: "program" | "workshop" | "contact_form" | "general";
+  status: "new" | "in_progress" | "closed";
+  programId?: ApiProgram | string | null;
+  workshopId?: ApiProgram | string | null;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export const EnquiriesAPI = {
+  list: (params?: { status?: string; source?: string; search?: string; limit?: number }) => {
+    const query = new URLSearchParams();
+    if (params?.status) query.append("status", params.status);
+    if (params?.source) query.append("source", params.source);
+    if (params?.search) query.append("search", params.search);
+    query.append("limit", String(params?.limit ?? 200));
+    const suffix = `?${query.toString()}`;
+    return apiFetch<{ enquiries: ApiEnquiry[]; total: number }>(`/enquiries${suffix}`);
+  },
+  update: (id: string, payload: { status?: ApiEnquiry["status"]; notes?: string }) =>
+    apiFetch<{ enquiry: ApiEnquiry; message: string }>(`/enquiries/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+  delete: (id: string) =>
+    apiFetch<{ message: string }>(`/enquiries/${id}`, {
+      method: "DELETE",
+    }),
+};
+
+export interface ApiGallery {
+  _id: string;
+  title: string;
+  description?: string;
+  category: string;
+  isActive: boolean;
+  items: Array<{ _id?: string; url: string; type?: "image" | "video"; alt?: string; caption?: string; order?: number }>;
+  createdAt?: string;
+}
+
+export const GalleryAPI = {
+  list: () => apiFetch<{ galleries: ApiGallery[]; total: number }>("/gallery?isActive=all&limit=100"),
+  create: (payload: Partial<ApiGallery>) =>
+    apiFetch<{ gallery: ApiGallery; message: string }>("/gallery", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  update: (id: string, payload: Partial<ApiGallery>) =>
+    apiFetch<{ gallery: ApiGallery; message: string }>(`/gallery/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+  delete: (id: string) =>
+    apiFetch<{ message: string }>(`/gallery/${id}`, {
       method: "DELETE",
     }),
 };
@@ -790,4 +860,344 @@ export const BookingAPI = {
       body: JSON.stringify(payload),
     }),
 };
+
+// ==================== New CMS APIs ====================
+
+export interface ApiFAQ {
+  _id: string;
+  question: string | Record<string, string>;
+  answer: string | Record<string, string>;
+  order: number;
+  status: "published" | "draft" | "archived";
+  createdAt?: string;
+}
+
+export const FAQAPI = {
+  list: (status?: string) => {
+    const query = status ? `?status=${status}` : "";
+    return apiFetch<{ faqs: ApiFAQ[]; total: number; pages: number }>(`/faqs${query}`);
+  },
+  create: (payload: Partial<ApiFAQ>) =>
+    apiFetch<{ faq: ApiFAQ; message: string }>("/faqs", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  update: (id: string, payload: Partial<ApiFAQ>) =>
+    apiFetch<{ faq: ApiFAQ; message: string }>(`/faqs/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+  delete: (id: string) =>
+    apiFetch<{ message: string }>(`/faqs/${id}`, {
+      method: "DELETE",
+    }),
+  reorder: (faqs: Array<{ id: string; order: number }>) =>
+    apiFetch<{ message: string }>("/faqs/reorder", {
+      method: "PUT",
+      body: JSON.stringify({ faqs }),
+    }),
+};
+
+export interface ApiMembershipPlan {
+  _id: string;
+  title: string | Record<string, string>;
+  price: number;
+  currency: string;
+  duration: number;
+  durationUnit: "month" | "year";
+  features: string[];
+  order: number;
+  status: "published" | "draft" | "archived";
+  metaTitle?: string;
+  metaDescription?: string;
+  canonicalUrl?: string;
+  createdAt?: string;
+}
+
+export const MembershipPlansAPI = {
+  list: (status?: string) => {
+    const query = status ? `?status=${status}` : "";
+    return apiFetch<{ plans: ApiMembershipPlan[]; total: number; pages: number }>(`/membership-plans${query}`);
+  },
+  create: (payload: Partial<ApiMembershipPlan>) =>
+    apiFetch<{ plan: ApiMembershipPlan; message: string }>("/membership-plans", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  update: (id: string, payload: Partial<ApiMembershipPlan>) =>
+    apiFetch<{ plan: ApiMembershipPlan; message: string }>(`/membership-plans/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+  delete: (id: string) =>
+    apiFetch<{ message: string }>(`/membership-plans/${id}`, {
+      method: "DELETE",
+    }),
+  reorder: (plans: Array<{ id: string; order: number }>) =>
+    apiFetch<{ message: string }>("/membership-plans/reorder", {
+      method: "PUT",
+      body: JSON.stringify({ plans }),
+    }),
+};
+
+export interface ApiContactMessage {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  subject?: string;
+  message: string;
+  source?: string;
+  status: "new" | "read" | "closed";
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export const ContactMessagesAPI = {
+  list: (status?: string) => {
+    const params = new URLSearchParams({ limit: "200" });
+    if (status) params.append("status", status);
+    return apiFetch<{ messages: ApiContactMessage[]; total: number; pages: number }>(`/contact-messages?${params.toString()}`);
+  },
+  updateStatus: (id: string, status: "new" | "read" | "closed") =>
+    apiFetch<{ contact: ApiContactMessage; message: string }>(`/contact-messages/${id}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    }),
+  delete: (id: string) =>
+    apiFetch<{ message: string }>(`/contact-messages/${id}`, {
+      method: "DELETE",
+    }),
+};
+
+export interface ApiPageContent {
+  _id: string;
+  slug: string;
+  title: string | Record<string, string>;
+  content: any;
+  metaTitle?: string;
+  metaDescription?: string;
+  canonicalUrl?: string;
+  status: "published" | "draft" | "archived";
+  order: number;
+}
+
+export const PageContentAPI = {
+  list: (status?: string) => {
+    const query = status ? `?status=${status}` : "";
+    return apiFetch<{ pages: ApiPageContent[]; total: number; pages_count: number }>(`/page-contents${query}`);
+  },
+  getBySlug: (slug: string) => apiFetch<{ page: ApiPageContent }>(`/page-contents/slug/${slug}`),
+  getById: (id: string) => apiFetch<{ page: ApiPageContent }>(`/page-contents/${id}`),
+  create: (payload: Partial<ApiPageContent>) =>
+    apiFetch<{ page: ApiPageContent; message: string }>("/page-contents", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  update: (id: string, payload: Partial<ApiPageContent>) =>
+    apiFetch<{ page: ApiPageContent; message: string }>(`/page-contents/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+  delete: (id: string) =>
+    apiFetch<{ message: string }>(`/page-contents/${id}`, {
+      method: "DELETE",
+    }),
+};
+
+export interface ApiGalleryItem {
+  _id: string;
+  type: "image" | "video";
+  url: string;
+  caption?: string | Record<string, string>;
+  order: number;
+  status: "published" | "draft" | "archived";
+  createdAt?: string;
+}
+
+export const GalleryItemAPI = {
+  list: (status?: string) => {
+    const query = status ? `?status=${status}` : "";
+    return apiFetch<{ items: ApiGalleryItem[]; total: number; pages: number }>(`/gallery-items${query}`);
+  },
+  create: (payload: Partial<ApiGalleryItem>) =>
+    apiFetch<{ item: ApiGalleryItem; message: string }>("/gallery-items", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  update: (id: string, payload: Partial<ApiGalleryItem>) =>
+    apiFetch<{ item: ApiGalleryItem; message: string }>(`/gallery-items/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+  delete: (id: string) =>
+    apiFetch<{ message: string }>(`/gallery-items/${id}`, {
+      method: "DELETE",
+    }),
+  reorder: (items: Array<{ id: string; order: number }>) =>
+    apiFetch<{ message: string }>("/gallery-items/reorder", {
+      method: "PUT",
+      body: JSON.stringify({ items }),
+    }),
+};
+
+export interface ApiSiteSettings {
+  _id: string;
+  logoUrl?: string;
+  navLinks: Array<{ label: string; href: string }>;
+  footerLinks?: Array<{ label: string; href: string }>;
+  footerText?: string;
+  socialLinks: Array<{ platform: string; url: string }>;
+  metaTitle?: string;
+  metaDescription?: string;
+  canonicalUrl?: string;
+  whatsappNumber?: string;
+  announcementBar?: {
+    enabled?: boolean;
+    text?: string;
+    buttonLabel?: string;
+    buttonUrl?: string;
+    backgroundColor?: string;
+    textColor?: string;
+  };
+}
+
+export const SiteSettingsAPI = {
+  get: () => apiFetch<{ settings: ApiSiteSettings }>("/site-settings"),
+  update: (payload: Partial<ApiSiteSettings>) =>
+    apiFetch<{ settings: ApiSiteSettings }>("/site-settings", {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+};
+
+export interface ApiCMSContent {
+  _id: string;
+  key: string;
+  section: string;
+  title: string | Record<string, string>;
+  description?: string | Record<string, string>;
+  content?: any;
+  images?: Array<{ url: string; alt: string; order: number }>;
+  videos?: Array<{ url: string; title: string; order: number }>;
+  metadata?: {
+    seoTitle: string;
+    seoDescription: string;
+    seoKeywords: string[];
+  };
+  isActive: boolean;
+  publishedAt?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export const CMSAPI = {
+  list: (params?: { section?: string; page?: number; limit?: number }) => {
+    const query = new URLSearchParams();
+    if (params?.section) query.append("section", params.section);
+    if (params?.page) query.append("page", params.page.toString());
+    if (params?.limit) query.append("limit", params.limit.toString());
+    const queryString = query.toString();
+    return apiFetch<{ cms: ApiCMSContent[]; total: number; pages: number }>(
+      `/cms${queryString ? `?${queryString}` : ""}`
+    );
+  },
+  getByKey: (key: string) => apiFetch<ApiCMSContent>(`/cms/key/${key}`),
+  getBySection: (section: string) => apiFetch<ApiCMSContent[]>(`/cms/section/${section}`),
+  save: (payload: Partial<ApiCMSContent>) =>
+    apiFetch<{ message: string; cms: ApiCMSContent }>("/cms", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  delete: (id: string) =>
+    apiFetch<{ message: string }>(`/cms/${id}`, {
+      method: "DELETE",
+    }),
+};
+
+export interface ApiTestimonial {
+  _id: string;
+  name: string;
+  position?: string;
+  message: string | Record<string, string>;
+  image?: string;
+  rating: number;
+  isActive: boolean;
+  order: number;
+  createdAt?: string;
+}
+
+export const TestimonialAPI = {
+  list: (params?: { isActive?: string; limit?: number }) => {
+    const query = new URLSearchParams();
+    if (params?.isActive) query.append("isActive", params.isActive);
+    if (params?.limit) query.append("limit", params.limit.toString());
+    const qs = query.toString();
+    return apiFetch<{ testimonials: ApiTestimonial[]; total: number; pages: number }>(
+      `/testimonials${qs ? `?${qs}` : ""}`
+    );
+  },
+  create: (payload: Partial<ApiTestimonial>) =>
+    apiFetch<{ testimonial: ApiTestimonial; message: string }>("/testimonials", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  update: (id: string, payload: Partial<ApiTestimonial>) =>
+    apiFetch<{ testimonial: ApiTestimonial; message: string }>(`/testimonials/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+  delete: (id: string) =>
+    apiFetch<{ message: string }>(`/testimonials/${id}`, {
+      method: "DELETE",
+    }),
+  reorder: (testimonials: Array<{ id: string; order: number }>) =>
+    apiFetch<{ message: string }>("/testimonials/reorder", {
+      method: "POST",
+      body: JSON.stringify({ testimonials }),
+    }),
+};
+
+export interface ApiBlog {
+  _id: string;
+  title: string | Record<string, string>;
+  slug: string;
+  excerpt?: string | Record<string, string>;
+  content: string | Record<string, string>;
+  featuredImage?: { url: string; alt?: string };
+  category?: string;
+  tags?: string[];
+  status: "draft" | "published" | "archived";
+  views?: number;
+  publishedAt?: string;
+  createdAt?: string;
+}
+
+export const BlogAPI = {
+  list: (params?: { status?: string; limit?: number; search?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.status !== undefined) query.append("status", params.status);
+    if (params?.limit) query.append("limit", params.limit.toString());
+    if (params?.search) query.append("search", params.search);
+    const qs = query.toString();
+    return apiFetch<{ blogs: ApiBlog[]; total: number; pages: number }>(
+      `/blogs${qs ? `?${qs}` : ""}`
+    );
+  },
+  create: (payload: Partial<ApiBlog>) =>
+    apiFetch<{ blog: ApiBlog; message: string }>("/blogs", {
+      method: "POST",
+      body: JSON.stringify(payload),
+    }),
+  update: (id: string, payload: Partial<ApiBlog>) =>
+    apiFetch<{ blog: ApiBlog; message: string }>(`/blogs/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(payload),
+    }),
+  delete: (id: string) =>
+    apiFetch<{ message: string }>(`/blogs/${id}`, {
+      method: "DELETE",
+    }),
+};
+
 

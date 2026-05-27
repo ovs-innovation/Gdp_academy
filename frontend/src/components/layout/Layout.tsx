@@ -2,6 +2,7 @@ import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import { getSiteSettings, type SiteSettings } from '../../services/settingsService';
+import { getSiteSettings as getCmsSiteSettings } from '../../services/cmsService';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -9,6 +10,10 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [settings, setSettings] = React.useState<SiteSettings | null>(null);
+  const [announcementBar, setAnnouncementBar] = React.useState<
+    NonNullable<import('../../services/cmsService').SiteSettings['announcementBar']> | null
+  >(null);
+  const [cmsWhatsapp, setCmsWhatsapp] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     getSiteSettings().then((s) => {
@@ -18,11 +23,49 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         document.title = `${cleanSiteName} | Garima Dance Productions`;
       }
     });
+    getCmsSiteSettings()
+      .then((cms) => {
+        if (cms?.announcementBar) {
+          setAnnouncementBar(cms.announcementBar);
+        }
+        if (cms?.whatsappNumber) {
+          setCmsWhatsapp(cms.whatsappNumber.replace(/\D/g, ""));
+        }
+      })
+      .catch(() => {});
   }, []);
 
-  const whatsappNumber = settings?.whatsappNumber || "1234567890";
+  const whatsappNumber =
+    cmsWhatsapp ||
+    settings?.whatsappNumber?.replace(/\D/g, "") ||
+    "9711384768";
+  const bar = announcementBar;
   return (
     <div className="layout-wrapper">
+      {bar?.enabled && bar.text ? (
+        <div
+          className="announcement-banner"
+          style={{
+            background: bar.backgroundColor || undefined,
+            color: bar.textColor || undefined,
+          }}
+        >
+          <p style={{ margin: 0, color: bar.textColor || undefined }}>
+            {bar.text}
+            {bar.buttonLabel && bar.buttonUrl ? (
+              <>
+                {' '}
+                <a
+                  href={bar.buttonUrl}
+                  style={{ color: bar.textColor || 'inherit', textDecoration: 'underline' }}
+                >
+                  {bar.buttonLabel}
+                </a>
+              </>
+            ) : null}
+          </p>
+        </div>
+      ) : null}
       <Header />
       <main className="content-area">
         {children}

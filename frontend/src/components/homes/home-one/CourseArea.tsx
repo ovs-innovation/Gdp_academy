@@ -46,6 +46,15 @@ interface CourseProps {
   style: boolean;
 }
 
+const getLocalizedValue = (val: any): string => {
+  if (!val) return '';
+  if (typeof val === 'string') return val;
+  if (typeof val === 'object') {
+    return val.en || val.hi || Object.values(val)[0] || '';
+  }
+  return String(val);
+};
+
 const CourseArea = ({ style }: CourseProps) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(0);
@@ -157,7 +166,7 @@ const CourseArea = ({ style }: CourseProps) => {
                     <div className="courses__item shine__animate-item">
                       <div className="courses__item-thumb" style={{ position: 'relative' }}>
                         <Link to={`/program/${item.slug || item._id}`} className="shine__animate-link">
-                          <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={item.name} />
+                           <img src={item.image || '/assets/img/courses/course_default.jpg'} alt={typeof item.name === 'string' ? item.name : (item.name as any)?.en || ''} />
                         </Link>
                         <button
                           onClick={(e) => {
@@ -194,8 +203,8 @@ const CourseArea = ({ style }: CourseProps) => {
                           </li>
                           <li className="avg-rating"><i className="fas fa-star"></i> (5.0 {t('common.reviews')})</li>
                         </ul>
-                        <h5 className="title"><Link to={`/program/${item.slug || item._id}`}>{item.name}</Link></h5>
-                        {item.description && <p className="info">{item.description}</p>}
+                        <h5 className="title"><Link to={`/program/${item.slug || item._id}`}>{getLocalizedValue(item.name)}</Link></h5>
+                        {item.description && <p className="info">{getLocalizedValue(item.description)}</p>}
                         <div className="courses__item-bottom">
                           <div className="button">
                             <Link to={`/program/${item.slug || item._id}`}>

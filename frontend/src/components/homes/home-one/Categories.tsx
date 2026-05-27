@@ -8,18 +8,14 @@ import { TranslatedContent } from '../../common/TranslatedContent';
 const Categories = () => {
     const { t } = useTranslation();
     const [danceStyles, setDanceStyles] = useState<DanceStyle[]>([]);
-    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const loadDanceStyles = async () => {
             try {
-                setLoading(true);
                 const response = await fetchDanceStyles('active');
                 setDanceStyles(response.categories.slice(0, 8));
             } catch (err) {
                 console.error('Failed to load Dance Styles:', err);
-            } finally {
-                setLoading(false);
             }
         };
 

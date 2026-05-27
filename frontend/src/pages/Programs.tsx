@@ -1,84 +1,338 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Layout from '../components/layout/Layout';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
+import { fetchPrograms, type Program } from '../services/programService';
+import { usePageContent, renderMultiLineHeroTitle } from '../hooks/usePageContent';
 import '../styles/programs.css';
 
+const fallbackPrograms: Program[] = [
+  {
+    _id: 'bollywood-dance',
+    name: 'Bollywood Dance',
+    description: 'High-energy choreography, expressions, stage presence, and performance-ready routines.',
+    danceStyle: 'Bollywood',
+    category: 'Bollywood',
+    level: 'all_levels',
+    duration: 12,
+    durationUnit: 'weeks',
+    image: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=1200&q=85',
+    price: 2999,
+    discountPrice: 2499,
+    currency: 'INR',
+    status: 'active',
+    type: 'program',
+    slug: 'bollywood-dance',
+  },
+  {
+    _id: 'hip-hop',
+    name: 'Hip Hop',
+    description: 'Grooves, footwork, freestyle foundations, musicality, and bold urban performance style.',
+    danceStyle: 'Hip Hop',
+    category: 'Hip Hop',
+    level: 'beginner',
+    duration: 8,
+    durationUnit: 'weeks',
+    image: 'https://images.unsplash.com/photo-1535525153412-5a42439a210d?auto=format&fit=crop&w=1200&q=85',
+    price: 2499,
+    currency: 'INR',
+    status: 'active',
+    type: 'program',
+    slug: 'hip-hop',
+  },
+  {
+    _id: 'contemporary',
+    name: 'Contemporary',
+    description: 'Fluid movement, floorwork, balance, control, and emotive choreography for growing dancers.',
+    danceStyle: 'Contemporary',
+    category: 'Contemporary',
+    level: 'intermediate',
+    duration: 10,
+    durationUnit: 'weeks',
+    image: 'https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=1200&q=85',
+    price: 3499,
+    currency: 'INR',
+    status: 'active',
+    type: 'program',
+    slug: 'contemporary',
+  },
+  {
+    _id: 'kids-dance',
+    name: 'Kids Dance',
+    description: 'Fun movement sessions for kids with rhythm, confidence, coordination, and stage basics.',
+    danceStyle: 'Kids',
+    category: 'Kids',
+    level: 'beginner',
+    duration: 6,
+    durationUnit: 'weeks',
+    image: 'https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?auto=format&fit=crop&w=1200&q=85',
+    price: 1999,
+    currency: 'INR',
+    status: 'active',
+    type: 'program',
+    slug: 'kids-dance',
+  },
+  {
+    _id: 'salsa',
+    name: 'Salsa',
+    description: 'Partner basics, turns, timing, body rhythm, and social dance combinations.',
+    danceStyle: 'Salsa',
+    category: 'Latin',
+    level: 'all_levels',
+    duration: 8,
+    durationUnit: 'weeks',
+    image: 'https://images.unsplash.com/photo-1516475429286-465d815a0df7?auto=format&fit=crop&w=1200&q=85',
+    price: 2999,
+    currency: 'INR',
+    status: 'active',
+    type: 'program',
+    slug: 'salsa',
+  },
+  {
+    _id: 'wedding-choreography',
+    name: 'Wedding Choreography',
+    description: 'Custom family, couple, and group routines designed for unforgettable wedding performances.',
+    danceStyle: 'Wedding',
+    category: 'Wedding',
+    level: 'all_levels',
+    duration: 4,
+    durationUnit: 'weeks',
+    image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=1200&q=85',
+    price: 4999,
+    currency: 'INR',
+    status: 'active',
+    type: 'program',
+    slug: 'wedding-choreography',
+  },
+];
+
+const imageFallback = 'https://images.unsplash.com/photo-1540324155974-7523202daa3f?auto=format&fit=crop&w=1200&q=85';
+
+const getText = (value?: string | { en?: string; [key: string]: string }) => {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  return value.en || Object.values(value)[0] || '';
+};
+
+const formatLevel = (level?: Program['level']) => {
+  const labels = {
+    beginner: 'Beginner',
+    intermediate: 'Intermediate',
+    advanced: 'Advanced',
+    all_levels: 'All Levels',
+  };
+  return level ? labels[level] : 'All Levels';
+};
+
+const formatPrice = (program: Program) => {
+  const price = program.discountPrice || program.price || 0;
+  if (!price) return 'Free Trial';
+  const currency = program.currency || 'INR';
+  return new Intl.NumberFormat(currency === 'INR' ? 'en-IN' : 'en-US', {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: 0,
+  }).format(price);
+};
+
 const Programs: React.FC = () => {
-  const styles = [
-    { id: 1, name: 'Classical Ballet', level: 'Beginner to Advanced', coach: 'Elena Volkova', image: 'https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&q=80', price: '$49/mo' },
-    { id: 2, name: 'Contemporary', level: 'Intermediate', coach: 'Marcus Chen', image: 'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&q=80', price: '$55/mo' },
-    { id: 3, name: 'Urban Hip-Hop', level: 'All Levels', coach: 'Jordan Knight', image: 'https://images.unsplash.com/photo-1535525153412-5a42439a210d?auto=format&fit=crop&q=80', price: '$45/mo' },
-    { id: 4, name: 'Jazz Fusion', level: 'Advanced', coach: 'Sarah Miller', image: 'https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?auto=format&fit=crop&q=80', price: '$50/mo' },
-    { id: 5, name: 'Latin Ballroom', level: 'Beginner', coach: 'Ricardo Silva', image: 'https://images.unsplash.com/photo-1516475429286-465d815a0df7?auto=format&fit=crop&q=80', price: '$60/mo' },
-    { id: 6, name: 'Breakdance', level: 'Intermediate', coach: 'B-Boy Rush', image: 'https://images.unsplash.com/photo-1537367680248-a449a6affb04?auto=format&fit=crop&q=80', price: '$40/mo' },
-  ];
+  const { content: pageContent } = usePageContent('programs');
+  const [programs, setPrograms] = useState<Program[]>(fallbackPrograms);
+  const heroLines = renderMultiLineHeroTitle(pageContent, ['LEARN.', 'PERFORM.', 'EVOLVE.']);
+  const heroBadge = (pageContent.heroBadge as string) || 'GDP ACADEMY PROGRAMS';
+  const heroSubtitle =
+    (pageContent.heroSubtitle as string) ||
+    'Structured dance programs for studio, stage, and celebration — Bollywood, Hip Hop, Contemporary, Kids, Salsa, and custom wedding choreography.';
+  const ctaPrimary = (pageContent.ctaText as string) || 'Explore Programs';
+  const ctaPrimaryUrl = (pageContent.ctaUrl as string) || '#program-list';
+  const ctaSecondary = (pageContent.ctaSecondaryText as string) || 'Get Guidance';
+  const ctaSecondaryUrl = (pageContent.ctaSecondaryUrl as string) || '/contact';
+  const [activeStyle, setActiveStyle] = useState('All');
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadPrograms = async () => {
+      try {
+        const response = await fetchPrograms({ status: 'active' });
+        const livePrograms = response.programs || response.Programs || [];
+        if (mounted && livePrograms.length > 0) {
+          setPrograms(livePrograms.filter((program) => (program.type || 'program') === 'program'));
+        }
+      } catch (error) {
+        if (mounted) setPrograms(fallbackPrograms);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    loadPrograms();
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const danceStyles = useMemo(() => {
+    const styles = programs
+      .map((program) => program.danceStyle || program.DanceStyle || program.category || 'General')
+      .filter(Boolean);
+    return ['All', ...Array.from(new Set(styles))];
+  }, [programs]);
+
+  const filteredPrograms = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return programs.filter((program) => {
+      const title = getText(program.name).toLowerCase();
+      const description = getText(program.description).toLowerCase();
+      const style = (program.danceStyle || program.DanceStyle || program.category || 'General').toLowerCase();
+      const matchesStyle = activeStyle === 'All' || style === activeStyle.toLowerCase();
+      const matchesSearch = !query || title.includes(query) || description.includes(query) || style.includes(query);
+      return matchesStyle && matchesSearch;
+    });
+  }, [activeStyle, programs, search]);
 
   return (
     <Layout>
-      <section className="programs-hero">
-        <div className="container">
-          <motion.h1 
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="section-title"
+      <section className="prog-hero-section">
+        <div className="prog-hero-bg"></div>
+        <div className="prog-hero-smoke"></div>
+        <div className="prog-hero-grid-overlay"></div>
+
+        <div className="container prog-hero-container">
+          <motion.div
+            className="prog-hero-content"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
           >
-            OUR <span className="gradient-text">PROGRAMS</span>
-          </motion.h1>
-          <p className="hero-subtitle">Discover your style and master the technique with our professional curriculum.</p>
+            <div className="prog-cyber-label">
+              <span className="prog-cyber-label__dot"></span>
+              {heroBadge}
+            </div>
+
+            <h1 className="prog-hero-title">
+              <span>{heroLines[0]}</span>
+              <span>{heroLines[1]}</span>
+              <span>{heroLines[2]}</span>
+            </h1>
+
+            <p className="prog-hero-subtitle">{heroSubtitle}</p>
+
+            <div className="prog-hero-actions">
+              <a href={ctaPrimaryUrl} className="prog-btn-glow">{ctaPrimary}</a>
+              <Link to={ctaSecondaryUrl} className="prog-btn-outline">{ctaSecondary}</Link>
+            </div>
+
+            <div className="prog-hero-stats">
+              <div className="prog-hero-stat">
+                <strong>{programs.length}+</strong>
+                <span>Live Programs</span>
+              </div>
+              <div className="prog-hero-stat">
+                <strong>All</strong>
+                <span>Skill Levels</span>
+              </div>
+              <div className="prog-hero-stat">
+                <strong>Live</strong>
+                <span>& Recorded</span>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 
-      <section className="programs-filter section-padding">
+      <section id="program-list" className="programs-filter section-padding">
         <div className="container">
-          <div className="filter-bar">
-            <button className="filter-btn active">ALL DISCIPLINES</button>
-            <button className="filter-btn">CLASSICAL</button>
-            <button className="filter-btn">URBAN</button>
-            <button className="filter-btn">LATIN</button>
-            <button className="filter-btn">MODERN</button>
+          <div className="programs-toolbar">
+            <div className="filter-bar" aria-label="Filter programs by dance style">
+              {danceStyles.map((style) => (
+                <button
+                  key={style}
+                  className={`filter-btn ${activeStyle === style ? 'active' : ''}`}
+                  onClick={() => setActiveStyle(style)}
+                  type="button"
+                >
+                  {style}
+                </button>
+              ))}
+            </div>
+            <label className="program-search">
+              <span>Search</span>
+              <input
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Bollywood, kids, salsa..."
+              />
+            </label>
           </div>
 
+          {loading && <div className="programs-status">Loading live programs...</div>}
+
           <div className="programs-grid">
-            {styles.map((style) => (
-              <motion.div 
-                key={style.id}
-                layout
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="program-card glass-card"
-              >
-                <div className="program-image">
-                  <img src={style.image} alt={style.name} />
-                  <div className="price-tag">{style.price}</div>
-                  <div className="program-overlay">
-                     <button className="primary-btn">ENROLL NOW</button>
+            {filteredPrograms.map((program, index) => {
+              const title = getText(program.name);
+              const description = getText(program.description);
+              const style = program.danceStyle || program.DanceStyle || program.category || 'General';
+              const href = `/contact?source=program&program=${encodeURIComponent(title)}`;
+
+              return (
+                <motion.article
+                  key={program._id || title}
+                  layout
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.35, delay: Math.min(index * 0.04, 0.18) }}
+                  className="program-card"
+                >
+                  <div className="program-image">
+                    <img
+                      src={program.thumbnail || program.image || imageFallback}
+                      alt={title}
+                      onError={(event) => {
+                        event.currentTarget.src = imageFallback;
+                      }}
+                    />
+                    <div className="price-tag">{formatPrice(program)}</div>
                   </div>
-                </div>
-                <div className="program-info">
-                  <div className="program-meta">
-                    <span className="level-badge">{style.level}</span>
+                  <div className="program-info">
+                    <div className="program-meta">
+                      <span className="level-badge">{formatLevel(program.level)}</span>
+                      <span>{style}</span>
+                    </div>
+                    <h3>{title}</h3>
+                    <p>{description || 'Structured dance training with GDP Studio coaches.'}</p>
+                    <div className="program-details">
+                      <span>{program.duration || 8} {program.durationUnit || 'weeks'}</span>
+                      <span>{program.recordedClasses?.length || 6}+ sessions</span>
+                    </div>
+                    <div className="program-footer">
+                      <Link to={href} className="primary-btn">Enquire Now</Link>
+                      <a
+                        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`I want to join ${title} at GDP Studio. ${window.location.origin}/programs`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="whatsapp-share-btn"
+                        title="Share on WhatsApp"
+                      >
+                        WhatsApp
+                      </a>
+                    </div>
                   </div>
-                  <h3>{style.name}</h3>
-                  <p className="coach-name">Dance Coach: {style.coach}</p>
-                  <div className="program-footer">
-                    <button className="text-btn">VIEW CURRICULUM →</button>
-                    <a 
-                      href={`https://api.whatsapp.com/send?text=Join me for ${style.name} at GDP Academy! Check it out: ${window.location.href}`} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="whatsapp-share-btn"
-                      title="Share on WhatsApp"
-                    >
-                      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                        <path d="M12.031 6.172c-2.32 0-4.591 1.199-6.063 3.328-1.544 2.224-1.61 4.405-.166 6.55l-1.042 3.805 3.901-1.023c1.025.565 2.148.86 3.287.86 3.527 0 6.391-2.864 6.391-6.39 0-3.527-2.864-6.33-6.308-6.33zm5.023 9.032c-.173.483-.984.887-1.346.945-.333.053-.761.085-1.229-.074-.298-.101-.676-.239-1.144-.442-2.001-.868-3.298-2.924-3.398-3.058-.1-.134-.813-1.08-.813-2.06 0-.98.511-1.463.693-1.663.181-.2.395-.25.526-.25.132 0 .263.003.377.01.114.007.268-.043.42.321.157.377.537 1.312.584 1.41.047.098.079.213.013.344-.066.131-.098.213-.197.328-.098.115-.207.256-.296.344-.098.098-.201.205-.086.402.115.197.512.844 1.103 1.37.761.677 1.4.887 1.6.986.2.1.317.085.434-.05.117-.134.502-.585.636-.786.135-.201.27-.168.455-.098.185.07.1.536 1.171 1.036.185.085.309.127.453.223.144.095.144.18.047.453z"/>
-                      </svg>
-                    </a>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.article>
+              );
+            })}
           </div>
+
+          {!loading && filteredPrograms.length === 0 && (
+            <div className="programs-empty">
+              <h3>No matching programs found</h3>
+              <p>Try another dance style or send us a custom choreography request.</p>
+              <Link to="/contact" className="primary-btn">Contact GDP Studio</Link>
+            </div>
+          )}
         </div>
       </section>
     </Layout>
@@ -86,4 +340,3 @@ const Programs: React.FC = () => {
 };
 
 export default Programs;
-

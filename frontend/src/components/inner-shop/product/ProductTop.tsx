@@ -1,6 +1,8 @@
-import { ChangeEvent, useState } from "react";
+import { useState } from "react";
+import type { ChangeEvent } from "react";
 import { useSelector } from "react-redux";
-import { Product, selectProducts } from "../../../redux/features/productSlice";
+import { selectProducts } from "../../../redux/features/productSlice";
+import type { Product } from "../../../redux/features/productSlice";
 
 interface ProductTopProps {
    startOffset: number;
