@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
+import SEO from '../components/SEO';
 import { motion } from 'framer-motion';
 import { getMembershipPlans } from '../services/cmsService';
 import { usePageContent, renderSplitHeroTitle } from '../hooks/usePageContent';
@@ -42,6 +44,11 @@ const Membership: React.FC = () => {
 
   return (
     <Layout>
+      <SEO
+        pageTitle="Membership Plans"
+        description="Choose a GDP membership plan for live Zoom classes, recorded library access, workshops, and priority support."
+        path="/membership"
+      />
       <section className="membership-hero">
         <div className="container">
           <h1 className="section-title">{hero.before}<span className="gradient-text">{hero.highlight}</span></h1>
@@ -71,9 +78,13 @@ const Membership: React.FC = () => {
                 <ul className="features-list">
                   {plan.features.map((f: string) => <li key={f}>{f}</li>)}
                 </ul>
-                <button className={`primary-btn join-btn ${plan.recommended ? '' : 'glass-btn'}`} style={{ width: '100%' }}>
+                <Link
+                  to={`/contact?source=membership&plan=${encodeURIComponent(plan.name)}`}
+                  className={`primary-btn join-btn ${plan.recommended ? '' : 'glass-btn'}`}
+                  style={{ width: '100%', display: 'inline-flex', justifyContent: 'center', alignItems: 'center' }}
+                >
                   START MEMBERSHIP
-                </button>
+                </Link>
               </motion.div>
             ))}
           </div>

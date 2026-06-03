@@ -3,6 +3,7 @@ import Layout from '../components/layout/Layout';
 import { motion } from 'framer-motion';
 import { getFAQs } from '../services/cmsService';
 import { usePageContent, renderSplitHeroTitle } from '../hooks/usePageContent';
+import SEO from '../components/SEO';
 
 const DEFAULT_FAQS = [
   {
@@ -44,6 +45,11 @@ const FAQ: React.FC = () => {
 
   return (
     <Layout>
+      <SEO
+        pageTitle="FAQ"
+        description="Frequently asked questions about Garima Dance Productions programs, memberships, Zoom classes, and workshops."
+        path="/faq"
+      />
       <section className="faq-hero section-padding">
         <div className="container">
           <motion.h1 

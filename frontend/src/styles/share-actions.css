@@ -1,0 +1,93 @@
+.share-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.share-actions--compact {
+  gap: 8px;
+}
+
+.share-actions__label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin-right: 2px;
+}
+
+.share-actions__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease, transform 0.25s ease;
+}
+
+.share-actions__btn svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Compact = circular icon-only buttons */
+.share-actions--compact .share-actions__btn {
+  padding: 0;
+  width: 38px;
+  height: 38px;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+/* WhatsApp brand */
+.share-actions__btn--whatsapp svg {
+  color: #25d366;
+}
+
+.share-actions__btn--whatsapp:hover {
+  color: #fff;
+  border-color: rgba(37, 211, 102, 0.6);
+  background: rgba(37, 211, 102, 0.16);
+  transform: translateY(-2px);
+}
+
+.share-actions__btn--whatsapp:hover svg {
+  color: #25d366;
+}
+
+/* Instagram brand */
+.share-actions__btn--instagram svg {
+  color: #e1306c;
+}
+
+.share-actions__btn--instagram:hover {
+  color: #fff;
+  border-color: rgba(225, 48, 108, 0.6);
+  background: rgba(225, 48, 108, 0.16);
+  transform: translateY(-2px);
+}
+
+.share-actions__btn--instagram:hover svg {
+  color: #fff;
+}
+
+.workshop-details .share-actions {
+  margin-top: 16px;
+}
+
+.program-footer .share-actions {
+  margin-top: 0;
+}
+
+.program-footer .share-actions__btn {
+  padding: 8px 12px;
+}

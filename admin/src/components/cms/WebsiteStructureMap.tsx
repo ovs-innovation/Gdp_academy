@@ -90,7 +90,7 @@ const WEBSITE_MAP = [
     sections: [{ name: "Header, phone, email, address", edit: "Website Content → Contact", path: "/cms" }],
   },
   {
-    page: "Header & Footer (sab pages)",
+    page: "Header & Footer (all pages)",
     slug: "settings",
     sections: [
       { name: "Logo, nav links, WhatsApp, announcement", edit: "Site Settings tab", path: "/cms" },
@@ -106,7 +106,7 @@ export function WebsiteStructureMap({ onSelectSlug }: Props) {
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted-foreground">
-        Neeche poori website ka map hai — har section ke saamne likha hai admin mein kahan edit karna hai.
+        Below is a map of the entire website — each section shows where to edit it in the admin panel.
       </p>
       {WEBSITE_MAP.map((page) => (
         <Card key={page.slug} className="p-4 border-border bg-card">

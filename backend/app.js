@@ -36,6 +36,11 @@ const contactMessageRoutes = require("./routes/contactMessageRoutes.js");
 const pageContentRoutes = require("./routes/pageContentRoutes.js");
 const siteSettingsRoutes = require("./routes/siteSettingsRoutes.js");
 const mediaRoutes = require("./routes/mediaRoutes.js");
+const webhookRoutes = require("./routes/webhookRoutes.js");
+const recordingRoutes = require("./routes/recordingRoutes.js");
+const protectedMediaRoutes = require("./routes/protectedMediaRoutes.js");
+const integrationsRoutes = require("./routes/integrationsRoutes.js");
+const zoomRoutes = require("./routes/zoomRoutes.js");
 const { getDbHealth } = require("./config/db.js");
 const { requirePersistentDb } = require("./middlewares/requireDbMiddleware.js");
 
@@ -107,6 +112,11 @@ app.use("/api/contact-messages", contactMessageRoutes);
 app.use("/api/page-contents", pageContentRoutes);
 app.use("/api/site-settings", siteSettingsRoutes);
 app.use("/api/media", mediaRoutes);
+app.use("/api/webhooks", webhookRoutes);
+app.use("/api/recordings", recordingRoutes);
+app.use("/api/protected-media", protectedMediaRoutes);
+app.use("/api/integrations", integrationsRoutes);
+app.use("/api/zoom", zoomRoutes);
 
 // Error handling
 app.use(errorHandler);

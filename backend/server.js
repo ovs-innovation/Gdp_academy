@@ -5,6 +5,7 @@ const connectDB = require("./config/db.js");
 const { startExchangeRateJob, stopExchangeRateJob } = require("./jobs/exchangeRateJob.js");
 const { ensureDefaultRoles } = require("./controllers/roleController.js");
 const { ensureDefaultAdmin } = require("./lib/ensureDefaultAdmin.js");
+const { initEmailTransport } = require("./lib/emailTransport.js");
 
 const PORT = process.env.PORT || 5000;
 
@@ -34,6 +35,7 @@ const initializeServices = async () => {
   await ensureDefaultRoles();
   console.log("Default roles ensured ✅");
   await ensureDefaultAdmin();
+  await initEmailTransport();
   startExchangeRateJob();
   console.log("All services initialized successfully 🚀");
 };

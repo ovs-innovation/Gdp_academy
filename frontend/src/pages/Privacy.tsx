@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../components/layout/Layout';
 import { motion } from 'framer-motion';
 import { getPageContentBySlug } from '../services/cmsService';
+import SEO from '../components/SEO';
 
 const Privacy: React.FC = () => {
   const defaultSections = [
@@ -11,7 +12,7 @@ const Privacy: React.FC = () => {
     },
     {
       title: "2. Use of Information",
-      text: "Your data is used to provide access to the platform, process payments, and communicate academy updates. We do not sell your personal information to third parties."
+      text: "Your data is used to provide access to the platform, process payments, and communicate studio updates. We do not sell your personal information to third parties."
     },
     {
       title: "3. Data Security",
@@ -37,6 +38,7 @@ const Privacy: React.FC = () => {
 
   return (
     <Layout>
+      <SEO pageTitle="Privacy Policy" path="/privacy" />
       <section className="legal-hero section-padding">
         <div className="container">
           <motion.h1 

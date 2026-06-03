@@ -216,7 +216,7 @@ const ControlDashboardPage = () => {
         {/* Header with Filters */}
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between animate-fade-in">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">Control Dashboard</h1>
+            <h1 className="font-display text-2xl tracking-tight text-foreground sm:text-3xl">Control Dashboard</h1>
             <p className="mt-1 text-muted-foreground">
               Real-time analytics and platform insights
             </p>

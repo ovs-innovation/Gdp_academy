@@ -8,6 +8,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import { WishlistProvider } from './contexts/WishlistContext'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import './styles/share-actions.css'
 
 function App() {
   return (

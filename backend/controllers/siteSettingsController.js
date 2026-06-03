@@ -1,11 +1,20 @@
 const SiteSettings = require("../models/siteSettings.js");
+const { sanitizeLogoUrl } = require("../utils/siteLogo.js");
+
+function toClientSettings(settings) {
+  const doc =
+    settings && typeof settings.toObject === "function"
+      ? settings.toObject()
+      : { ...settings };
+  doc.logoUrl = sanitizeLogoUrl(doc.logoUrl);
+  return doc;
+}
 
 // Get site settings (singleton) – public
 const getSiteSettings = async (req, res, next) => {
   try {
     let settings = await SiteSettings.findOne();
     if (!settings) {
-      // Return sensible defaults if never configured
       settings = {
         logoUrl: "",
         navLinks: [],
@@ -16,8 +25,9 @@ const getSiteSettings = async (req, res, next) => {
         metaDescription: "Learn the art of dance with Garima Dance Production",
         canonicalUrl: "",
       };
+      return res.json({ settings });
     }
-    res.json({ settings });
+    res.json({ settings: toClientSettings(settings) });
   } catch (err) {
     next(err);
   }
@@ -26,14 +36,19 @@ const getSiteSettings = async (req, res, next) => {
 // Update site settings (admin only) – upsert singleton
 const updateSiteSettings = async (req, res, next) => {
   try {
+    const body = { ...req.body };
+    if ("logoUrl" in body) {
+      body.logoUrl = sanitizeLogoUrl(body.logoUrl);
+    }
+
     let settings = await SiteSettings.findOne();
     if (!settings) {
-      settings = await SiteSettings.create(req.body);
+      settings = await SiteSettings.create(body);
     } else {
-      Object.assign(settings, req.body);
+      Object.assign(settings, body);
       await settings.save();
     }
-    res.json({ message: "Site settings updated", settings });
+    res.json({ message: "Site settings updated", settings: toClientSettings(settings) });
   } catch (err) {
     next(err);
   }

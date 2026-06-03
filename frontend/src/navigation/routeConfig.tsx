@@ -1,57 +1,76 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import AppPreloader from '../components/common/AppPreloader';
+
+// Page chunk loaders — kept in one place so they can also be prefetched.
+const pageLoaders = {
+  Home: () => import('../pages/Home'),
+  About: () => import('../pages/About'),
+  Programs: () => import('../pages/Programs'),
+  Schedule: () => import('../pages/Schedule'),
+  Membership: () => import('../pages/Membership'),
+  Contact: () => import('../pages/Contact'),
+  Login: () => import('../pages/Login'),
+  Signup: () => import('../pages/Signup'),
+  Dashboard: () => import('../pages/Dashboard'),
+  Blog: () => import('../pages/Blog'),
+  Workshops: () => import('../pages/Workshops'),
+  Gallery: () => import('../pages/Gallery'),
+  FAQ: () => import('../pages/FAQ'),
+  Terms: () => import('../pages/Terms'),
+  Privacy: () => import('../pages/Privacy'),
+  Services: () => import('../pages/Services'),
+  ServiceDetails: () => import('../pages/ServiceDetails'),
+  Testimonials: () => import('../pages/Testimonials'),
+  LiveZoomSessions: () => import('../pages/LiveZoomSessions'),
+  ForgotPassword: () => import('../pages/ForgotPassword'),
+} as const;
+
+/**
+ * Warm all page chunks in the background so navbar clicks navigate instantly
+ * (no Suspense fallback / page-swap glitch on first visit to a route).
+ */
+export const prefetchAllRoutes = (): void => {
+  Object.values(pageLoaders).forEach((load) => {
+    load().catch(() => {});
+  });
+};
 
 // Lazy loaded page components
-const Home = React.lazy(() => import('../pages/Home'));
-const About = React.lazy(() => import('../pages/About'));
-const Programs = React.lazy(() => import('../pages/Programs'));
-const Schedule = React.lazy(() => import('../pages/Schedule'));
-const Membership = React.lazy(() => import('../pages/Membership'));
-const Contact = React.lazy(() => import('../pages/Contact'));
-const Login = React.lazy(() => import('../pages/Login'));
-const Signup = React.lazy(() => import('../pages/Signup'));
-const Dashboard = React.lazy(() => import('../pages/Dashboard'));
-const Blog = React.lazy(() => import('../pages/Blog'));
-const Workshops = React.lazy(() => import('../pages/Workshops'));
-const Gallery = React.lazy(() => import('../pages/Gallery'));
-const FAQ = React.lazy(() => import('../pages/FAQ'));
-const Terms = React.lazy(() => import('../pages/Terms'));
-const Privacy = React.lazy(() => import('../pages/Privacy'));
-const Services = React.lazy(() => import('../pages/Services'));
-const ServiceDetails = React.lazy(() => import('../pages/ServiceDetails'));
-const Testimonials = React.lazy(() => import('../pages/Testimonials'));
-const LiveZoomSessions = React.lazy(() => import('../pages/LiveZoomSessions'));
-const ForgotPassword = React.lazy(() => import('../pages/ForgotPassword'));
+const Home = React.lazy(pageLoaders.Home);
+const About = React.lazy(pageLoaders.About);
+const Programs = React.lazy(pageLoaders.Programs);
+const Schedule = React.lazy(pageLoaders.Schedule);
+const Membership = React.lazy(pageLoaders.Membership);
+const Contact = React.lazy(pageLoaders.Contact);
+const Login = React.lazy(pageLoaders.Login);
+const Signup = React.lazy(pageLoaders.Signup);
+const Dashboard = React.lazy(pageLoaders.Dashboard);
+const Blog = React.lazy(pageLoaders.Blog);
+const Workshops = React.lazy(pageLoaders.Workshops);
+const Gallery = React.lazy(pageLoaders.Gallery);
+const FAQ = React.lazy(pageLoaders.FAQ);
+const Terms = React.lazy(pageLoaders.Terms);
+const Privacy = React.lazy(pageLoaders.Privacy);
+const Services = React.lazy(pageLoaders.Services);
+const ServiceDetails = React.lazy(pageLoaders.ServiceDetails);
+const Testimonials = React.lazy(pageLoaders.Testimonials);
+const LiveZoomSessions = React.lazy(pageLoaders.LiveZoomSessions);
+const ForgotPassword = React.lazy(pageLoaders.ForgotPassword);
 
 // Route guards
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
   if (isLoading) {
-    return (
-      <div
-        className="preloader"
-        style={{
-          height: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#060606',
-          color: '#634BFA',
-          fontFamily: 'Krona One',
-          letterSpacing: '4px',
-        }}
-      >
-        VERIFYING SESSION...
-      </div>
-    );
+    return <AppPreloader variant="session" />;
   }
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
 };
 
 const AuthRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
-  if (isLoading) return null;
+  if (isLoading) return <AppPreloader variant="session" />;
   return isAuthenticated ? <Navigate to="/dashboard" /> : <>{children}</>;
 };
 

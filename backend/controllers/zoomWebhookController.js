@@ -1,7 +1,14 @@
 const crypto = require("crypto");
-const {
-  processRecordingByMeetingId,
-} = require("../services/recordingService.js");
+
+/** Lazy-load ESM recording service so app starts without Zoom/AWS keys. */
+const loadRecordingService = async () => {
+  try {
+    return await import("../services/recordingService.js");
+  } catch (err) {
+    console.warn("Recording service unavailable (demo mode):", err.message);
+    return null;
+  }
+};
 
 const verifyWebhookSignature = (requestBody, signature, timestamp) => {
   const webhookSecret = process.env.ZOOM_WEBHOOK_SECRET;
@@ -71,24 +78,21 @@ const handleZoomWebhook = async (req, res, next) => {
 
       console.log(`✓ Processing recording for meeting: ${meetingId}`);
 
-      processRecordingByMeetingId(String(meetingId))
-        .then((success) => {
-          if (success) {
-            console.log(
-              `✅ Recording processed successfully for meeting ${meetingId}`,
-            );
-          } else {
-            console.log(
-              `⚠️  Recording processing pending for meeting ${meetingId}`,
-            );
-          }
-        })
-        .catch((error) => {
-          console.error(
-            `✗ Recording processing failed for meeting ${meetingId}:`,
-            error.message,
-          );
-        });
+      loadRecordingService().then((svc) => {
+        if (!svc?.processRecordingByMeetingId) {
+          console.log("ℹ️  Recording skipped — service not configured (demo mode)");
+          return;
+        }
+        return svc.processRecordingByMeetingId(String(meetingId));
+      }).then((success) => {
+        if (success) {
+          console.log(`✅ Recording processed for meeting ${meetingId}`);
+        } else if (success === false) {
+          console.log(`⚠️  Recording pending for meeting ${meetingId}`);
+        }
+      }).catch((error) => {
+        console.error(`✗ Recording failed for meeting ${meetingId}:`, error.message);
+      });
 
       return res.status(200).json({ message: "Webhook received" });
     }
@@ -115,19 +119,26 @@ const manualTriggerRecording = async (req, res, next) => {
       `\n🔧 Manual trigger: meetingId=${meetingId}, bookingId=${bookingId}`,
     );
 
+    const svc = await loadRecordingService();
+    if (!svc) {
+      return res.status(200).json({
+        message: "Recording service not configured (demo mode). Add AWS/Zoom keys when ready.",
+        success: false,
+        mode: "demo",
+      });
+    }
+
     let success;
     if (meetingId) {
-      success = await processRecordingByMeetingId(String(meetingId));
+      success = await svc.processRecordingByMeetingId(String(meetingId));
     } else {
-      const { processRecording } =
-        await import("../services/recordingService.js");
-      const Booking = (await import("../models/bookingModel.js")).default;
+      const Booking = require("../models/bookingModel.js");
       const booking = await Booking.findById(bookingId);
       if (!booking) {
         return res.status(404).json({ error: "Booking not found" });
       }
       const mid = booking.meeting?.meetingId || booking.meetingId;
-      success = await processRecording(bookingId, mid);
+      success = await svc.processRecording(bookingId, mid);
     }
 
     if (success) {
@@ -144,4 +155,9 @@ const manualTriggerRecording = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+module.exports = {
+  handleZoomWebhook,
+  manualTriggerRecording,
 };

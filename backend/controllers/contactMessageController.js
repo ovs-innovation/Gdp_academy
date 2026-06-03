@@ -1,4 +1,7 @@
 const ContactMessage = require("../models/contactMessageModel");
+const {
+  sendContactMessageNotificationToAdmin,
+} = require("../utils/emailService.js");
 
 // Public – submit a contact message
 const submitContactMessage = async (req, res, next) => {
@@ -19,6 +22,12 @@ const submitContactMessage = async (req, res, next) => {
       message: message.trim(),
       source: "contact_page",
     });
+
+    try {
+      await sendContactMessageNotificationToAdmin(contact.toObject());
+    } catch (emailErr) {
+      console.error("Contact form admin email failed:", emailErr.message);
+    }
 
     res.status(201).json({
       message: "Message sent successfully",

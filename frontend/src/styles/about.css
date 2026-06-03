@@ -181,44 +181,6 @@
   gap: 40px;
 }
 
-/* Background Massive Typography */
-.hero-giant-bg-text {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  pointer-events: none;
-  z-index: 2;
-  overflow: hidden;
-}
-
-.giant-text-row {
-  font-family: var(--font-krona);
-  font-size: clamp(80px, 15vw, 220px);
-  font-weight: 900;
-  line-height: 0.85;
-  letter-spacing: -6px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.02);
-  white-space: nowrap;
-}
-
-.giant-text-row.outlined {
-  color: transparent;
-  -webkit-text-stroke: 1.5px rgba(99, 75, 250, 0.15);
-}
-
-.giant-text-row.accented {
-  color: transparent;
-  -webkit-text-stroke: 1px rgba(30, 255, 228, 0.1);
-}
-
 /* Hero Left Text Details */
 .hero-text-details {
   max-width: 580px;
@@ -316,8 +278,8 @@
   object-fit: contain;
   filter: drop-shadow(0 0 30px rgba(99, 75, 250, 0.35)) contrast(1.05);
   position: relative;
-  z-index: 2;
-  transition: all 0.5s ease;
+  z-index: 3;
+  transition: filter 0.45s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .main-dancer-cutout:hover {
@@ -325,55 +287,44 @@
   transform: scale(1.02);
 }
 
-/* Floating Mini Cards */
-.mini-card {
+/* Hero highlights — compact glass tags behind dancer */
+.hero-highlights {
   position: absolute;
-  background: rgba(6, 6, 6, 0.7);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(15px);
-  padding: 16px 20px;
-  border-radius: 12px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-  z-index: 5;
-  transition: all 0.3s ease;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
 }
 
-.mini-card:hover {
-  border-color: var(--theme-green);
-  box-shadow: 0 0 25px rgba(30, 255, 228, 0.2);
+.hero-highlight {
+  position: absolute;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  white-space: nowrap;
 }
 
-.mini-card-title {
-  font-family: var(--font-krona);
+.hero-highlight__text {
+  font-family: var(--font-body);
   font-size: 11px;
-  color: var(--theme-green);
-  margin-bottom: 6px;
-  text-transform: uppercase;
-}
-
-.mini-card-text {
-  font-size: 13px;
-  color: #ffffff;
   font-weight: 500;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.88);
 }
 
-/* Floating cards locations */
-.card-est {
-  top: 10%;
-  left: -20px;
-  border-left: 3px solid var(--theme-purple);
+.hero-highlight--tl {
+  top: 30%;
+  left: 14%;
 }
 
-.card-culture {
-  bottom: 22%;
-  right: -30px;
-  border-right: 3px solid var(--theme-green);
-}
-
-.card-motion {
-  bottom: 12%;
-  left: 20px;
-  border-bottom: 3px solid var(--theme-purple);
+.hero-highlight--br {
+  bottom: 34%;
+  right: 12%;
 }
 
 .cyber-circle-glow {
@@ -1398,14 +1349,18 @@
   .vertical-side-text {
     display: none;
   }
-  
-  .mini-card {
-    scale: 0.85;
+
+  .hero-highlight--tl {
+    left: 6%;
   }
-  
-  .card-est { left: 10px; }
-  .card-culture { right: 10px; }
-  .card-motion { left: 20px; }
+
+  .hero-highlight--br {
+    right: 6%;
+  }
+
+  .hero-highlight__text {
+    font-size: 10px;
+  }
 
   .laptop-exp-container {
     flex-direction: column;
@@ -1417,6 +1372,10 @@
 }
 
 @media (max-width: 768px) {
+  .hero-highlights {
+    display: none;
+  }
+
   .hero-visual-centerpiece {
     height: 400px;
   }

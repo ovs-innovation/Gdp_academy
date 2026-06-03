@@ -62,17 +62,17 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
   return (
     <div className="space-y-4">
       <CMSSection
-        title="1. Hero — Right side text (bagal wala text)"
-        description="Main headline, subtitle, button aur stats jo homepage ke top section ke right panel me dikhte hain."
+        title="1. Hero — Right side text"
+        description="The main headline, subtitle, button and stats shown in the right panel of the homepage top section."
         websiteLocation="Homepage top → right dark panel"
         defaultOpen
       >
         <div className="space-y-2">
-          <Label>Small badge text (upar wala chota label)</Label>
+          <Label>Small badge text (small label above the title)</Label>
           <Input value={content.heroBadgeText || content.heroBadge || ""} onChange={(e) => onChange("heroBadgeText", e.target.value)} className="bg-muted/50" />
         </div>
         <div className="space-y-2">
-          <Label>Main headline (bada title)</Label>
+          <Label>Main headline (large title)</Label>
           <Input value={content.heroTitle || ""} onChange={(e) => onChange("heroTitle", e.target.value)} className="bg-muted/50" />
         </div>
         <div className="space-y-2">
@@ -102,7 +102,7 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
 
       <CMSSection
         title="2. Hero — Left side media grid (9 photos/videos)"
-        description="Homepage ke left side par 3×3 grid me jo videos aur images rotate hoti hain. Har slot ke liye type aur link daalein."
+        description="The 3×3 grid of rotating videos and images on the left side of the homepage. Set a type and link for each slot."
         websiteLocation="Homepage top → left video/image collage"
       >
         <div className="grid gap-4 md:grid-cols-2">
@@ -129,13 +129,13 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
             className="bg-muted/50 min-h-[60px]"
             placeholder="/hero.mp4, /services.mp4"
           />
-          <p className="text-xs text-muted-foreground">Ye videos hero animation ke dusre states me bhi chalti hain.</p>
+          <p className="text-xs text-muted-foreground">These videos also play in the other states of the hero animation.</p>
         </div>
       </CMSSection>
 
       <CMSSection
         title="3. Services section heading"
-        description="Homepage par service circles se pehle jo title aur description dikhta hai. Har service ka photo/text → sidebar Homepage Services."
+        description="The title and description shown before the service circles on the homepage. Each service's photo/text is managed in the Homepage Services menu."
         websiteLocation="Homepage → Services section header"
       >
         <div className="space-y-2">
@@ -150,12 +150,24 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
 
       <CMSSection
         title="4. YouTube Shorts row"
-        description="Homepage par horizontal YouTube shorts / reels section."
+        description="10 YouTube shorts on the homepage (2 rows × 5). Any empty slots are filled with defaults on the site."
         websiteLocation="Homepage → YouTube Shorts"
       >
         <div className="grid gap-4 md:grid-cols-2 mb-4">
           <Input value={content.youtubeChannel || ""} onChange={(e) => onChange("youtubeChannel", e.target.value)} placeholder="@channel handle" className="bg-muted/50" />
-          <Input value={content.youtubeChannelUrl || ""} onChange={(e) => onChange("youtubeChannelUrl", e.target.value)} placeholder="https://youtube.com/@..." className="bg-muted/50" />
+          <Input value={content.youtubeChannelUrl || ""} onChange={(e) => onChange("youtubeChannelUrl", e.target.value)} placeholder="https://www.youtube.com/@..." className="bg-muted/50" />
+        </div>
+        <div className="space-y-2 mb-4">
+          <Label>YouTube Channel ID (for Subscribe button)</Label>
+          <Input
+            value={content.youtubeChannelId || ""}
+            onChange={(e) => onChange("youtubeChannelId", e.target.value)}
+            placeholder="UCdSmMd0SD9w4SPHfNf1-CAA"
+            className="bg-muted/50 font-mono text-xs"
+          />
+          <p className="text-xs text-muted-foreground">
+            Required for in-page Subscribe. Find under YouTube → Settings → Advanced, or channel page source. Default works for @garimadanceproductions1146.
+          </p>
         </div>
         {shorts.map((item, i) => (
           <div key={i} className="rounded-lg border border-border p-3 space-y-2 mb-3 bg-muted/20">
@@ -167,7 +179,7 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
             </div>
             <MediaUrlField
               label="Video file or YouTube link (required)"
-              hint="Upload .mp4 video OR paste YouTube link (watch / shorts / youtu.be). Upload ke baad Save Page Content zaroor dabayein."
+              hint="Upload an .mp4 video OR paste a YouTube link (watch / shorts / youtu.be). After uploading, make sure to click Save Page Content."
               websiteLocation={`Homepage → YouTube Shorts → card #${i + 1} background video`}
               value={item.vid || ""}
               mediaType="video"
@@ -179,7 +191,7 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
               }}
             />
             {!item.vid?.trim() && (
-              <p className="text-xs text-amber-500">⚠️ Video URL khali hai — website par yeh short nahi dikhega.</p>
+              <p className="text-xs text-amber-500">Video URL is empty — this short will not appear on the website.</p>
             )}
             <Input placeholder="Title" value={item.title || ""} onChange={(e) => { const n = [...shorts]; n[i] = { ...n[i], title: e.target.value }; onChange("youtubeShorts", n); }} className="bg-muted/50" />
             <div className="grid grid-cols-2 gap-2">
@@ -188,9 +200,24 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
             </div>
           </div>
         ))}
-        <Button type="button" variant="outline" size="sm" className="gap-1" onClick={() => onChange("youtubeShorts", [...shorts, { vid: "", title: "", views: "", likes: "" }])}>
-          <Plus className="h-4 w-4" /> Add short
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" size="sm" className="gap-1" onClick={() => onChange("youtubeShorts", [...shorts, { vid: "", title: "", views: "", likes: "" }])}>
+            <Plus className="h-4 w-4" /> Add short
+          </Button>
+          {shorts.length < 10 && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                const extra = Array.from({ length: 10 - shorts.length }, () => ({ vid: "", title: "", views: "", likes: "" }));
+                onChange("youtubeShorts", [...shorts, ...extra]);
+              }}
+            >
+              Fill to 10 slots
+            </Button>
+          )}
+        </div>
       </CMSSection>
 
       <CMSSection
@@ -220,7 +247,7 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
 
       <CMSSection
         title="6. Workshops section heading"
-        description="Workshop cards ke upar title. Cards khud Programs/Workshops admin se aate hain."
+        description="The title above the workshop cards. The cards themselves come from the Programs/Workshops admin."
         websiteLocation="Homepage → Upcoming Workshops"
       >
         <div className="space-y-2">
@@ -235,7 +262,7 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
 
       <CMSSection
         title="7. Instagram reels"
-        description="Instagram style video cards on homepage."
+        description="10 Instagram reels on the homepage (2 rows × 5). Any empty slots are filled with defaults on the site."
         websiteLocation="Homepage → Instagram section"
       >
         <div className="grid gap-4 md:grid-cols-2 mb-4">
@@ -248,9 +275,15 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
             <Input value={content.instagramSectionHighlight || "on Instagram"} onChange={(e) => onChange("instagramSectionHighlight", e.target.value)} className="bg-muted/50" />
           </div>
         </div>
-        <div className="space-y-2 mb-4">
-          <Label>Instagram handle</Label>
-          <Input value={content.instagramHandle || ""} onChange={(e) => onChange("instagramHandle", e.target.value)} className="bg-muted/50" placeholder="@GarimadanceProductions" />
+        <div className="grid gap-4 md:grid-cols-2 mb-4">
+          <div className="space-y-2">
+            <Label>Instagram handle</Label>
+            <Input value={content.instagramHandle || ""} onChange={(e) => onChange("instagramHandle", e.target.value)} className="bg-muted/50" placeholder="@GarimadanceProductions" />
+          </div>
+          <div className="space-y-2">
+            <Label>Instagram profile URL</Label>
+            <Input value={content.instagramChannelUrl || ""} onChange={(e) => onChange("instagramChannelUrl", e.target.value)} className="bg-muted/50" placeholder="https://www.instagram.com/..." />
+          </div>
         </div>
         {instagram.map((item, i) => (
           <div key={i} className="rounded-lg border border-border p-3 space-y-2 mb-3 bg-muted/20">
@@ -262,7 +295,7 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
             </div>
             <MediaUrlField
               label="Reel video or YouTube link (required)"
-              hint="Upload .mp4 OR paste link. Save page after upload."
+              hint="Upload an .mp4 OR paste a link. Save the page after uploading."
               websiteLocation={`Homepage → Instagram row → reel #${i + 1}`}
               value={item.vid || ""}
               mediaType="video"
@@ -270,7 +303,7 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
               onChange={(vid) => { const n = [...instagram]; n[i] = { ...n[i], vid }; onChange("instagramPosts", n); }}
             />
             {!item.vid?.trim() && (
-              <p className="text-xs text-amber-500">⚠️ Video URL khali hai — reel nahi dikhegi.</p>
+              <p className="text-xs text-amber-500">Video URL is empty — this reel will not appear.</p>
             )}
             <div className="grid grid-cols-2 gap-2">
               <Input placeholder="Likes" value={item.likes || ""} onChange={(e) => { const n = [...instagram]; n[i] = { ...n[i], likes: e.target.value }; onChange("instagramPosts", n); }} className="bg-muted/50" />
@@ -278,18 +311,33 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
             </div>
           </div>
         ))}
-        <Button type="button" variant="outline" size="sm" className="gap-1" onClick={() => onChange("instagramPosts", [...instagram, { vid: "", likes: "", comments: "" }])}>
-          <Plus className="h-4 w-4" /> Add reel
-        </Button>
+        <div className="flex flex-wrap gap-2">
+          <Button type="button" variant="outline" size="sm" className="gap-1" onClick={() => onChange("instagramPosts", [...instagram, { vid: "", likes: "", comments: "" }])}>
+            <Plus className="h-4 w-4" /> Add reel
+          </Button>
+          {instagram.length < 10 && (
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                const extra = Array.from({ length: 10 - instagram.length }, () => ({ vid: "", likes: "", comments: "" }));
+                onChange("instagramPosts", [...instagram, ...extra]);
+              }}
+            >
+              Fill to 10 slots
+            </Button>
+          )}
+        </div>
       </CMSSection>
 
       <CMSSection
         title="8. Reviews & testimonials"
-        description="Google rating, section title, video review cards. Text review cards → Student Reviews menu."
+        description="Google rating, section title and video review cards. Text review cards are managed in the Student Reviews menu."
         websiteLocation="Homepage → Reviews section"
       >
         <div className="space-y-2 mb-4">
-          <Label>Section title (❤️ ke baad wala text)</Label>
+          <Label>Section title (text after the heart icon)</Label>
           <Input value={content.reviewsSectionTitle || "from Clients"} onChange={(e) => onChange("reviewsSectionTitle", e.target.value)} className="bg-muted/50" />
         </div>
         <div className="grid gap-4 md:grid-cols-3 mb-4">
@@ -316,7 +364,7 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
 
       <CMSSection
         title="9. FAQ section heading"
-        description="FAQ ke questions sidebar FAQ Questions se edit hote hain."
+        description="The FAQ questions themselves are edited from the FAQ Questions menu in the sidebar."
         websiteLocation="Homepage → FAQ"
       >
         <div className="space-y-2">
@@ -331,7 +379,7 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
 
       <CMSSection
         title="10. Let's Catch up / Contact"
-        description="Homepage ke bottom contact section — left title aur right form heading."
+        description="The contact section at the bottom of the homepage — left-side title and right-side form heading."
         websiteLocation="Homepage → bottom contact form"
       >
         <div className="grid gap-4 md:grid-cols-2">

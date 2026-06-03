@@ -32,18 +32,18 @@ export function PageHeroEditor({
   return (
     <CMSSection
       title="Page Hero / Top Section"
-      description="Website ke top par jo bada title aur subtitle dikhta hai — wahi yahan se edit hoga."
+      description="The large title and subtitle shown at the top of the page."
       websiteLocation={websiteLocation}
       defaultOpen
     >
       {showBadge && (
         <div className="space-y-2">
-          <Label>Small label (upar wala chota text)</Label>
+          <Label>Small label (text above the title)</Label>
           <Input
             value={(content.heroBadge as string) || (content.heroLabel as string) || ""}
             onChange={(e) => onChange("heroBadge", e.target.value)}
             className="bg-muted/50"
-            placeholder="GDP ACADEMY PROGRAMS"
+            placeholder="GDP STUDIO PROGRAMS"
           />
         </div>
       )}
@@ -65,7 +65,7 @@ export function PageHeroEditor({
       ) : splitTitle ? (
         <div className="grid gap-3 md:grid-cols-2">
           <div className="space-y-2">
-            <Label>Title (pehla part)</Label>
+            <Label>Title (first part)</Label>
             <Input
               value={(content.heroTitleBefore as string) || ""}
               onChange={(e) => onChange("heroTitleBefore", e.target.value)}
@@ -74,7 +74,7 @@ export function PageHeroEditor({
             />
           </div>
           <div className="space-y-2">
-            <Label>Title highlight (gradient color wala part)</Label>
+            <Label>Title highlight (gradient-colored part)</Label>
             <Input
               value={(content.heroTitleHighlight as string) || ""}
               onChange={(e) => onChange("heroTitleHighlight", e.target.value)}
@@ -86,7 +86,7 @@ export function PageHeroEditor({
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
           <div className="space-y-2">
-            <Label>Title (pehla part)</Label>
+            <Label>Title (first part)</Label>
             <Input
               value={(content.heroTitleBefore as string) || ""}
               onChange={(e) => onChange("heroTitleBefore", e.target.value)}

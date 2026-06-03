@@ -45,6 +45,7 @@
   font-size: 12px;
   letter-spacing: 2px;
   font-weight: 700;
+  text-transform: uppercase;
 }
 
 .workshop-title {
@@ -74,6 +75,42 @@
   font-size: 24px;
   color: var(--accent-color);
   font-weight: 700;
+}
+
+.zoom-btn {
+  margin-top: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 24px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #fff;
+  background: rgba(45, 140, 255, 0.12);
+  border: 1px solid rgba(45, 140, 255, 0.5);
+  transition: background 0.3s ease, border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.zoom-btn svg {
+  width: 18px;
+  height: 18px;
+  color: #2d8cff;
+  transition: color 0.3s ease;
+}
+
+.zoom-btn:hover {
+  background: #2d8cff;
+  border-color: #2d8cff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(45, 140, 255, 0.4);
+}
+
+.zoom-btn:hover svg {
+  color: #fff;
 }
 
 .workshops-explore-wrap {

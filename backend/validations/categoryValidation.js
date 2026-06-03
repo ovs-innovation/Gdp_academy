@@ -1,4 +1,5 @@
 const { z } = require("zod");
+const { imageSchema } = require("./mediaUrlSchema.js");
 
 const nameSchema = z.any().refine(
   (val) => {
@@ -28,10 +29,6 @@ const descriptionSchema = z
     },
     { message: "Description must be a string or language object" },
   )
-  .optional();
-
-const imageSchema = z
-  .union([z.string().url("Invalid image URL"), z.literal("")])
   .optional();
 
 const createCategorySchema = z.object({

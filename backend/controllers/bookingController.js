@@ -10,7 +10,7 @@ const createBooking = async (req, res, next) => {
   try {
     res.status(201).json({
       message:
-        "Online bookings are currently handled by the academy administration.",
+        "Online bookings are currently handled by the studio administration.",
       booking: null,
     });
   } catch (err) {

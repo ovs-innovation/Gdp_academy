@@ -7,11 +7,11 @@ const STATIC_FAQS = {
     {
       id: 1,
       q: "What is GDP Studio?",
-      a: "GDP Studio is a premium full-stack dance academy. We provide top-tier, CMS-driven choreography programs, workshops, and memberships for dancers of all skill levels.",
+      a: "GDP Studio is a premium full-stack dance studio. We provide top-tier, CMS-driven choreography programs, workshops, and memberships for dancers of all skill levels.",
     },
     {
       id: 2,
-      q: "How does the academy work?",
+      q: "How does the studio work?",
       a: "Simply sign up, browse our diverse range of Dance Programs, choose your level, and subscribe to a Membership Plan to unlock unlimited access to elite choreography.",
     },
     {

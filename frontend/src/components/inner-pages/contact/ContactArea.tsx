@@ -27,7 +27,7 @@ const ContactArea = () => {
                                         <i className="fas fa-chalkboard-teacher"></i>
                                     </div>
                                     <div className="content">
-                                        <h5 className="mb-1" style={{ fontWeight: 700 }}>Academy Support</h5>
+                                        <h5 className="mb-1" style={{ fontWeight: 700 }}>Studio Support</h5>
                                         <a href="mailto:info@gdpstudio.com" className="text-primary fw-bold" style={{ textDecoration: 'none' }}>info@gdpstudio.com</a>
                                         <p className="small opacity-60 m-0 mt-1">General inquiries & administration</p>
                                     </div>

@@ -7,7 +7,9 @@
     "dev": "nodemon server.js",
     "test": "jest",
     "seed": "node -e \"console.error('\\n⚠️  npm run seed is disabled — it WIPES CMS data.\\n   Use only for fresh setup: CONFIRM_SEED=yes npm run seed:reset\\n');process.exit(1)\"",
-    "seed:reset": "node scripts/seed.js"
+    "seed:reset": "node scripts/seed.js",
+    "email:verify": "node scripts/verify-email.cjs",
+    "email:oauth-setup": "node scripts/gmail-oauth-setup.cjs"
   },
   "keywords": [],
   "author": "angad-kumar",

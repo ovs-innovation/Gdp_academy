@@ -267,7 +267,7 @@ const seed = async () => {
             },
             {
               title: "2. Use of Information",
-              text: "Your data is used to provide access to the platform, process payments, and communicate academy updates. We do not sell your personal information to third parties."
+              text: "Your data is used to provide access to the platform, process payments, and communicate studio updates. We do not sell your personal information to third parties."
             },
             {
               title: "3. Data Security",

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getSiteSettings, getPageContentBySlug, type SiteSettings, type PageContent } from '../../services/cmsService';
-import { resolvePublicMediaUrl } from '../../utils/mediaUrl';
+import SiteLogo from '../common/SiteLogo';
 import '../../styles/footer.css';
 
 const Footer: React.FC = () => {
@@ -68,15 +68,13 @@ const Footer: React.FC = () => {
   const phone = contactPage?.content?.phone || '9711384768';
   const email = contactPage?.content?.email || 'Garima@productions.com';
 
-  const logoSrc = resolvePublicMediaUrl(settings?.logoUrl) || '/logo.png';
-
   return (
     <footer className="footer">
       <div className="container">
         <div className="footer-grid">
           <div className="footer-brand">
             <Link to="/" className="footer-logo-container">
-              <img src={logoSrc} alt="GDP" className="footer-site-logo" />
+              <SiteLogo logoUrl={settings?.logoUrl} className="footer-site-logo" alt="GDP" />
               <div className="footer-site-text">
                 <span>Garima</span>
                 <span>Dance</span>
@@ -142,6 +140,7 @@ const Footer: React.FC = () => {
         <div className="footer-bottom">
           <p>{footerText}</p>
           <div className="footer-bottom-links">
+            <Link to="/faq">FAQ</Link>
             <Link to="/terms">Terms and conditions</Link>
             <Link to="/privacy">Privacy policy</Link>
           </div>

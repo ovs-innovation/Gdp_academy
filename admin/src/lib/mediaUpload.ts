@@ -22,7 +22,7 @@ async function parseUploadResponse(response: Response): Promise<{ ok: boolean; u
       return {
         ok: false,
         message:
-          "Upload API not found. Backend restart karein: cd backend && npm run dev",
+          "Upload API not found. Restart the backend: cd backend && npm run dev",
       };
     }
     return { ok: false, message: text.slice(0, 120) || `HTTP ${response.status}` };

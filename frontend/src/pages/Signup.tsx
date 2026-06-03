@@ -20,7 +20,7 @@ const Signup: React.FC = () => {
       const response = await register({ name, email, password, role: 'student' });
       localStorage.setItem('auth_token', response.token);
       localStorage.setItem('auth_user', JSON.stringify(response.user));
-      toast.success('Registration successful! Welcome to the Academy.');
+      toast.success('Registration successful! Welcome to the Studio.');
       navigate('/dashboard');
     } catch (error: any) {
       toast.error(error.message || 'Registration failed');
@@ -39,7 +39,7 @@ const Signup: React.FC = () => {
             className="auth-card glass-card"
           >
             <div className="auth-header">
-              <h2>JOIN <span className="gradient-text">GDP ACADEMY</span></h2>
+              <h2>JOIN <span className="gradient-text">GDP STUDIO</span></h2>
               <p>Create your membership and start your dance mastery journey today.</p>
             </div>
 

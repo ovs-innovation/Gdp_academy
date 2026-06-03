@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { fetchWorkshops } from '../services/programService';
 import WorkshopCard, { defaultWorkshops } from '../components/workshops/WorkshopCard';
 import { usePageContent, renderSplitHeroTitle } from '../hooks/usePageContent';
+import SEO from '../components/SEO';
 import '../styles/workshops.css';
 
 const Workshops: React.FC = () => {
@@ -27,6 +28,11 @@ const Workshops: React.FC = () => {
 
   return (
     <Layout>
+      <SEO
+        pageTitle="Dance Workshops"
+        description="Join intensive dance workshops at Garima Dance Productions — masterclasses with expert choreographers."
+        path="/workshops"
+      />
       <section className="workshops-hero section-padding">
         <div className="container">
           <motion.h1

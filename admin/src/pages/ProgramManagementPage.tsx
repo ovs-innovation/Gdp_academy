@@ -3,7 +3,8 @@ import { AdminLayout } from '@/components/layout/AdminLayout';
 import { PermissionGate } from '@/components/PermissionGate';
 import { Button } from '@/components/ui/button';
 import { Plus, Download, Filter } from 'lucide-react';
-import { ProgramsAPI, type ApiProgram, DanceStylesAPI, type ApiDanceStyle } from '@/lib/api';
+import { ProgramsAPI, type ApiProgram, type RecordedClassItem, DanceStylesAPI, type ApiDanceStyle } from '@/lib/api';
+import { MediaUrlField } from '@/components/cms/MediaUrlField';
 import { getLanguageValue, normalizeLanguageValue } from '@/lib/languageHelper';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -77,7 +78,10 @@ const ProgramManagementPage = () => {
     danceStyle: '',
     image: '',
     status: (isAdmin ? 'active' : 'pending') as 'active' | 'inactive' | 'pending',
+    price: '',
+    previewVideo: '',
   });
+  const [recordedClasses, setRecordedClasses] = useState<RecordedClassItem[]>([]);
 
   const loadPrograms = async () => {
     setLoading(true);
@@ -117,7 +121,15 @@ const ProgramManagementPage = () => {
         danceStyle: Program.danceStyle || Program.DanceStyle || Program.category || '',
         image: Program.image || '',
         status: Program.status,
+        price: Program.price != null ? String(Program.price) : '',
+        previewVideo: Program.previewVideo || '',
       });
+      setRecordedClasses(
+        (Program.recordedClasses || []).map((lesson, index) => ({
+          ...lesson,
+          order: lesson.order ?? index,
+        })),
+      );
     } else {
       setEditProgram(null);
       setFormData({
@@ -126,7 +138,10 @@ const ProgramManagementPage = () => {
         danceStyle: '',
         image: '',
         status: 'active',
+        price: '',
+        previewVideo: '',
       });
+      setRecordedClasses([]);
     }
     setDialogOpen(true);
   };
@@ -140,17 +155,51 @@ const ProgramManagementPage = () => {
       danceStyle: '',
       image: '',
       status: 'active',
+      price: '',
+      previewVideo: '',
     });
+    setRecordedClasses([]);
+  };
+
+  const addRecordedLesson = () => {
+    setRecordedClasses((prev) => [
+      ...prev,
+      { title: `Lesson ${prev.length + 1}`, videoUrl: '', duration: 0, order: prev.length },
+    ]);
+  };
+
+  const updateRecordedLesson = (index: number, patch: Partial<RecordedClassItem>) => {
+    setRecordedClasses((prev) =>
+      prev.map((lesson, i) => (i === index ? { ...lesson, ...patch } : lesson)),
+    );
+  };
+
+  const removeRecordedLesson = (index: number) => {
+    setRecordedClasses((prev) =>
+      prev.filter((_, i) => i !== index).map((lesson, i) => ({ ...lesson, order: i })),
+    );
   };
 
   const handleSubmit = async () => {
     try {
       const payload = {
-        ...formData,
         danceStyle: formData.danceStyle,
         category: formData.danceStyle,
+        image: formData.image,
+        status: formData.status,
+        previewVideo: formData.previewVideo || undefined,
+        price: formData.price ? Number(formData.price) : undefined,
+        recordedClasses: recordedClasses
+          .filter((lesson) => lesson.videoUrl?.trim())
+          .map((lesson, index) => ({
+            title: lesson.title || `Lesson ${index + 1}`,
+            videoUrl: lesson.videoUrl,
+            duration: Number(lesson.duration) || 0,
+            order: index,
+          })),
         name: normalizeLanguageValue(formData.name),
         description: normalizeLanguageValue(formData.description),
+        type: 'program' as const,
       };
       if (editProgram) {
         await ProgramsAPI.update(editProgram._id, payload);
@@ -375,7 +424,7 @@ const ProgramManagementPage = () => {
 
       {/* Create/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editProgram ? 'Edit Program' : 'Create Program'}</DialogTitle>
             <DialogDescription>
@@ -456,6 +505,17 @@ const ProgramManagementPage = () => {
 
             </div>
             <div className="space-y-2">
+              <Label htmlFor="price">Program Price (INR)</Label>
+              <Input
+                id="price"
+                type="number"
+                min={0}
+                value={formData.price}
+                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                placeholder="e.g. 2999"
+              />
+            </div>
+            <div className="space-y-2">
               <Label htmlFor="image">Program Image</Label>
               <CloudinaryImageUploader
                 imageUrl={formData.image}
@@ -463,6 +523,60 @@ const ProgramManagementPage = () => {
                 folder="Programs"
                 maxSize={5 * 1024 * 1024}
               />
+            </div>
+            <MediaUrlField
+              label="Preview Video (optional)"
+              websiteLocation="Program preview on website"
+              value={formData.previewVideo}
+              onChange={(url) => setFormData({ ...formData, previewVideo: url })}
+              mediaType="video"
+              uploadFolder="programs"
+            />
+            <div className="space-y-3 rounded-lg border border-border p-4">
+              <div className="flex items-center justify-between gap-2">
+                <div>
+                  <Label>Recorded Lessons</Label>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Upload lesson videos — students access these after enrollment (protected stream).
+                  </p>
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={addRecordedLesson}>
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add lesson
+                </Button>
+              </div>
+              {recordedClasses.length === 0 && (
+                <p className="text-sm text-muted-foreground">No recorded lessons yet.</p>
+              )}
+              {recordedClasses.map((lesson, index) => (
+                <div key={index} className="space-y-2 rounded-md border border-border/60 p-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-medium">Lesson {index + 1}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="text-destructive"
+                      onClick={() => removeRecordedLesson(index)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <Input
+                    value={lesson.title || ''}
+                    onChange={(e) => updateRecordedLesson(index, { title: e.target.value })}
+                    placeholder="Lesson title"
+                  />
+                  <MediaUrlField
+                    label="Lesson video"
+                    websiteLocation={`Program lesson ${index + 1}`}
+                    value={lesson.videoUrl || ''}
+                    onChange={(url) => updateRecordedLesson(index, { videoUrl: url })}
+                    mediaType="video"
+                    uploadFolder="program-lessons"
+                  />
+                </div>
+              ))}
             </div>
             {isAdmin && (
               <div className="space-y-2">

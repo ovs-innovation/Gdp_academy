@@ -1,6 +1,9 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import LazyVideo from '../common/LazyVideo';
+import HomeMediaMarquee from './HomeMediaMarquee';
+import MediaProfileAvatar from './MediaProfileAvatar';
+import YouTubeSubscribeButton from './YouTubeSubscribeButton';
 
 export type YouTubeShortItem = {
   vid: string;
@@ -14,9 +17,16 @@ type Props = {
   shorts: YouTubeShortItem[];
   channel: string;
   channelUrl: string;
+  channelId?: string | null;
+  logoUrl?: string | null;
 };
 
-const YouTubeShortsSection: React.FC<Props> = ({ shorts, channel, channelUrl }) => (
+const YouTubeShortsSection: React.FC<Props> = ({ shorts, channel, channelUrl, channelId, logoUrl }) => {
+  const openChannel = () => {
+    window.open(channelUrl, '_blank', 'noopener,noreferrer');
+  };
+
+  return (
   <section className="youtube-shorts-section section-padding">
     <div className="container">
       <motion.div className="youtube-shorts-content">
@@ -29,36 +39,53 @@ const YouTubeShortsSection: React.FC<Props> = ({ shorts, channel, channelUrl }) 
           >
             Join us <br /> <span className="gradient-text youtube-gradient">on YouTube</span>
           </motion.h2>
-          <motion.a
-            href={channelUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="youtube-badge"
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-          >
-            <div className="youtube-icon-wrapper">
-              <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-              </svg>
-            </div>
-            <span className="youtube-handle">{channel}</span>
-          </motion.a>
-        </div>
-
-        <div className="youtube-shorts-grid">
-          {shorts.map((item, i) => (
+          <div className="youtube-header-actions">
             <motion.a
-              key={i}
               href={channelUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="yt-short-card"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: item.delay, duration: 0.8 }}
+              className="youtube-badge"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
+            >
+              <div className="youtube-icon-wrapper">
+                <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                </svg>
+              </div>
+              <span className="youtube-handle">{channel}</span>
+            </motion.a>
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+            >
+              <YouTubeSubscribeButton
+                channelUrl={channelUrl}
+                channelId={channelId}
+                className="yt-subscribe-btn--header"
+              />
+            </motion.div>
+          </div>
+        </div>
+
+        <HomeMediaMarquee
+          items={shorts}
+          renderItem={(item) => (
+            <div
+              role="link"
+              tabIndex={0}
+              className="yt-short-card"
+              aria-label={`Open ${channel} on YouTube`}
+              onClick={openChannel}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  openChannel();
+                }
+              }}
             >
               <LazyVideo src={item.vid} scale={1.1} />
 
@@ -102,9 +129,11 @@ const YouTubeShortsSection: React.FC<Props> = ({ shorts, channel, channelUrl }) 
 
                 <div className="yt-shorts-bottom-info">
                   <div className="yt-short-channel">
-                    <div className="yt-short-avatar">G</div>
-                    <span className="yt-short-channel-name">{channel}</span>
-                    <span className="yt-subscribe-btn">Subscribe</span>
+                    <MediaProfileAvatar logoUrl={logoUrl} className="yt-short-avatar" />
+                    <span className="yt-short-channel-name" title={channel}>
+                      {channel}
+                    </span>
+                    <YouTubeSubscribeButton channelUrl={channelUrl} channelId={channelId} />
                   </div>
                   <p className="yt-short-title">{item.title}</p>
                   <span className="yt-short-views">{item.views} views</span>
@@ -112,12 +141,13 @@ const YouTubeShortsSection: React.FC<Props> = ({ shorts, channel, channelUrl }) 
               </div>
 
               <div className="yt-short-overlay" />
-            </motion.a>
-          ))}
-        </div>
+            </div>
+          )}
+        />
       </motion.div>
     </div>
   </section>
-);
+  );
+};
 
 export default YouTubeShortsSection;

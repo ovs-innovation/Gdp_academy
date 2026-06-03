@@ -40,7 +40,7 @@ export function CMSSection({
           {websiteLocation && (
             <p className="text-xs text-primary/80 mt-2 flex items-center gap-1.5">
               <MapPin className="h-3.5 w-3.5 shrink-0" />
-              Website pe dikhega: <span className="font-medium">{websiteLocation}</span>
+              Shows on website: <span className="font-medium">{websiteLocation}</span>
             </p>
           )}
         </div>

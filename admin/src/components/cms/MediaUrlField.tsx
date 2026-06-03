@@ -74,7 +74,7 @@ export function MediaUrlField({
       {label && <Label>{label}</Label>}
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
       {websiteLocation && (
-        <p className="text-xs text-primary/80 font-medium">📍 Website pe: {websiteLocation}</p>
+        <p className="text-xs text-primary/80 font-medium">On website: {websiteLocation}</p>
       )}
 
       <div
@@ -89,10 +89,10 @@ export function MediaUrlField({
         <Upload className="h-5 w-5 mx-auto mb-1 text-muted-foreground" />
         <p className="text-xs text-muted-foreground">
           {uploading
-            ? "Upload ho raha hai..."
+            ? "Uploading..."
             : isDragActive
-              ? "Yahan chhod dein"
-              : "Drag & drop image/video, ya click karein"}
+              ? "Drop the file here"
+              : "Drag & drop an image/video, or click to browse"}
         </p>
       </div>
 

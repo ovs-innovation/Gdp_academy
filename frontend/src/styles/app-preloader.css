@@ -1,0 +1,187 @@
+/* Slim top progress bar shown during in-app route transitions */
+.route-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 100000000;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.route-progress__bar {
+  display: block;
+  width: 35%;
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(90deg, #634bfa 0%, #1effe4 100%);
+  box-shadow: 0 0 12px rgba(99, 75, 250, 0.6);
+  animation: routeProgressSlide 0.9s ease-in-out infinite;
+}
+
+@keyframes routeProgressSlide {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(380%);
+  }
+}
+
+/* Professional loader — matches header/footer brand lockup */
+.app-preloader {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-color);
+  color: var(--text-white);
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+.app-preloader__ambient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 65% 45% at 50% 45%,
+    color-mix(in srgb, var(--primary-color) 12%, transparent),
+    transparent 72%
+  );
+}
+
+.app-preloader__inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 56px;
+  padding: 0 28px;
+}
+
+.app-preloader__brand {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.app-preloader__logo {
+  width: 76px;
+  height: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.app-preloader__lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+/* Same structure as header .site-text */
+.app-preloader__site-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+  font-family: var(--font-title);
+}
+
+.app-preloader__site-text span {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-white);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.app-preloader__studio-mark {
+  margin: 0;
+  font-family: var(--font-title);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-gray);
+  display: flex;
+  gap: 0.5em;
+}
+
+.app-preloader__studio-mark-accent {
+  background: var(--highlight-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app-preloader__loader {
+  width: min(280px, 72vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.app-preloader__bar {
+  width: 100%;
+  height: 1px;
+  background: color-mix(in srgb, var(--glass-border) 100%, transparent);
+  overflow: hidden;
+}
+
+.app-preloader__bar-indeterminate {
+  display: block;
+  height: 100%;
+  width: 32%;
+  background: var(--primary-color);
+  animation: appPreloaderBar 1.35s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.app-preloader__status {
+  margin: 0;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-gray);
+}
+
+@keyframes appPreloaderBar {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(420%);
+  }
+}
+
+@media (max-width: 480px) {
+  .app-preloader__brand {
+    flex-direction: column;
+    text-align: center;
+    gap: 24px;
+  }
+
+  .app-preloader__lockup {
+    align-items: center;
+  }
+
+  .app-preloader__logo {
+    width: 68px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-preloader__bar-indeterminate {
+    animation: none;
+    width: 40%;
+    margin: 0 auto;
+    opacity: 0.5;
+  }
+}

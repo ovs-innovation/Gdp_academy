@@ -3,6 +3,7 @@ import Layout from '../components/layout/Layout';
 import { motion } from 'framer-motion';
 import event_data from '../data/home-data/EventData';
 import { getPageContentBySlug } from '../services/cmsService';
+import { fetchLiveZoomSessions, type LiveZoomSession } from '../services/zoomService';
 import '../styles/live-zoom.css';
 
 type LiveSession = {
@@ -12,6 +13,7 @@ type LiveSession = {
   location: string;
   time?: string;
   desc?: string;
+  joinUrl?: string;
 };
 
 type JoinStep = {
@@ -46,22 +48,28 @@ const LiveZoomSessions: React.FC = () => {
   const [heroSubtitle, setHeroSubtitle] = useState(DEFAULT_HERO_SUBTITLE);
 
   useEffect(() => {
+    fetchLiveZoomSessions()
+      .then((apiSessions: LiveZoomSession[]) => {
+        if (apiSessions.length > 0) {
+          setSessions(
+            apiSessions.map((s, index) => ({
+              id: s.id ?? index + 1,
+              title: s.title,
+              date: s.date,
+              location: s.coach || 'GDP Coach',
+              time: s.time,
+              desc: s.joinUrl ? `Zoom · ${s.mode === 'demo' ? 'Demo link' : 'Live'}` : undefined,
+              joinUrl: s.joinUrl,
+            })),
+          );
+        }
+      })
+      .catch(() => {});
+
     getPageContentBySlug('live-zoom')
       .then((page) => {
         const c = page?.content;
         if (!c) return;
-        if (c.sessions?.length > 0) {
-          setSessions(
-            c.sessions.map((s: LiveSession, index: number) => ({
-              id: s.id ?? index + 1,
-              title: s.title,
-              date: s.date,
-              location: s.location,
-              time: s.time,
-              desc: s.desc,
-            })),
-          );
-        }
         if (c.joinSteps?.length > 0) {
           setJoinSteps(c.joinSteps);
         }
@@ -123,8 +131,24 @@ const LiveZoomSessions: React.FC = () => {
                   </div>
                 </div>
                 <div className="session-actions" style={{ textAlign: 'right' }}>
-                  <p style={{ fontSize: '14px', marginBottom: '15px', fontWeight: '600' }}>Starting in 15:00</p>
-                  <button className="primary-btn join-btn" style={{ background: 'var(--primary-color)' }}>JOIN SESSION</button>
+                  {session.time && (
+                    <p style={{ fontSize: '14px', marginBottom: '15px', fontWeight: '600' }}>{session.time}</p>
+                  )}
+                  {session.joinUrl ? (
+                    <a
+                      href={session.joinUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="primary-btn join-btn"
+                      style={{ background: 'var(--primary-color)', display: 'inline-flex' }}
+                    >
+                      JOIN SESSION
+                    </a>
+                  ) : (
+                    <a href="/contact?source=live-zoom" className="primary-btn join-btn" style={{ background: 'var(--primary-color)', display: 'inline-flex' }}>
+                      ENQUIRE
+                    </a>
+                  )}
                 </div>
               </motion.div>
             ))}

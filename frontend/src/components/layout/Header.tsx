@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getSiteSettings, type SiteSettings } from '../../services/cmsService';
-import { resolvePublicMediaUrl } from '../../utils/mediaUrl';
+import SiteLogo from '../common/SiteLogo';
 import '../../styles/header.css';
 
 const Header: React.FC = () => {
@@ -52,13 +52,11 @@ const Header: React.FC = () => {
     : defaultNavLinks
   ).filter((link) => !isLibraryNavItem(link.path, link.name));
 
-  const logoSrc = resolvePublicMediaUrl(settings?.logoUrl) || '/logo.png';
-
   return (
     <header className={`header ${isScrolled ? 'scrolled' : ''}`}>
       <div className="container header-container">
         <Link to="/" className="logo-container">
-          <img src={logoSrc} alt="GDP" className="site-logo" />
+          <SiteLogo logoUrl={settings?.logoUrl} className="site-logo" alt="GDP" />
           <div className="site-text">
             <span>Garima</span>
             <span>Dance</span>

@@ -69,12 +69,17 @@ const DEFAULT_ECOSYSTEM: EcosystemItem[] = [
   },
 ];
 
+const HERO_HIGHLIGHTS = [
+  { text: 'Classical · Contemporary · Fusion' },
+  { text: 'Studio · Workshops · Stage' },
+] as const;
+
 const DEFAULT_CONTENT: AboutContent = {
   storyTitle: "Our Movement Story",
   storyText: "Founded with the dream of making cultural and modern dance forms accessible worldwide, Garima Dance Production brings a fusion of discipline, grace, and storytelling. We focus on physical mastery alongside deep expressive performance elements.",
   missionTitle: "Our Mission",
   missionText: "To empower individuals to express themselves freely through dance, while honoring deep cultural roots and embracing contemporary innovation.",
-  heroText: "GDP Dance Academy is a creative space where passion, performance, and personality come together. We train dancers with confidence, discipline, and real stage experience.",
+  heroText: "GDP Dance Studio is a creative space where passion, performance, and personality come together. We train dancers with confidence, discipline, and real stage experience.",
   stats: DEFAULT_STATS,
   pillars: DEFAULT_PILLARS,
   ecosystem: DEFAULT_ECOSYSTEM,
@@ -162,13 +167,6 @@ const About: React.FC = () => {
             MORE THAN DANCE — A <span>MOVEMENT</span>
           </div>
 
-          {/* Huge Backdrop Typography */}
-          <div className="hero-giant-bg-text">
-            <div className="giant-text-row outlined">DANCE</div>
-            <div className="giant-text-row">GDP</div>
-            <div className="giant-text-row accented">ACADEMY</div>
-          </div>
-
           <div className="container">
             <div className="hero-content-inner">
 
@@ -198,14 +196,28 @@ const About: React.FC = () => {
                 </p>
                 <div className="futuristic-cta-wrapper" style={{ marginTop: '35px' }}>
                   <Link to="/signup" className="glow-btn-primary">
-                    Join The Academy
+                    Join The Studio
                   </Link>
                 </div>
               </motion.div>
 
               {/* Right Side: Hero Dancer Cutout */}
               <div className="hero-visual-centerpiece">
-                <div className="cyber-circle-glow"></div>
+                <div className="hero-highlights" aria-hidden>
+                  {HERO_HIGHLIGHTS.map((item, i) => (
+                    <motion.div
+                      key={item.text}
+                      className={`hero-highlight ${i === 0 ? 'hero-highlight--tl' : 'hero-highlight--br'}`}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.55 + i * 0.1, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                      <span className="hero-highlight__text">{item.text}</span>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <div className="cyber-circle-glow" aria-hidden />
 
                 <motion.img
                   src="/anubhav.png"
@@ -215,27 +227,6 @@ const About: React.FC = () => {
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
                 />
-
-                {/* Floating tags */}
-                <motion.div
-                  className="mini-card card-est float-slow"
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5, duration: 0.8 }}
-                >
-                  <div className="mini-card-title">SYSTEM</div>
-                  <div className="mini-card-text">HIGH ENERGY v2.0</div>
-                </motion.div>
-
-                <motion.div
-                  className="mini-card card-culture float-reverse"
-                  initial={{ opacity: 0, x: 30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.7, duration: 0.8 }}
-                >
-                  <div className="mini-card-title">STYLE DEFINITION</div>
-                  <div className="mini-card-text">DANCE POSTER VIBE</div>
-                </motion.div>
               </div>
 
             </div>
@@ -262,7 +253,7 @@ const About: React.FC = () => {
               >
                 <div className="laptop-exp-label">{content.storyTitle.toUpperCase()}</div>
                 <h2 className="laptop-exp-title">
-                  NOT YOUR<br/>AVERAGE<br/><span className="grad-text">DANCE ACADEMY</span>
+                  NOT YOUR<br/>AVERAGE<br/><span className="grad-text">DANCE STUDIO</span>
                 </h2>
                 <p className="laptop-exp-desc">
                   {content.storyText}

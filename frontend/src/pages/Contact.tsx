@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import Layout from "../components/layout/Layout";
 import SEO from "../components/SEO";
 import { submitContactMessage, getPageContentBySlug } from "../services/cmsService";
-import { toast } from "react-toastify";
+import FormResultModal, { type FormResultType } from "../components/common/FormResultModal";
 import "../styles/contact.css";
 
 interface ContactContent {
@@ -31,6 +31,16 @@ const Contact: React.FC = () => {
     message: "",
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [formModal, setFormModal] = useState<{
+    open: boolean;
+    type: FormResultType;
+    title: string;
+    message: string;
+  }>({ open: false, type: "success", title: "", message: "" });
+
+  const showFormModal = (type: FormResultType, title: string, message: string) => {
+    setFormModal({ open: true, type, title, message });
+  };
 
   useEffect(() => {
     getPageContentBySlug("contact")
@@ -243,12 +253,20 @@ const Contact: React.FC = () => {
                 className="c-submit-btn"
                 disabled={isLoading}
               >
-                {isLoading ? "SENDING..." : "SEND MESSAGE"}
+                {isLoading ? "Sending…" : "Send message"}
               </button>
             </form>
           </motion.div>
         </div>
       </div>
+
+      <FormResultModal
+        open={formModal.open}
+        type={formModal.type}
+        title={formModal.title}
+        message={formModal.message}
+        onClose={() => setFormModal((m) => ({ ...m, open: false }))}
+      />
     </Layout>
   );
 };

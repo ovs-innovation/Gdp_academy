@@ -305,6 +305,13 @@ export const clearToken = () => {
 
 // ==================== Course Management APIs ====================
 
+export interface RecordedClassItem {
+  title?: string;
+  videoUrl?: string;
+  duration?: number;
+  order?: number;
+}
+
 export interface ApiProgram {
   _id: string;
   name: string | { en: string };
@@ -316,6 +323,14 @@ export interface ApiProgram {
   danceStyle?: string;
   DanceStyle?: string;
   type: "program" | "workshop";
+  price?: number;
+  workshopDate?: string;
+  workshopTime?: string;
+  workshopEndTime?: string;
+  zoomLink?: string;
+  workshopBanner?: string;
+  recordedClasses?: RecordedClassItem[];
+  previewVideo?: string;
   createdBy: ApiUser | string;
   createdAt?: string;
   updatedAt?: string;
@@ -335,6 +350,14 @@ export const ProgramsAPI = {
     status?: "active" | "inactive" | "pending";
     danceStyle?: string;
     type?: "program" | "workshop";
+    price?: number;
+    workshopDate?: string;
+    workshopTime?: string;
+    workshopEndTime?: string;
+    zoomLink?: string;
+    workshopBanner?: string;
+    recordedClasses?: RecordedClassItem[];
+    previewVideo?: string;
   }) =>
     apiFetch<{ course: ApiProgram }>("/admin/courses", {
       method: "POST",
@@ -348,6 +371,14 @@ export const ProgramsAPI = {
     status?: "active" | "inactive" | "pending";
     danceStyle?: string;
     type?: "program" | "workshop";
+    price?: number;
+    workshopDate?: string;
+    workshopTime?: string;
+    workshopEndTime?: string;
+    zoomLink?: string;
+    workshopBanner?: string;
+    recordedClasses?: RecordedClassItem[];
+    previewVideo?: string;
   }) =>
     apiFetch<{ course: ApiProgram }>(`/admin/courses/${id}`, {
       method: "PATCH",
@@ -1198,6 +1229,26 @@ export const BlogAPI = {
     apiFetch<{ message: string }>(`/blogs/${id}`, {
       method: "DELETE",
     }),
+};
+
+export const IntegrationsAPI = {
+  status: () =>
+    apiFetch<{
+      integrations: {
+        mode: string;
+        payment: { demo: boolean; razorpay: boolean; phonepe: boolean };
+        zoom: { demo: boolean; configured: boolean };
+        recording: { demo: boolean; configured: boolean };
+      };
+    }>("/integrations/status"),
+};
+
+export const ZoomAPI = {
+  ensureWorkshopLink: (workshopId: string) =>
+    apiFetch<{ success: boolean; zoomLink: string; mode: string }>(
+      `/zoom/workshops/${workshopId}/ensure-link`,
+      { method: "POST" },
+    ),
 };
 
 

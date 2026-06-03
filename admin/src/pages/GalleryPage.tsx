@@ -157,8 +157,8 @@ const GalleryPage = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between animate-fade-in">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">Photos & Videos Gallery</h1>
-            <p className="mt-1 text-muted-foreground">Website /gallery page par jo photos aur videos dikhte hain — yahan link paste karke add karein.</p>
+            <h1 className="font-display text-2xl tracking-tight text-foreground sm:text-3xl">Photos & Videos Gallery</h1>
+            <p className="mt-1 text-muted-foreground">The photos and videos shown on the website /gallery page — add them here by pasting a link.</p>
           </div>
           {!isAdding && !editingId && (
             <Button onClick={() => { setIsAdding(true); resetForm(); }} className="gap-2 gradient-primary text-primary-foreground hover:opacity-90">
@@ -204,7 +204,7 @@ const GalleryPage = () => {
 
               <MediaUrlField
                 label="Photo or video link"
-                hint="Direct URL — image (.jpg, .png) ya video (.mp4) link paste karein"
+                hint="Direct URL — paste an image (.jpg, .png) or video (.mp4) link"
                 value={url}
                 onChange={setUrl}
               />

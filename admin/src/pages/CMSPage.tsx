@@ -281,9 +281,9 @@ const CMSPage = () => {
       <div className="space-y-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-fade-in">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">Website Content Control</h1>
+            <h1 className="font-display text-2xl tracking-tight text-foreground sm:text-3xl">Website Content Control</h1>
             <p className="mt-1 text-muted-foreground">
-              Poori website ka control — section-wise edit, photo/video upload, slug se save. Structure map dekhein taaki samajh aaye kya kahan dikhega.
+              Edit your entire website section by section — update text, upload photos/videos and save. Use the Website Map to see exactly where each section appears.
             </p>
           </div>
           <div className="flex gap-2 flex-wrap">
@@ -718,14 +718,17 @@ const CMSPage = () => {
                     <div className="space-y-2">
                       <MediaUrlField
                         label="Studio Logo"
+                        hint="Leave empty to use the default GDP logo (/logo.png) in the header/footer. You can upload a custom logo or paste a URL."
                         websiteLocation="Header + Footer → logo image"
                         value={siteSettings.logoUrl || ""}
                         onChange={(url) => setSiteSettings({ ...siteSettings, logoUrl: url })}
+                        placeholder="Empty = default logo, or /uploads/... for a custom one"
                         mediaType="image"
+                        uploadFolder="gdp-logo"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="whatsappNumber">WhatsApp Number (sab pages par button)</Label>
+                      <Label htmlFor="whatsappNumber">WhatsApp Number (floating button on all pages)</Label>
                       <Input
                         id="whatsappNumber"
                         value={siteSettings.whatsappNumber || ""}
@@ -901,7 +904,7 @@ const CMSPage = () => {
                       Site-Wide Default SEO
                     </h3>
                     <div className="space-y-2">
-                      <Label htmlFor="seoTitle">SEO Title Title</Label>
+                      <Label htmlFor="seoTitle">SEO Title</Label>
                       <Input
                         id="seoTitle"
                         value={siteSettings.metaTitle || ""}

@@ -3,7 +3,7 @@ const Booking = require("../models/bookingModel.js");
 const getBookingRecording = async (req, res, next) => {
   try {
     const bookingId = req.params.id;
-    const userId = req.user.userId;
+    const userId = req.user.id || req.user.userId;
     const userRole = req.user.role;
 
     const booking = await Booking.findById(bookingId);

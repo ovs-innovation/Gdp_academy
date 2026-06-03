@@ -83,7 +83,7 @@ const Login: React.FC = () => {
             </form>
 
             <div className="auth-footer">
-              <p>New to the platform? <Link to="/signup" className="gradient-text">JOIN GDP ACADEMY</Link></p>
+              <p>New to the platform? <Link to="/signup" className="gradient-text">JOIN GDP STUDIO</Link></p>
             </div>
           </motion.div>
         </div>

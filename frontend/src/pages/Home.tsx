@@ -9,11 +9,20 @@ import { getFeaturedTestimonials, type Testimonial } from '../services/testimoni
 import { getLocalizedValue } from '../utils/contentHelper';
 import { fetchWorkshops } from '../services/programService';
 import WorkshopCard, { defaultWorkshops } from '../components/workshops/WorkshopCard';
-import { toast } from 'react-toastify';
 import LazyVideo from '../components/common/LazyVideo';
+import FormResultModal, { type FormResultType } from '../components/common/FormResultModal';
 import Hero from '../components/homes/home-one/Hero';
 import YouTubeShortsSection from '../components/home/YouTubeShortsSection';
+import HomeMediaMarquee from '../components/home/HomeMediaMarquee';
+import MediaProfileAvatar from '../components/home/MediaProfileAvatar';
 import { normalizeShortsList, normalizeVideoSource } from '../utils/mediaUrl';
+import {
+  DEFAULT_INSTAGRAM_PROFILE_URL,
+  DEFAULT_YOUTUBE_CHANNEL_URL,
+  resolveInstagramProfileUrl,
+  resolveYoutubeChannelUrl,
+} from '../utils/socialLinks';
+import SEO from '../components/SEO';
 import '../styles/home.css';
 import '../styles/workshops.css';
 import { normalizeHomeContent } from '../lib/homeCms';
@@ -56,14 +65,20 @@ const HOME_SERVICE_IMAGE_LIST = [
 ] as const;
 
 const DEFAULT_YOUTUBE_CHANNEL = '@garimadanceproductions1146';
-const DEFAULT_YOUTUBE_CHANNEL_URL =
-  'https://youtube.com/@garimadanceproductions1146?si=XEMV40bqEVW6JM71';
+
+const HOME_MEDIA_ROW_COUNT = 10;
 
 const DEFAULT_YOUTUBE_SHORTS = [
   { vid: '/services.mp4', title: 'Dance Reel — Studio Session', views: '1.2k', likes: '890', delay: 0 },
   { vid: '/service3.mp4', title: 'Group Flow Choreography', views: '2.5k', likes: '1.1k', delay: 0.1 },
   { vid: '/services4.mp4', title: 'Solo Edge Performance', views: '3.1k', likes: '1.4k', delay: 0.2 },
   { vid: '/hero.mp4', title: 'Urban Move — Hip Hop', views: '1.8k', likes: '720', delay: 0.3 },
+  { vid: '/service2.mp4', title: 'Classical Fusion Flow', views: '2.1k', likes: '960', delay: 0.4 },
+  { vid: '/services.mp4', title: 'Wedding Choreo Reel', views: '3.4k', likes: '1.2k', delay: 0.5 },
+  { vid: '/service3.mp4', title: 'Stage Performance Clip', views: '1.6k', likes: '640', delay: 0.6 },
+  { vid: '/services4.mp4', title: 'Masterclass Highlight', views: '2.8k', likes: '1.0k', delay: 0.7 },
+  { vid: '/hero.mp4', title: 'Behind the Scenes', views: '1.9k', likes: '810', delay: 0.8 },
+  { vid: '/service2.mp4', title: 'Student Spotlight', views: '2.3k', likes: '940', delay: 0.9 },
 ];
 
 const DEFAULT_INSTAGRAM_POSTS = [
@@ -71,7 +86,32 @@ const DEFAULT_INSTAGRAM_POSTS = [
   { vid: '/service2.mp4', delay: 0.1, offset: '-50px', likes: '2.5k', comments: '82' },
   { vid: '/service3.mp4', delay: 0.2, offset: '50px', likes: '890', comments: '12' },
   { vid: '/services4.mp4', delay: 0.3, offset: '-20px', likes: '3.1k', comments: '104' },
+  { vid: '/hero.mp4', delay: 0.4, offset: '30px', likes: '1.7k', comments: '56' },
+  { vid: '/services.mp4', delay: 0.5, offset: '-35px', likes: '2.2k', comments: '71' },
+  { vid: '/service3.mp4', delay: 0.6, offset: '15px', likes: '1.4k', comments: '38' },
+  { vid: '/services4.mp4', delay: 0.7, offset: '-45px', likes: '2.9k', comments: '92' },
+  { vid: '/hero.mp4', delay: 0.8, offset: '40px', likes: '1.1k', comments: '29' },
+  { vid: '/service2.mp4', delay: 0.9, offset: '-10px', likes: '2.0k', comments: '63' },
 ];
+
+function padHomeMediaRow<T extends { vid: string; delay?: number }>(
+  items: T[],
+  defaults: T[],
+  count: number,
+): T[] {
+  if (items.length >= count) return items.slice(0, count);
+  const out = [...items];
+  let i = 0;
+  while (out.length < count) {
+    const fallback = defaults[i % defaults.length];
+    out.push({
+      ...fallback,
+      delay: out.length * 0.1,
+    });
+    i += 1;
+  }
+  return out;
+}
 
 const DEFAULT_VIDEO_TESTIMONIALS = [
   { id: 1, img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80', vid: 'https://www.youtube.com/embed/2iM5RoR0khg' },
@@ -159,6 +199,17 @@ const Home: React.FC = () => {
   const [faqs, setFaqs] = useState<any[]>([]);
   const [featuredTestimonials, setFeaturedTestimonials] = useState<Testimonial[]>([]);
   const [enquiryForm, setEnquiryForm] = useState({ name: '', phone: '', email: '', message: '', whatsappConsent: false });
+  const [isEnquirySubmitting, setIsEnquirySubmitting] = useState(false);
+  const [formModal, setFormModal] = useState<{
+    open: boolean;
+    type: FormResultType;
+    title: string;
+    message: string;
+  }>({ open: false, type: 'success', title: '', message: '' });
+
+  const showFormModal = (type: FormResultType, title: string, message: string) => {
+    setFormModal({ open: true, type, title, message });
+  };
 
   useEffect(() => {
     getSiteSettings().then(setSettings);
@@ -220,10 +271,11 @@ const Home: React.FC = () => {
     e.preventDefault();
 
     if (!enquiryForm.name.trim() || !enquiryForm.phone.trim() || !enquiryForm.email.trim()) {
-      toast.error('Please fill in name, phone, and email');
+      showFormModal('error', 'Almost there', 'Please fill in your name, phone, and email.');
       return;
     }
 
+    setIsEnquirySubmitting(true);
     try {
       await submitEnquiry({
         name: enquiryForm.name.trim(),
@@ -236,10 +288,16 @@ const Home: React.FC = () => {
         whatsappConsent: enquiryForm.whatsappConsent,
         source: 'contact_form',
       });
-      toast.success('Enquiry submitted successfully');
       setEnquiryForm({ name: '', phone: '', email: '', message: '', whatsappConsent: false });
+      showFormModal(
+        'success',
+        'Message sent!',
+        'Thank you for reaching out. Our team will contact you within 24–48 hours.',
+      );
     } catch (err: any) {
-      toast.error(err.message || 'Failed to submit enquiry');
+      showFormModal('error', 'Could not send', err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setIsEnquirySubmitting(false);
     }
   };
 
@@ -247,6 +305,7 @@ const Home: React.FC = () => {
     e.preventDefault();
     if (!selectedService) return;
 
+    setIsEnquirySubmitting(true);
     try {
       await submitEnquiry({
         name: enquiryForm.name,
@@ -259,11 +318,17 @@ const Home: React.FC = () => {
         whatsappConsent: enquiryForm.whatsappConsent,
         source: 'general',
       });
-      toast.success('Enquiry submitted successfully');
       setEnquiryForm({ name: '', phone: '', email: '', message: '', whatsappConsent: false });
       setSelectedService(null);
+      showFormModal(
+        'success',
+        'Enquiry sent!',
+        'We received your details and will get back to you soon.',
+      );
     } catch (err: any) {
-      toast.error(err.message || 'Failed to submit enquiry');
+      showFormModal('error', 'Could not send', err.message || 'Something went wrong. Please try again.');
+    } finally {
+      setIsEnquirySubmitting(false);
     }
   };
 
@@ -311,11 +376,17 @@ const Home: React.FC = () => {
   ];
 
   const normalizedYoutubeShorts = normalizeShortsList(homeContent.youtubeShorts);
-  const youtubeShorts =
-    normalizedYoutubeShorts.length > 0 ? normalizedYoutubeShorts : DEFAULT_YOUTUBE_SHORTS;
+  const youtubeShorts = padHomeMediaRow(
+    normalizedYoutubeShorts.length > 0 ? normalizedYoutubeShorts : DEFAULT_YOUTUBE_SHORTS,
+    DEFAULT_YOUTUBE_SHORTS,
+    HOME_MEDIA_ROW_COUNT,
+  );
 
   const youtubeChannel = homeContent.youtubeChannel || DEFAULT_YOUTUBE_CHANNEL;
-  const youtubeChannelUrl = homeContent.youtubeChannelUrl || DEFAULT_YOUTUBE_CHANNEL_URL;
+  const youtubeChannelUrl = resolveYoutubeChannelUrl(
+    homeContent.youtubeChannelUrl as string | undefined,
+    DEFAULT_YOUTUBE_CHANNEL_URL,
+  );
 
   const rawInstagram = Array.isArray(homeContent.instagramPosts) ? homeContent.instagramPosts : [];
   const normalizedInstagram = rawInstagram
@@ -327,10 +398,18 @@ const Home: React.FC = () => {
       comments: item?.comments || '',
     }))
     .filter((item) => Boolean(item.vid));
-  const instagramPosts =
-    normalizedInstagram.length > 0 ? normalizedInstagram : DEFAULT_INSTAGRAM_POSTS;
+  const instagramPosts = padHomeMediaRow(
+    normalizedInstagram.length > 0 ? normalizedInstagram : DEFAULT_INSTAGRAM_POSTS,
+    DEFAULT_INSTAGRAM_POSTS,
+    HOME_MEDIA_ROW_COUNT,
+  );
 
   const instagramHandle = homeContent.instagramHandle || '@GarimadanceProductions';
+  const instagramChannelUrl = resolveInstagramProfileUrl(
+    homeContent.instagramChannelUrl as string | undefined,
+    instagramHandle,
+    DEFAULT_INSTAGRAM_PROFILE_URL,
+  );
 
   const aboutYoutubeId = homeContent.aboutYoutubeId || DEFAULT_ABOUT_YOUTUBE_ID;
   const heroYoutubeId = homeContent.heroYoutubeId || DEFAULT_HERO_YOUTUBE_ID;
@@ -479,6 +558,11 @@ const Home: React.FC = () => {
 
   return (
     <Layout>
+      <SEO
+        pageTitle="Home"
+        description="Garima Dance Productions — dance classes, workshops, live Zoom sessions, and performance training in Ghaziabad and online."
+        path="/"
+      />
       {/* 1. Hero Section */}
       <Hero settings={settings} homeContent={homeContent} />
 
@@ -616,7 +700,9 @@ const Home: React.FC = () => {
                         />
                         <label htmlFor="wa-consent-modal">agree to receive messages on WhatsApp</label>
                       </div>
-                      <button type="submit" className="primary-btn submit-modal-btn">Send details</button>
+                      <button type="submit" className="primary-btn submit-modal-btn" disabled={isEnquirySubmitting}>
+                        {isEnquirySubmitting ? 'Sending…' : 'Send details'}
+                      </button>
                     </form>
                   </div>
                 </div>
@@ -630,6 +716,8 @@ const Home: React.FC = () => {
         shorts={youtubeShorts}
         channel={youtubeChannel}
         channelUrl={youtubeChannelUrl}
+        channelId={homeContent.youtubeChannelId as string | undefined}
+        logoUrl={settings?.logoUrl}
       />
 
       {/* 3. About Section */}
@@ -742,37 +830,58 @@ const Home: React.FC = () => {
               >
                 {homeContent.instagramSectionTitle || 'Join us'} <br /> <span className="gradient-text">{homeContent.instagramSectionHighlight || 'on Instagram'}</span>
               </motion.h2>
-              <motion.div 
-                className="insta-badge"
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-              >
-                <div className="insta-icon-wrapper">
-                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <div className="insta-header-actions">
+                <motion.a
+                  href={instagramChannelUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="insta-badge"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                >
+                  <div className="insta-icon-wrapper">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M3 16V8C3 5.23858 5.23858 3 8 3H16C18.7614 3 21 5.23858 21 8V16C21 18.7614 18.7614 21 16 21H8C5.23858 21 3 18.7614 3 16Z" stroke="currentColor" strokeWidth="2"/>
+                      <path d="M17.5 6.51L17.51 6.49889" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <span className="insta-handle">{instagramHandle}</span>
+                </motion.a>
+
+                <motion.a
+                  href={instagramChannelUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="insta-follow-btn"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  aria-label={`Follow ${instagramHandle} on Instagram`}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="18" height="18">
                     <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                     <path d="M3 16V8C3 5.23858 5.23858 3 8 3H16C18.7614 3 21 5.23858 21 8V16C21 18.7614 18.7614 21 16 21H8C5.23858 21 3 18.7614 3 16Z" stroke="currentColor" strokeWidth="2"/>
                     <path d="M17.5 6.51L17.51 6.49889" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                   </svg>
-                </div>
-                <span className="insta-handle">{instagramHandle}</span>
-              </motion.div>
+                  Follow
+                </motion.a>
+              </div>
             </div>
             
-            <div className="instagram-grid">
-              {instagramPosts.map((item: typeof DEFAULT_INSTAGRAM_POSTS[number], i: number) => (
-                <motion.div 
-                  key={i}
+            <HomeMediaMarquee
+              items={instagramPosts}
+              renderItem={(item: typeof DEFAULT_INSTAGRAM_POSTS[number]) => (
+                <a
+                  href={instagramChannelUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="insta-video-card"
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: item.delay, duration: 0.8 }}
-                  viewport={{ once: true }}
-                  style={{ marginTop: item.offset }}
+                  aria-label={`Open ${instagramHandle} on Instagram`}
                 >
                   <LazyVideo src={item.vid} scale={1.1} />
-                  
-                  {/* Reels UI Overlay */}
+
                   <div className="insta-reels-ui">
                     <div className="reels-side-actions">
                       <div className="reel-action">
@@ -787,19 +896,19 @@ const Home: React.FC = () => {
                         <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" width="24" height="24"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                       </div>
                     </div>
-                    
+
                     <div className="reels-bottom-info">
                       <div className="reel-user">
-                        <div className="reel-avatar">G</div>
+                        <MediaProfileAvatar logoUrl={settings?.logoUrl} className="reel-avatar" />
                         <span>Garimadance...</span>
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="insta-overlay"></div>
-                </motion.div>
-              ))}
-            </div>
+                </a>
+              )}
+            />
           </div>
         </div>
       </section>
@@ -948,12 +1057,21 @@ const Home: React.FC = () => {
                   />
                   <label htmlFor="wa-consent-home">I agree to receive messages on WhatsApp. <Link to="/terms" style={{ color: 'var(--accent-color)' }}>Terms & Conditions</Link></label>
                 </div>
-                <button type="submit" className="send-details-btn">Send details</button>
+                <button type="submit" className="send-details-btn" disabled={isEnquirySubmitting}>
+                  {isEnquirySubmitting ? 'Sending…' : 'Send details'}
+                </button>
               </form>
             </motion.div>
           </div>
         </div>
       </section>
+      <FormResultModal
+        open={formModal.open}
+        type={formModal.type}
+        title={formModal.title}
+        message={formModal.message}
+        onClose={() => setFormModal((m) => ({ ...m, open: false }))}
+      />
     </Layout>
   );
 };

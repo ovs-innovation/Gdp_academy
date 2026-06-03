@@ -1,42 +1,29 @@
-const nodemailer = require("nodemailer");
-const dotenv = require("dotenv");
+const {
+  getTransport,
+  isEmailReady,
+  getEmailUser,
+  getAdminEmail,
+  canSendEmail: hasEmailConfig,
+} = require("../lib/emailTransport.js");
+const {
+  buildAdminLeadEmail,
+  buildCustomerThankYouEmail,
+  withLogoAttachment,
+} = require("./emailTemplates.js");
 
-dotenv.config();
+const canSendEmail = () => hasEmailConfig() && isEmailReady();
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
-
-const canSendEmail = () =>
-  Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
-
-// Verify only when credentials are configured
-if (canSendEmail()) {
-  transporter.verify(function (error) {
-    if (error) {
-      console.error("❌ Email Transporter Error:", error.message);
-      if (error.message.includes("Invalid login")) {
-        console.error(
-          "👉 TIP: Your Gmail App Password seems incorrect or expired. Please generate a new one.",
-        );
-      }
-    } else {
-      console.log("✅ Email Server is ready to send notifications");
-    }
-  });
-}
+const sendMail = async (mailOptions) => {
+  if (!canSendEmail()) {
+    throw new Error("Email not ready — check backend startup logs for Gmail setup");
+  }
+  await getTransport().sendMail(mailOptions);
+};
 
 const sendOTPEmail = async (email, otp, userName) => {
   try {
     const mailOptions = {
-      from: `"GDP Studio Security" <${process.env.EMAIL_USER}>`,
+      from: `"GDP Studio Security" <${getEmailUser()}>`,
       to: email,
       subject: "Your Login Verification Code",
       html: `
@@ -84,7 +71,7 @@ const sendOTPEmail = async (email, otp, userName) => {
         </div>
       `,
     };
-    await transporter.sendMail(mailOptions);
+    await sendMail(mailOptions);
     console.log(`OTP email sent successfully to ${email}`);
   } catch (error) {
     console.error("Error sending OTP email:", error);
@@ -95,7 +82,7 @@ const sendOTPEmail = async (email, otp, userName) => {
 const sendResetPasswordEmail = async (email, otp, userName) => {
   try {
     const mailOptions = {
-      from: `"GDP Studio Security" <${process.env.EMAIL_USER}>`,
+      from: `"GDP Studio Security" <${getEmailUser()}>`,
       to: email,
       subject: "Reset your password",
       html: `
@@ -135,7 +122,7 @@ const sendResetPasswordEmail = async (email, otp, userName) => {
         </div>
       `,
     };
-    await transporter.sendMail(mailOptions);
+    await sendMail(mailOptions);
     console.log(`Reset password email sent successfully to ${email}`);
   } catch (error) {
     console.error("Error sending reset password email:", error);
@@ -145,9 +132,9 @@ const sendResetPasswordEmail = async (email, otp, userName) => {
 
 const sendTeacherRegistrationNotificationToAdmin = async (teacherData) => {
   try {
-    const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+    const adminEmail = getAdminEmail();
     const mailOptions = {
-      from: `"GDP Studio System" <${process.env.EMAIL_USER}>`,
+      from: `"GDP Studio System" <${getEmailUser()}>`,
       to: adminEmail,
       subject: "New Instructor Registration Pending Approval",
       html: `
@@ -164,7 +151,7 @@ const sendTeacherRegistrationNotificationToAdmin = async (teacherData) => {
         </div>
       `,
     };
-    await transporter.sendMail(mailOptions);
+    await sendMail(mailOptions);
     console.log(
       `Admin notification sent for new teacher: ${teacherData.email}`,
     );
@@ -176,7 +163,7 @@ const sendTeacherRegistrationNotificationToAdmin = async (teacherData) => {
 const sendInstructorApprovalEmail = async (email, userName) => {
   try {
     const mailOptions = {
-      from: `"GDP Studio Team" <${process.env.EMAIL_USER}>`,
+      from: `"GDP Studio Team" <${getEmailUser()}>`,
       to: email,
       subject: "Your Instructor Account has been Approved!",
       html: `
@@ -193,7 +180,7 @@ const sendInstructorApprovalEmail = async (email, userName) => {
         </div>
       `,
     };
-    await transporter.sendMail(mailOptions);
+    await sendMail(mailOptions);
     console.log(`Approval email sent to ${email}`);
   } catch (error) {
     console.error("Error sending approval email:", error);
@@ -208,21 +195,35 @@ const sendEnquiryConfirmationEmail = async ({ name, email }) => {
     return;
   }
 
-  const mailOptions = {
-    from: `"GDP Studio" <${process.env.EMAIL_USER}>`,
-    to: email,
-    subject: "We received your GDP Studio enquiry",
-    html: `
-      <div style="font-family: Arial, sans-serif; padding: 20px; color: #222;">
-        <h2 style="color: #634BFA;">Thanks for reaching out, ${name}!</h2>
-        <p>We have received your enquiry for Garima Dance Production / GDP Studio.</p>
-        <p>Our team will review your message and contact you shortly.</p>
-        <p style="margin-top: 24px;">Regards,<br/>GDP Studio Team</p>
-      </div>
-    `,
-  };
+  await sendMail(
+    withLogoAttachment({
+      from: `"GDP Studio" <${getEmailUser()}>`,
+      to: email,
+      subject: "We received your enquiry — GDP Studio",
+      html: buildCustomerThankYouEmail({ name }),
+    }),
+  );
+};
 
-  await transporter.sendMail(mailOptions);
+const sendContactMessageNotificationToAdmin = async (contact) => {
+  if (!canSendEmail()) {
+    console.log("Email not ready; skipping contact form admin notification.");
+    return;
+  }
+
+  await sendMail(
+    withLogoAttachment({
+      from: `"GDP Studio" <${getEmailUser()}>`,
+      to: getAdminEmail(),
+      subject: `New enquiry · ${contact.name}`,
+      html: buildAdminLeadEmail({
+        name: contact.name,
+        email: contact.email,
+        phone: contact.phone,
+        message: contact.message,
+      }),
+    }),
+  );
 };
 
 const sendEnquiryNotificationToAdmin = async ({ enquiry }) => {
@@ -233,33 +234,154 @@ const sendEnquiryNotificationToAdmin = async ({ enquiry }) => {
     return;
   }
 
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+  await sendMail(
+    withLogoAttachment({
+      from: `"GDP Studio" <${getEmailUser()}>`,
+      to: getAdminEmail(),
+      subject: `New enquiry · ${enquiry.name}`,
+      html: buildAdminLeadEmail({
+        name: enquiry.name,
+        email: enquiry.email,
+        phone: enquiry.phone,
+        message: enquiry.message,
+        whatsappConsent: enquiry.whatsappConsent,
+      }),
+    }),
+  );
+};
+
+const formatWorkshopWhen = (workshop) => {
+  const parts = [];
+  if (workshop.workshopDate) {
+    const d = new Date(workshop.workshopDate);
+    if (!Number.isNaN(d.getTime())) {
+      parts.push(d.toLocaleDateString("en-IN", { dateStyle: "medium" }));
+    }
+  }
+  if (workshop.workshopTime) parts.push(workshop.workshopTime);
+  if (workshop.workshopEndTime) parts.push(`– ${workshop.workshopEndTime}`);
+  return parts.join(" · ") || "Schedule announced soon";
+};
+
+const sendWorkshopNotificationToAdmin = async (workshop, action = "published") => {
+  if (!canSendEmail()) return;
+
+  const title = getLanguageValue(workshop.name) || "Workshop";
+  const when = formatWorkshopWhen(workshop);
+  const zoom = workshop.zoomLink || "Link will be shared with enrolled students";
+  const frontend = process.env.FRONTEND_URL || "http://localhost:3000";
+
   const mailOptions = {
-    from: `"GDP Studio" <${process.env.EMAIL_USER}>`,
-    to: adminEmail,
-    subject: `New ${enquiry.source || "website"} enquiry`,
+    from: `"GDP Studio" <${getEmailUser()}>`,
+    to: getAdminEmail(),
+    subject: `Workshop ${action}: ${title}`,
     html: `
       <div style="font-family: Arial, sans-serif; padding: 20px; color: #222;">
-        <h2 style="color: #634BFA;">New GDP Studio Enquiry</h2>
-        <p><strong>Name:</strong> ${enquiry.name}</p>
-        <p><strong>Email:</strong> ${enquiry.email}</p>
-        <p><strong>Phone:</strong> ${enquiry.phone}</p>
-        <p><strong>Source:</strong> ${enquiry.source || "general"}</p>
-        <p><strong>Message:</strong></p>
-        <p style="white-space: pre-wrap;">${enquiry.message}</p>
+        <h2 style="color: #634BFA;">Workshop ${action}</h2>
+        <p><strong>${title}</strong></p>
+        <p><strong>When:</strong> ${when}</p>
+        <p><strong>Price:</strong> ${workshop.price ? `₹${workshop.price}` : "TBD"}</p>
+        <p><strong>Zoom:</strong> <a href="${zoom}">${zoom}</a></p>
+        <p><a href="${frontend}/workshops">View on website</a></p>
       </div>
     `,
   };
 
-  await transporter.sendMail(mailOptions);
+  await sendMail(mailOptions);
+};
+
+const sendWorkshopNotificationToStudent = async (student, workshop) => {
+  if (!canSendEmail() || !student?.email) return;
+
+  const title = getLanguageValue(workshop.name) || "GDP Workshop";
+  const when = formatWorkshopWhen(workshop);
+  const frontend = process.env.FRONTEND_URL || "http://localhost:3000";
+  const joinBlock = workshop.zoomLink
+    ? `<p><a href="${workshop.zoomLink}" style="background:#634BFA;color:#fff;padding:12px 20px;text-decoration:none;border-radius:6px;font-weight:bold;">Join Zoom Session</a></p>`
+    : `<p>Visit <a href="${frontend}/live-zoom">Live Zoom page</a> for the join link.</p>`;
+
+  const mailOptions = {
+    from: `"GDP Studio" <${getEmailUser()}>`,
+    to: student.email,
+    subject: `New workshop: ${title}`,
+    html: `
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #222;">
+        <h2 style="color: #634BFA;">You're invited — ${title}</h2>
+        <p>Hello ${student.name || "Dancer"},</p>
+        <p>A new live class / workshop is scheduled at Garima Dance Productions.</p>
+        <p><strong>When:</strong> ${when}</p>
+        ${joinBlock}
+        <p><a href="${frontend}/workshops">See all workshops</a></p>
+        <p style="margin-top:24px;">Regards,<br/>GDP Studio</p>
+      </div>
+    `,
+  };
+
+  await sendMail(mailOptions);
+};
+
+/** Notify admin + all active students when a workshop goes live */
+const notifyWorkshopClassEmails = async (workshop, options = {}) => {
+  const { action = "published", notifyStudents = true } = options;
+  if (!canSendEmail()) {
+    console.log("Email not configured — skipping class notifications");
+    return { sent: false };
+  }
+
+  if (workshop.type !== "workshop" || workshop.status !== "active") {
+    return { sent: false, reason: "not_active_workshop" };
+  }
+
+  try {
+    await sendWorkshopNotificationToAdmin(workshop, action);
+
+    let studentCount = 0;
+    if (notifyStudents && process.env.CLASS_EMAIL_NOTIFY_STUDENTS !== "false") {
+      const User = require("../models/userModel.js");
+      const students = await User.find({
+        role: "student",
+        status: "active",
+      })
+        .select("name email")
+        .lean();
+
+      for (const student of students) {
+        try {
+          await sendWorkshopNotificationToStudent(student, workshop);
+          studentCount += 1;
+        } catch (err) {
+          console.warn(`Class email failed for ${student.email}:`, err.message);
+        }
+      }
+    }
+
+    console.log(
+      `✅ Workshop emails sent (admin + ${studentCount} students): ${getLanguageValue(workshop.name)}`,
+    );
+    return { sent: true, studentCount };
+  } catch (err) {
+    console.error("Workshop notification emails failed:", err.message);
+    return { sent: false, error: err.message };
+  }
+};
+
+const getLanguageValue = (val) => {
+  if (!val) return "";
+  if (typeof val === "string") return val;
+  if (typeof val === "object" && val.en) return val.en;
+  return String(val);
 };
 
 module.exports = {
-  transporter,
   sendOTPEmail,
   sendResetPasswordEmail,
   sendTeacherRegistrationNotificationToAdmin,
   sendInstructorApprovalEmail,
   sendEnquiryConfirmationEmail,
   sendEnquiryNotificationToAdmin,
+  sendContactMessageNotificationToAdmin,
+  sendWorkshopNotificationToAdmin,
+  sendWorkshopNotificationToStudent,
+  notifyWorkshopClassEmails,
+  canSendEmail,
 };

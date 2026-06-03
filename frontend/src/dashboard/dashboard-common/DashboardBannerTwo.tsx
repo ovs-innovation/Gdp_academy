@@ -56,7 +56,7 @@ const DashboardBannerTwo = ({ totalSessions = 0, completedSessions = 0 }: Dashbo
             <h2 className="title mb-1 text-white" style={{ fontSize: '28px' }}>{getMemberName()}</h2>
             <div className="d-flex gap-3 align-items-center opacity-75 flex-wrap">
                <span className="small"><i className="fas fa-graduation-cap me-2 text-primary"></i>Member</span>
-               <span className="small"><i className="fas fa-map-marker-alt me-2 text-primary"></i>Elite Academy</span>
+               <span className="small"><i className="fas fa-map-marker-alt me-2 text-primary"></i>Elite Studio</span>
                {totalSessions > 0 && (
                  <span className="small"><i className="fas fa-calendar-check me-2 text-success"></i>{completedSessions}/{totalSessions} Sessions Completed</span>
                )}

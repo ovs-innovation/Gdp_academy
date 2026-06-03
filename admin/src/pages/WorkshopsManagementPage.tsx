@@ -3,7 +3,7 @@ import { AdminLayout } from '@/components/layout/AdminLayout';
 import { PermissionGate } from '@/components/PermissionGate';
 import { Button } from '@/components/ui/button';
 import { Plus, Download, Filter } from 'lucide-react';
-import { ProgramsAPI, type ApiProgram, DanceStylesAPI, type ApiDanceStyle } from '@/lib/api';
+import { ProgramsAPI, type ApiProgram, DanceStylesAPI, type ApiDanceStyle, ZoomAPI } from '@/lib/api';
 import { getLanguageValue, normalizeLanguageValue } from '@/lib/languageHelper';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -78,7 +78,19 @@ const WorkshopsManagementPage = () => {
     image: '',
     status: (isAdmin ? 'active' : 'pending') as 'active' | 'inactive' | 'pending',
     type: 'workshop' as const,
+    workshopDate: '',
+    workshopTime: '',
+    workshopEndTime: '',
+    price: '',
+    zoomLink: '',
   });
+
+  const formatDateInput = (value?: string) => {
+    if (!value) return '';
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return '';
+    return d.toISOString().slice(0, 10);
+  };
 
   const loadWorkshops = async () => {
     setLoading(true);
@@ -116,9 +128,14 @@ const WorkshopsManagementPage = () => {
         name: getLanguageValue(workshop.name),
         description: getLanguageValue(workshop.description),
         category: workshop.category || '',
-        image: workshop.image || '',
+        image: workshop.image || workshop.workshopBanner || '',
         status: workshop.status as any,
         type: 'workshop',
+        workshopDate: formatDateInput(workshop.workshopDate),
+        workshopTime: workshop.workshopTime || '',
+        workshopEndTime: workshop.workshopEndTime || '',
+        price: workshop.price != null ? String(workshop.price) : '',
+        zoomLink: workshop.zoomLink || '',
       });
     } else {
       setEditWorkshop(null);
@@ -129,6 +146,11 @@ const WorkshopsManagementPage = () => {
         image: '',
         status: 'active',
         type: 'workshop',
+        workshopDate: '',
+        workshopTime: '',
+        workshopEndTime: '',
+        price: '',
+        zoomLink: '',
       });
     }
     setDialogOpen(true);
@@ -144,15 +166,29 @@ const WorkshopsManagementPage = () => {
       image: '',
       status: 'active',
       type: 'workshop',
+      workshopDate: '',
+      workshopTime: '',
+      workshopEndTime: '',
+      price: '',
+      zoomLink: '',
     });
   };
 
   const handleSubmit = async () => {
     try {
       const payload = {
-        ...formData,
         name: normalizeLanguageValue(formData.name),
         description: normalizeLanguageValue(formData.description),
+        category: formData.category,
+        image: formData.image,
+        workshopBanner: formData.image,
+        status: formData.status,
+        type: 'workshop' as const,
+        workshopDate: formData.workshopDate || undefined,
+        workshopTime: formData.workshopTime || undefined,
+        workshopEndTime: formData.workshopEndTime || undefined,
+        zoomLink: formData.zoomLink || undefined,
+        price: formData.price ? Number(formData.price) : undefined,
       };
       if (editWorkshop) {
         await ProgramsAPI.update(editWorkshop._id, payload);
@@ -165,6 +201,19 @@ const WorkshopsManagementPage = () => {
       loadWorkshops();
     } catch (err: any) {
       toast({ title: 'Operation failed', description: err?.message, variant: 'destructive' });
+    }
+  };
+
+  const handleEnsureZoom = async (workshop: ApiProgram) => {
+    try {
+      const result = await ZoomAPI.ensureWorkshopLink(workshop._id);
+      toast({
+        title: 'Zoom link ready',
+        description: result.mode === 'demo' ? 'Demo link saved (add Zoom keys for live).' : result.zoomLink,
+      });
+      loadWorkshops();
+    } catch (err: any) {
+      toast({ title: 'Zoom link failed', description: err?.message, variant: 'destructive' });
     }
   };
 
@@ -325,6 +374,10 @@ const WorkshopsManagementPage = () => {
                               <Pencil className="h-4 w-4 mr-2" />
                               Edit
                             </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleEnsureZoom(workshop)}>
+                              <Pencil className="h-4 w-4 mr-2" />
+                              Generate Zoom link
+                            </DropdownMenuItem>
                           </PermissionGate>
                           <PermissionGate permission="programs.delete">
                             <DropdownMenuItem
@@ -347,7 +400,7 @@ const WorkshopsManagementPage = () => {
 
       {/* Create/Edit Dialog */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-[560px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editWorkshop ? 'Edit Workshop' : 'Create Workshop'}</DialogTitle>
             <DialogDescription>
@@ -403,6 +456,57 @@ const WorkshopsManagementPage = () => {
                   })}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="workshopDate">Workshop Date</Label>
+                <Input
+                  id="workshopDate"
+                  type="date"
+                  value={formData.workshopDate}
+                  onChange={(e) => setFormData({ ...formData, workshopDate: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="price">Price (INR)</Label>
+                <Input
+                  id="price"
+                  type="number"
+                  min={0}
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  placeholder="e.g. 1500"
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <Label htmlFor="workshopTime">Start Time</Label>
+                <Input
+                  id="workshopTime"
+                  value={formData.workshopTime}
+                  onChange={(e) => setFormData({ ...formData, workshopTime: e.target.value })}
+                  placeholder="10:00 AM"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="workshopEndTime">End Time</Label>
+                <Input
+                  id="workshopEndTime"
+                  value={formData.workshopEndTime}
+                  onChange={(e) => setFormData({ ...formData, workshopEndTime: e.target.value })}
+                  placeholder="02:00 PM"
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="zoomLink">Zoom / Live Link</Label>
+              <Input
+                id="zoomLink"
+                value={formData.zoomLink}
+                onChange={(e) => setFormData({ ...formData, zoomLink: e.target.value })}
+                placeholder="https://zoom.us/j/..."
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="image">Workshop Image</Label>

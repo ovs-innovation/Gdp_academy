@@ -126,8 +126,8 @@ const ServicesCMSPage = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between animate-fade-in">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">Homepage Service Cards</h1>
-            <p className="mt-1 text-muted-foreground">Website homepage par jo gol service circles dikhte hain — unka photo, title aur text yahan se edit karein.</p>
+            <h1 className="font-display text-2xl tracking-tight text-foreground sm:text-3xl">Homepage Service Cards</h1>
+            <p className="mt-1 text-muted-foreground">The round service circles shown on the website homepage — edit their photo, title and text here.</p>
           </div>
           {!isAdding && !editingId && (
             <Button onClick={() => { setIsAdding(true); resetForm(); }} className="gap-2 gradient-primary text-primary-foreground hover:opacity-90">
@@ -165,7 +165,7 @@ const ServicesCMSPage = () => {
               <div className="space-y-2">
               <MediaUrlField
                 label="Service circle photo"
-                hint="Homepage par is service ka gol image — link paste karein (e.g. /svc-stage.png ya Cloudinary URL)"
+                hint="The round image for this service on the homepage — paste a link (e.g. /svc-stage.png or a Cloudinary URL)"
                 value={imageUrl}
                 onChange={setImageUrl}
               />

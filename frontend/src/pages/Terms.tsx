@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from '../components/layout/Layout';
 import { motion } from 'framer-motion';
 import { getPageContentBySlug } from '../services/cmsService';
+import SEO from '../components/SEO';
 
 const Terms: React.FC = () => {
   const defaultSections = [
@@ -37,6 +38,7 @@ const Terms: React.FC = () => {
 
   return (
     <Layout>
+      <SEO pageTitle="Terms of Service" path="/terms" />
       <section className="legal-hero section-padding">
         <div className="container">
           <motion.h1 

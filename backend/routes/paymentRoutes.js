@@ -2,23 +2,22 @@ const express = require("express");
 const { verifyToken } = require("../middlewares/authMiddleware.js");
 const {
   createCheckoutPaymentIntent,
+  createDemoCheckout,
+  verifyCheckout,
   stripeWebhook,
   createFreeBooking,
+  getPaymentMode,
 } = require("../controllers/paymentController.js");
 
 const router = express.Router();
 
-// Authenticated checkout init
-router.post(
-  "/checkout/payment-intent",
-  verifyToken,
-  createCheckoutPaymentIntent,
-);
+router.get("/mode", getPaymentMode);
 
-// Free booking init
+router.post("/checkout/payment-intent", verifyToken, createCheckoutPaymentIntent);
+router.post("/checkout/create-order", verifyToken, createDemoCheckout);
+router.post("/checkout/verify", verifyToken, verifyCheckout);
 router.post("/checkout/free-booking", verifyToken, createFreeBooking);
 
-// Stripe webhook (raw body is handled in app.js)
 router.post("/stripe/webhook", stripeWebhook);
 
 module.exports = router;

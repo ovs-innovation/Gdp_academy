@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Eye, EyeOff, Lock, Mail, KeyRound } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, KeyRound, ShieldCheck, LayoutDashboard, Users, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { AuthAPI, setToken } from '@/lib/api';
 import { useRole } from '@/contexts/RoleContext';
@@ -130,13 +130,10 @@ const LoginPage = () => {
       <div className="admin-login-bg" />
       <div className="admin-login-glow" />
 
-      <div className="admin-login-inner">
-        <div className="w-full max-w-md animate-fade-in">
-          <div className="admin-login-brand">
-            <div className="admin-login-badge">
-              <span className="admin-login-badge-dot" />
-              GDP Admin Panel
-            </div>
+      <div className="admin-login-shell">
+        {/* Brand / showcase panel */}
+        <aside className="admin-login-aside">
+          <div className="admin-login-aside-top">
             <div className="admin-login-logo-wrap">
               <img src="/logo.png" alt="GDP" className="admin-login-logo" />
               <div className="admin-login-brand-text">
@@ -145,25 +142,69 @@ const LoginPage = () => {
                 <span>Productions</span>
               </div>
             </div>
-            <h1 className="admin-login-title">
-              {requiresOTP ? (
-                <>Verify <span className="accent">Access</span></>
-              ) : forgotMode ? (
-                <>Reset <span className="accent">Password</span></>
-              ) : (
-                <>Admin <span className="accent">Login</span></>
-              )}
-            </h1>
-            <p className="admin-login-subtitle">
-              {requiresOTP
-                ? 'Enter the verification code sent to your email'
-                : forgotMode
-                  ? 'Recover your admin account securely'
-                  : 'Manage programs, workshops, CMS, students & more'}
-            </p>
+            <div className="admin-login-badge">
+              <span className="admin-login-badge-dot" />
+              Admin Control Panel
+            </div>
           </div>
 
+          <div className="admin-login-aside-mid">
+            <h2 className="admin-login-headline font-display">
+              Run the <span className="accent">studio</span><br />from one place.
+            </h2>
+            <p className="admin-login-aside-text">
+              Manage programs, workshops, students, payments and the entire
+              website experience — all in one beautiful dashboard.
+            </p>
+
+            <ul className="admin-login-features">
+              <li>
+                <span className="admin-login-feature-ico"><LayoutDashboard className="h-4 w-4" /></span>
+                Live analytics & control dashboard
+              </li>
+              <li>
+                <span className="admin-login-feature-ico"><Users className="h-4 w-4" /></span>
+                Students, enrolments & memberships
+              </li>
+              <li>
+                <span className="admin-login-feature-ico"><Sparkles className="h-4 w-4" /></span>
+                Full website CMS & content control
+              </li>
+            </ul>
+          </div>
+
+          <div className="admin-login-aside-foot">
+            <ShieldCheck className="h-4 w-4" />
+            Secure access · 2-factor protected
+          </div>
+        </aside>
+
+        {/* Form panel */}
+        <main className="admin-login-main">
           <div className="admin-login-card animate-slide-up">
+            <div className="admin-login-card-head">
+              <div className="admin-login-badge admin-login-badge--mobile">
+                <span className="admin-login-badge-dot" />
+                GDP Admin Panel
+              </div>
+              <h1 className="admin-login-title font-display">
+                {requiresOTP ? (
+                  <>Verify <span className="accent">Access</span></>
+                ) : forgotMode ? (
+                  <>Reset <span className="accent">Password</span></>
+                ) : (
+                  <>Welcome <span className="accent">back</span></>
+                )}
+              </h1>
+              <p className="admin-login-subtitle">
+                {requiresOTP
+                  ? 'Enter the verification code sent to your email'
+                  : forgotMode
+                    ? 'Recover your admin account securely'
+                    : 'Sign in to manage your dance studio'}
+              </p>
+            </div>
+
             <form onSubmit={handleLogin} className="space-y-5">
               {!requiresOTP && !forgotMode ? (
                 <>
@@ -330,7 +371,7 @@ const LoginPage = () => {
               </div>
             )}
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );

@@ -22,6 +22,7 @@ import {
 import { Search, Download, DollarSign, TrendingUp, AlertCircle, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
+import { IntegrationsAPI } from '@/lib/api';
 
 interface Payment {
   _id: string;
@@ -74,6 +75,7 @@ const PaymentsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [paymentStatusFilter, setPaymentStatusFilter] = useState<string>('all');
   const [payoutStatusFilter, setPayoutStatusFilter] = useState<string>('all');
+  const [integrationMode, setIntegrationMode] = useState('demo');
   const { toast } = useToast();
 
   const [stats, setStats] = useState({
@@ -85,6 +87,9 @@ const PaymentsPage = () => {
 
   useEffect(() => {
     loadPayments();
+    IntegrationsAPI.status()
+      .then((r) => setIntegrationMode(r.integrations?.mode || 'demo'))
+      .catch(() => setIntegrationMode('demo'));
   }, []);
 
   useEffect(() => {
@@ -214,6 +219,12 @@ const PaymentsPage = () => {
             Export Report
           </Button>
         </div>
+
+        {integrationMode === 'demo' && (
+          <Card className="border-amber-500/30 bg-amber-500/10 p-4 text-sm text-foreground">
+            <strong>Demo payment mode</strong> — Razorpay/PhonePe keys add karne par live checkout auto-enable ho jayega. Abhi enquiries/contact se payments handle karo.
+          </Card>
+        )}
 
         {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

@@ -4,6 +4,8 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { fetchPrograms, type Program } from '../services/programService';
 import { usePageContent, renderMultiLineHeroTitle } from '../hooks/usePageContent';
+import SEO from '../components/SEO';
+import ShareActions from '../components/common/ShareActions';
 import '../styles/programs.css';
 
 const fallbackPrograms: Program[] = [
@@ -139,7 +141,7 @@ const Programs: React.FC = () => {
   const { content: pageContent } = usePageContent('programs');
   const [programs, setPrograms] = useState<Program[]>(fallbackPrograms);
   const heroLines = renderMultiLineHeroTitle(pageContent, ['LEARN.', 'PERFORM.', 'EVOLVE.']);
-  const heroBadge = (pageContent.heroBadge as string) || 'GDP ACADEMY PROGRAMS';
+  const heroBadge = (pageContent.heroBadge as string) || 'GDP STUDIO PROGRAMS';
   const heroSubtitle =
     (pageContent.heroSubtitle as string) ||
     'Structured dance programs for studio, stage, and celebration — Bollywood, Hip Hop, Contemporary, Kids, Salsa, and custom wedding choreography.';
@@ -195,6 +197,11 @@ const Programs: React.FC = () => {
 
   return (
     <Layout>
+      <SEO
+        pageTitle="Dance Programs"
+        description="Browse category-wise dance programs at Garima Dance Productions — Bollywood, classical, contemporary, and more."
+        path="/programs"
+      />
       <section className="prog-hero-section">
         <div className="prog-hero-bg"></div>
         <div className="prog-hero-smoke"></div>
@@ -310,15 +317,12 @@ const Programs: React.FC = () => {
                     </div>
                     <div className="program-footer">
                       <Link to={href} className="primary-btn">Enquire Now</Link>
-                      <a
-                        href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`I want to join ${title} at GDP Studio. ${window.location.origin}/programs`)}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="whatsapp-share-btn"
-                        title="Share on WhatsApp"
-                      >
-                        WhatsApp
-                      </a>
+                      <ShareActions
+                        title={title}
+                        text={`I want to join ${title} at GDP Studio`}
+                        path="/programs"
+                        compact
+                      />
                     </div>
                   </div>
                 </motion.article>

@@ -10,6 +10,7 @@ const { resolveRoleKey } = require("../lib/validateRole.js");
 const {
   sendOTPEmail,
   sendResetPasswordEmail,
+  canSendEmail,
 } = require("../utils/emailService.js");
 const { getLanguageValue } = require("../utils/languageHelper.js");
 const crypto = require("crypto");
@@ -198,6 +199,12 @@ const login = async (req, res, next) => {
       if (!otp) {
         const otpCode = crypto.randomInt(100000, 999999).toString();
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+        if (!canSendEmail()) {
+          return res.status(503).json({
+            message:
+              "Email is not configured yet. Ask admin to set Gmail App Password in backend/.env",
+          });
+        }
         await OTP.deleteMany({ email, purpose: "login" });
         await OTP.create({ email, otp: otpCode, purpose: "login", expiresAt });
         await sendOTPEmail(email, otpCode, user.name);
@@ -263,6 +270,12 @@ const forgotPassword = async (req, res, next) => {
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
     await OTP.deleteMany({ email, purpose: "reset" });
     await OTP.create({ email, otp: otpCode, purpose: "reset", expiresAt });
+    if (!canSendEmail()) {
+      return res.status(503).json({
+        message:
+          "Email is not configured yet. Ask admin to set Gmail App Password in backend/.env",
+      });
+    }
     await sendResetPasswordEmail(email, otpCode, user.name);
     res.json({ message: "Password reset code sent to your email" });
   } catch (err) {

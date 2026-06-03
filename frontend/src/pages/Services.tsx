@@ -343,7 +343,7 @@ const Services: React.FC = () => {
             >
               <h2 className="svc-final-cta-title">START YOUR JOURNEY</h2>
               <Link to="/signup" className="svc-btn-glow">
-                JOIN THE ACADEMY
+                JOIN THE STUDIO
               </Link>
             </motion.div>
           </div>

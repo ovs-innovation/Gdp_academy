@@ -1,6 +1,7 @@
 const Program = require("../models/programModel.js");
 const mongoose = require("mongoose");
 const Category = require("../models/danceStyleModel.js");
+const { notifyWorkshopClassEmails } = require("../utils/emailService.js");
 
 const {
   normalizeLanguageValue,
@@ -149,6 +150,13 @@ const createProgram = async (req, res, next) => {
     });
     await course.populate("createdBy", "name email");
     const courseObj = toProgramDto(course);
+
+    if (course.type === "workshop" && course.status === "active") {
+      notifyWorkshopClassEmails(course.toObject(), { action: "published" }).catch(
+        (err) => console.warn("Workshop email notify:", err.message),
+      );
+    }
+
     res.status(201).json({ course: courseObj });
   } catch (err) {
     next(err);
@@ -303,9 +311,19 @@ const updateProgram = async (req, res, next) => {
       course.description = normalizeLanguageValue(description);
     Object.assign(course, buildProgramPayload(req.body));
 
+    const wasActiveWorkshop =
+      course.type === "workshop" && course.status === "active";
+
     await course.save();
     await course.populate("createdBy", "name email");
     const courseObj = toProgramDto(course);
+
+    if (wasActiveWorkshop) {
+      notifyWorkshopClassEmails(course.toObject(), { action: "updated" }).catch(
+        (err) => console.warn("Workshop email notify:", err.message),
+      );
+    }
+
     res.json({ course: courseObj });
   } catch (err) {
     next(err);
