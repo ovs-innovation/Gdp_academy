@@ -5,6 +5,7 @@ const API_URL = API_BASE_URL;
 
 export interface SiteSettings {
   siteName: string;
+  logoUrl?: string;
   heroTitle?: string;
   heroSubtitle?: string;
   heroBadge?: string;
@@ -68,6 +69,7 @@ export interface SiteSettings {
 
 const DEFAULT_SITE_SETTINGS: SiteSettings = {
   siteName: "GDP Studio",
+  logoUrl: "",
   heroTitle: "ELEVATE YOUR ARTISTRY",
   heroSubtitle:
     "Step into the world's most prestigious dance sanctuary. Where passion meets precision, and every move tells a story.",

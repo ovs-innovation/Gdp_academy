@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { toast } from "react-toastify";
 import Layout from "../components/layout/Layout";
 import SEO from "../components/SEO";
 import { submitContactMessage, getPageContentBySlug } from "../services/cmsService";
-import FormResultModal, { type FormResultType } from "../components/common/FormResultModal";
 import "../styles/contact.css";
 
 interface ContactContent {
@@ -31,16 +31,6 @@ const Contact: React.FC = () => {
     message: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [formModal, setFormModal] = useState<{
-    open: boolean;
-    type: FormResultType;
-    title: string;
-    message: string;
-  }>({ open: false, type: "success", title: "", message: "" });
-
-  const showFormModal = (type: FormResultType, title: string, message: string) => {
-    setFormModal({ open: true, type, title, message });
-  };
 
   useEffect(() => {
     getPageContentBySlug("contact")
@@ -259,14 +249,6 @@ const Contact: React.FC = () => {
           </motion.div>
         </div>
       </div>
-
-      <FormResultModal
-        open={formModal.open}
-        type={formModal.type}
-        title={formModal.title}
-        message={formModal.message}
-        onClose={() => setFormModal((m) => ({ ...m, open: false }))}
-      />
     </Layout>
   );
 };
