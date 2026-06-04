@@ -1,4 +1,4 @@
-import { defineConfig, splitVendorChunkPlugin } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import legacy from '@vitejs/plugin-legacy'
 import { existsSync, readFileSync } from 'node:fs'
@@ -26,7 +26,6 @@ const backendTarget = getBackendTarget()
 export default defineConfig({
   plugins: [
     react(),
-    splitVendorChunkPlugin(),
     legacy({
       targets: ['defaults', 'not IE 11']
     })
@@ -62,36 +61,5 @@ export default defineConfig({
     minify: 'esbuild',
     cssCodeSplit: true,
     chunkSizeWarningLimit: 2000,
-
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-
-            if (
-              id.includes('react') ||
-              id.includes('react-dom') ||
-              id.includes('react-router-dom')
-            ) {
-              return 'vendor-react';
-            }
-
-            if (
-              id.includes('gsap') ||
-              id.includes('framer-motion') ||
-              id.includes('aos')
-            ) {
-              return 'vendor-animation';
-            }
-
-            if (id.includes('firebase')) {
-              return 'vendor-firebase';
-            }
-
-            return 'vendor-core';
-          }
-        }
-      }
-    }
   }
 })
