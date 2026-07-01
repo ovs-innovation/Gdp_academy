@@ -31,10 +31,11 @@ const Footer: React.FC = () => {
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
     { label: 'Services', href: '/services' },
-    { label: 'Programs', href: '/programs' },
-    { label: 'Workshops', href: '/workshops' },
-    { label: 'Gallery', href: '/gallery' },
+    { label: 'Review', href: '/#reviews' },
     { label: 'Contact', href: '/contact' },
+    { label: 'Programs', href: '/programs' },
+    { label: 'Upcoming Workshops', href: '/workshops' },
+    { label: 'Gallery', href: '/gallery' },
   ];
 
   const socialLinks =
@@ -51,11 +52,7 @@ const Footer: React.FC = () => {
     );
   };
 
-  const footerLinks = (
-    settings && settings.footerLinks && settings.footerLinks.length > 0
-      ? settings.footerLinks
-      : defaultFooterLinks
-  ).filter((link) => !isLibraryNavItem(link.href, link.label));
+  const footerLinks = defaultFooterLinks.filter((link) => !isLibraryNavItem(link.href, link.label));
 
   const footerText =
     settings?.footerText || 'copyright@2026 Garima dance productions, All rights reserved';

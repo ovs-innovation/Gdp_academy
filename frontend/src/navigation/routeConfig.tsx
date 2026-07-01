@@ -3,7 +3,6 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import AppPreloader from '../components/common/AppPreloader';
 
-// Page chunk loaders — kept in one place so they can also be prefetched.
 const pageLoaders = {
   Home: () => import('../pages/Home'),
   About: () => import('../pages/About'),
@@ -21,23 +20,16 @@ const pageLoaders = {
   Terms: () => import('../pages/Terms'),
   Privacy: () => import('../pages/Privacy'),
   Services: () => import('../pages/Services'),
-  ServiceDetails: () => import('../pages/ServiceDetails'),
-  Testimonials: () => import('../pages/Testimonials'),
   LiveZoomSessions: () => import('../pages/LiveZoomSessions'),
   ForgotPassword: () => import('../pages/ForgotPassword'),
 } as const;
 
-/**
- * Warm all page chunks in the background so navbar clicks navigate instantly
- * (no Suspense fallback / page-swap glitch on first visit to a route).
- */
 export const prefetchAllRoutes = (): void => {
   Object.values(pageLoaders).forEach((load) => {
     load().catch(() => {});
   });
 };
 
-// Lazy loaded page components
 const Home = React.lazy(pageLoaders.Home);
 const About = React.lazy(pageLoaders.About);
 const Programs = React.lazy(pageLoaders.Programs);
@@ -54,12 +46,9 @@ const FAQ = React.lazy(pageLoaders.FAQ);
 const Terms = React.lazy(pageLoaders.Terms);
 const Privacy = React.lazy(pageLoaders.Privacy);
 const Services = React.lazy(pageLoaders.Services);
-const ServiceDetails = React.lazy(pageLoaders.ServiceDetails);
-const Testimonials = React.lazy(pageLoaders.Testimonials);
 const LiveZoomSessions = React.lazy(pageLoaders.LiveZoomSessions);
 const ForgotPassword = React.lazy(pageLoaders.ForgotPassword);
 
-// Route guards
 const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
   if (isLoading) {
@@ -101,8 +90,10 @@ export const routeConfig: RouteItem[] = [
   { path: '/terms', element: <Terms /> },
   { path: '/privacy', element: <Privacy /> },
   { path: '/services', element: <Services /> },
-  { path: '/services/:id', element: <ServiceDetails /> },
-  { path: '/testimonials', element: <Testimonials /> },
+  { path: '/services/*', element: <Navigate to="/services" replace /> },
+  { path: '/wellness', element: <Navigate to="/services" replace /> },
+  { path: '/wellness/*', element: <Navigate to="/services" replace /> },
+  { path: '/testimonials', element: <Navigate to="/#reviews" replace /> },
   { path: '/live-zoom', element: <LiveZoomSessions /> },
 ];
 

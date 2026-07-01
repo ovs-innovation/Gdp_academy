@@ -7,12 +7,13 @@ import { getFAQs, getPageContentBySlug, getCMSBySection, type CMSContent } from 
 import { submitEnquiry } from '../services/enquiryService';
 import { getFeaturedTestimonials, type Testimonial } from '../services/testimonialService';
 import { getLocalizedValue } from '../utils/contentHelper';
-import { fetchWorkshops } from '../services/programService';
-import WorkshopCard, { defaultWorkshops } from '../components/workshops/WorkshopCard';
 import LazyVideo from '../components/common/LazyVideo';
 import FormResultModal, { type FormResultType } from '../components/common/FormResultModal';
 import Hero from '../components/homes/home-one/Hero';
 import YouTubeShortsSection from '../components/home/YouTubeShortsSection';
+import WhyChooseGDPSection from '../components/home/WhyChooseGDPSection';
+import ReviewsSection from '../components/home/ReviewsSection';
+import { useScrollToHash } from '../hooks/useScrollToHash';
 import HomeMediaMarquee from '../components/home/HomeMediaMarquee';
 import MediaProfileAvatar from '../components/home/MediaProfileAvatar';
 import { normalizeShortsList, normalizeVideoSource } from '../utils/mediaUrl';
@@ -24,8 +25,8 @@ import {
 } from '../utils/socialLinks';
 import SEO from '../components/SEO';
 import '../styles/home.css';
-import '../styles/workshops.css';
 import { normalizeHomeContent } from '../lib/homeCms';
+import { DEFAULT_SERVICES, HOME_SERVICE_IMAGE_BY_KEY } from '../lib/defaultServices';
 
 interface HomeContent {
   aboutShortTitle: string;
@@ -124,7 +125,7 @@ const DEFAULT_ABOUT_YOUTUBE_ID = 'J-yM5y4Kd04';
 const DEFAULT_HERO_YOUTUBE_ID = '1phsCpxcBZU';
 
 const DEFAULT_TESTIMONIALS_SUBTITLE =
-  'We are Garima Dance Productions, helping all dance enthusiasts to live upto their dream';
+  'Real stories from students, couples & performers who learned, celebrated & grew with GDP.';
 
 type GoogleReviewCard = {
   name: string;
@@ -132,36 +133,38 @@ type GoogleReviewCard = {
   message: string;
   image: string;
   rating: number;
-  time: string;
+  headline?: string;
 };
 
 const DEFAULT_GOOGLE_REVIEWS: GoogleReviewCard[] = [
   {
-    name: 'Shubham Kumar',
-    position: 'Local Guide · 4 reviews · 42 photos',
+    name: 'Gauri S.',
+    position: 'Wedding Choreography',
+    headline: 'Wonderful experience',
     message:
-      'From two-left-feet to wedding floor heroes! I am incredibly grateful to Garima Dance Production. Despite our limited dance skills, we took a leap of faith...',
-    image: 'https://i.pravatar.cc/150?u=10',
+      'We had a wonderful experience with Garima Dance Productions. They were patient and professional, and created choreography that suited our comfort level while still looking elegant and impressive.',
+    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80',
     rating: 5,
-    time: 'a month ago',
   },
   {
-    name: 'Shubham Kumar',
-    position: 'Local Guide · 4 reviews · 42 photos',
+    name: 'Mona G.',
+    position: 'Online Dance Classes',
+    headline: 'So much confidence',
     message:
-      'From two-left-feet to wedding floor heroes! I am incredibly grateful to Garima Dance Production. Despite our limited dance skills, we took a leap of faith...',
-    image: 'https://i.pravatar.cc/150?u=11',
+      'As a beginner, I am learning a lot and gaining confidence. The instructors are patient, energetic, and always willing to give feedback on your moves during class.',
+    image: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&q=80',
     rating: 5,
-    time: 'a month ago',
+  },
+  {
+    name: 'Pinke C.',
+    position: 'Pre-recorded Courses',
+    headline: 'Highly recommend',
+    message:
+      'I can easily join from anywhere, which makes training so convenient. Overall it has been a positive experience — I highly recommend GDP!',
+    image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80',
+    rating: 5,
   },
 ];
-
-const HOME_SERVICE_IMAGE_BY_KEY: Record<string, string> = {
-  'hiphop-street-foundations': HOME_SERVICE_IMAGES.regular,
-  'stage-performance-choreography': HOME_SERVICE_IMAGES.fitness,
-  'kids-teens-development': HOME_SERVICE_IMAGES.custom,
-  'wedding-private-coaching': HOME_SERVICE_IMAGES.wedding,
-};
 
 const resolveHomeServiceImage = (
   opts: { key?: string; title?: string; cmsImage?: string },
@@ -170,7 +173,7 @@ const resolveHomeServiceImage = (
   const cms = opts.cmsImage?.trim();
   if (
     cms &&
-    (cms.includes('cloudinary') || cms.includes('/uploads/')) &&
+    (cms.startsWith('http') || cms.includes('cloudinary') || cms.includes('/uploads/')) &&
     !cms.includes('/svc-')
   ) {
     return cms;
@@ -183,6 +186,9 @@ const resolveHomeServiceImage = (
 
   const title = (opts.title || '').toLowerCase();
   if (title.includes('wedding')) return HOME_SERVICE_IMAGES.wedding;
+  if (title.includes('online') || title.includes('zoom')) return HOME_SERVICE_IMAGES.regular;
+  if (title.includes('pre-recorded') || title.includes('recorded')) return HOME_SERVICE_IMAGES.fitness;
+  if (title.includes('kids') || title.includes('teen')) return HOME_SERVICE_IMAGES.custom;
   if (title.includes('fitness') || title.includes('combo')) return HOME_SERVICE_IMAGES.fitness;
   if (title.includes('custom')) return HOME_SERVICE_IMAGES.custom;
   if (title.includes('regular') || title.includes('dance session')) return HOME_SERVICE_IMAGES.regular;
@@ -190,13 +196,53 @@ const resolveHomeServiceImage = (
   return HOME_SERVICE_IMAGE_LIST[index % HOME_SERVICE_IMAGE_LIST.length];
 };
 
+const mapCmsServiceToHomeCard = (svc: CMSContent, index: number) => {
+  const features = Array.isArray(svc.content?.features)
+    ? svc.content.features
+    : (typeof svc.content?.features === 'string'
+        ? svc.content.features.split(',').map((f: string) => f.trim())
+        : []);
+
+  return {
+    _id: svc._id,
+    key: svc.key,
+    title: getLocalizedValue(svc.title, ''),
+    image: resolveHomeServiceImage(
+      {
+        key: svc.key,
+        title: getLocalizedValue(svc.title, ''),
+        cmsImage: svc.images?.[0]?.url,
+      },
+      index,
+    ),
+    tagline: svc.content?.tagline || 'All Levels | Expert Guided',
+    mainTitle: getLocalizedValue(svc.description, '').split('.')[0] || 'Unleash your creative potential',
+    features: features.length > 0 ? features : ['Personalised training plans', 'Expert choreography guidance', 'Showcase opportunities'],
+  };
+};
+
+const buildHomeServices = (
+  cmsServices: CMSContent[],
+  defaults: ReturnType<typeof mapCmsServiceToHomeCard>[],
+) => {
+  if (!cmsServices?.length) return defaults;
+
+  const mapped = cmsServices.map(mapCmsServiceToHomeCard);
+  if (mapped.length >= 4) return mapped.slice(0, 4);
+
+  const usedTitles = new Set(mapped.map((s) => s.title.toLowerCase()));
+  const fillers = defaults.filter((d) => !usedTitles.has(d.title.toLowerCase()));
+  return [...mapped, ...fillers].slice(0, 4);
+};
+
 const Home: React.FC = () => {
+  useScrollToHash();
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [homeContent, setHomeContent] = useState<any>(DEFAULT_HOME_CONTENT);
   const [cmsServices, setCmsServices] = useState<CMSContent[]>([]);
-  const [workshopsList, setWorkshopsList] = useState(defaultWorkshops);
   const [selectedService, setSelectedService] = useState<any>(null);
   const [faqs, setFaqs] = useState<any[]>([]);
+  const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [featuredTestimonials, setFeaturedTestimonials] = useState<Testimonial[]>([]);
   const [enquiryForm, setEnquiryForm] = useState({ name: '', phone: '', email: '', message: '', whatsappConsent: false });
   const [isEnquirySubmitting, setIsEnquirySubmitting] = useState(false);
@@ -237,15 +283,6 @@ const Home: React.FC = () => {
         }
       })
       .catch((err) => console.error("Error loading services for home:", err));
-
-    fetchWorkshops({ status: 'active' })
-      .then((data: any) => {
-        const list = data.Programs || data.courses || data.programs || [];
-        if (list && list.length > 0) {
-          setWorkshopsList(list);
-        }
-      })
-      .catch((err) => console.error('Error loading workshops for home:', err));
 
     getFAQs()
       .then((data) => {
@@ -332,48 +369,16 @@ const Home: React.FC = () => {
     }
   };
 
-  const defaultServices = [
-    {
-      _id: 'default-1',
-      key: 'hiphop-street-foundations',
-      title: 'Regular dance sessions',
-      image: HOME_SERVICE_IMAGES.regular,
-      active: true,
-      tagline: 'All Levels | Fitness Focused',
-      mainTitle: 'Transform your lifestyle through rhythm',
-      features: ['Personalised training plans', 'Flexible morning & evening slots', 'Live performance opportunities']
-    },
-    {
-      _id: 'default-2',
-      key: 'stage-performance-choreography',
-      title: 'Combo fitness sessions',
-      image: HOME_SERVICE_IMAGES.fitness,
-      active: false,
-      tagline: 'Cardio | Strength | Dance',
-      mainTitle: 'Get fit while having the time of your life',
-      features: ['High-intensity workouts', 'Custom diet guidance', 'Progress tracking dashboard']
-    },
-    {
-      _id: 'default-3',
-      key: 'wedding-private-coaching',
-      title: 'Wedding Choreography',
-      image: HOME_SERVICE_IMAGES.wedding,
-      active: false,
-      tagline: 'Online | Offline',
-      mainTitle: 'Make your special day unforgettable',
-      features: ['Personalised choreographies', 'Flexible time schedules', 'Complementary music edits']
-    },
-    {
-      _id: 'default-4',
-      key: 'kids-teens-development',
-      title: 'Custom choreography',
-      image: HOME_SERVICE_IMAGES.custom,
-      active: false,
-      tagline: 'Events | Competitions',
-      mainTitle: 'Stand out with unique artistic vision',
-      features: ['Theme-based concepts', 'Stage blocking & positioning', 'Prop assistance']
-    }
-  ];
+  const defaultServices = DEFAULT_SERVICES.map((service, index) => ({
+    _id: service._id,
+    key: service.key,
+    title: service.title,
+    image: service.imageUrl,
+    active: index === 0,
+    tagline: service.tagline,
+    mainTitle: service.description.split('.')[0] || service.title,
+    features: service.features,
+  }));
 
   const normalizedYoutubeShorts = normalizeShortsList(homeContent.youtubeShorts);
   const youtubeShorts = padHomeMediaRow(
@@ -424,51 +429,22 @@ const Home: React.FC = () => {
 
   const mapTestimonialToReview = (t: Testimonial, i: number): GoogleReviewCard => ({
     name: t.name,
-    position: t.position || 'Member',
+    position: t.position || 'GDP Student',
     message: getLocalizedValue(t.message, ''),
     image: t.image || `https://i.pravatar.cc/150?u=${i + 10}`,
     rating: t.rating || 5,
-    time: 'a month ago',
   });
 
   const googleReviewCards: GoogleReviewCard[] = (() => {
     if (featuredTestimonials.length === 0) return DEFAULT_GOOGLE_REVIEWS;
-    const mapped = featuredTestimonials.slice(0, 2).map(mapTestimonialToReview);
-    while (mapped.length < 2) {
+    const mapped = featuredTestimonials.slice(0, 5).map(mapTestimonialToReview);
+    while (mapped.length < 3) {
       mapped.push(DEFAULT_GOOGLE_REVIEWS[mapped.length]);
     }
     return mapped;
   })();
 
-  const renderStars = (rating: number) =>
-    '★'.repeat(Math.min(5, Math.max(1, Math.round(rating))));
-
-  const servicesToRender = cmsServices && cmsServices.length > 0
-    ? cmsServices.map((svc, index) => {
-        const features = Array.isArray(svc.content?.features)
-          ? svc.content.features
-          : (typeof svc.content?.features === 'string'
-              ? svc.content.features.split(',').map((f: string) => f.trim())
-              : []);
-        return {
-          _id: svc._id,
-          key: svc.key,
-          title: getLocalizedValue(svc.title, ''),
-          image: resolveHomeServiceImage(
-            {
-              key: svc.key,
-              title: getLocalizedValue(svc.title, ''),
-              cmsImage: svc.images?.[0]?.url,
-            },
-            index,
-          ),
-          active: index === 0,
-          tagline: svc.content?.tagline || 'All Levels | Expert Guided',
-          mainTitle: getLocalizedValue(svc.description, '').split('.')[0] || 'Unleash your creative potential',
-          features: features.length > 0 ? features : ['Personalised training plans', 'Expert choreography guidance', 'Showcase opportunities']
-        };
-      })
-    : defaultServices;
+  const servicesToRender = buildHomeServices(cmsServices, defaultServices);
 
   const [isMuted, setIsMuted] = useState(true);
   const [isTheaterMode, setIsTheaterMode] = useState(false);
@@ -569,20 +545,22 @@ const Home: React.FC = () => {
       {/* 2. Services Section */}
       <section className="services-section section-padding">
         <div className="container">
-          <h2 className="section-title" style={{ fontFamily: 'var(--font-title)', fontSize: '32px', letterSpacing: '1px' }}>{homeContent.servicesTitle || settings?.servicesTitle || 'Services'}</h2>
-          <p className="section-desc" style={{ marginTop: '10px', color: 'var(--text-gray)' }}>{homeContent.servicesSubtitle || settings?.servicesSubtitle || 'Experience the ultimate dance training ecosystem.'}</p>
+          <div className="services-section-header">
+            <h2 className="section-title">{homeContent.servicesTitle || settings?.servicesTitle || 'Services'}</h2>
+            <p className="section-desc">{homeContent.servicesSubtitle || settings?.servicesSubtitle || 'Experience the ultimate dance training ecosystem.'}</p>
+          </div>
           <div className="services-v2-grid">
             {servicesToRender.map((service, index) => (
               <Link
                 key={service._id || service.key || index}
                 to="/services"
-                style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
+                className="service-card-link"
               >
                 <motion.div
-                  className={`service-card-v2 ${service.active ? 'active' : ''}`}
+                  className="service-card-v2"
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
-                  whileHover={{ y: -10 }}
+                  whileHover={{ y: -8 }}
                   viewport={{ once: true }}
                 >
                   <div className="service-card-img">
@@ -598,7 +576,7 @@ const Home: React.FC = () => {
                         if (img.src !== fallback) img.src = fallback;
                       }}
                     />
-                    <div className="img-overlay"></div>
+                    <div className="img-overlay" />
                   </div>
                   <div className="service-card-footer">
                     <h3>{service.title}</h3>
@@ -606,6 +584,12 @@ const Home: React.FC = () => {
                 </motion.div>
               </Link>
             ))}
+          </div>
+          <div className="services-explore-wrap">
+            <Link to="/services" className="services-explore-btn">
+              Explore All Services
+              <span aria-hidden="true">→</span>
+            </Link>
           </div>
         </div>
 
@@ -640,7 +624,7 @@ const Home: React.FC = () => {
 
                   <div style={{ marginTop: '25px', marginBottom: '25px' }}>
                     <Link 
-                      to={`/services/${selectedService._id || selectedService.key}`} 
+                      to="/services" 
                       className="primary-btn" 
                       style={{ 
                         textDecoration: 'none', 
@@ -711,6 +695,8 @@ const Home: React.FC = () => {
           )}
         </AnimatePresence>
       </section>
+
+      <WhyChooseGDPSection />
 
       <YouTubeShortsSection
         shorts={youtubeShorts}
@@ -797,27 +783,6 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 5. Upcoming Workshops */}
-      <section className="workshops-preview section-padding" style={{ background: '#0a0a0a' }}>
-        <div className="container">
-          <div className="section-header">
-            <h2 className="section-title">{homeContent.workshopsTitle || homeContent.upcomingWorkshopsTitle || settings?.upcomingWorkshopsTitle || 'UPCOMING WORKSHOPS'}</h2>
-            <p className="section-desc">{homeContent.workshopsSubtitle || homeContent.upcomingWorkshopsSubtitle || settings?.upcomingWorkshopsSubtitle || 'Join our high-energy live sessions and intensive masterclasses.'}</p>
-          </div>
-          <div className="workshops-list">
-            {workshopsList.slice(0, 2).map((workshop, i) => (
-              <WorkshopCard key={workshop._id || workshop.id || i} workshop={workshop} index={i} />
-            ))}
-          </div>
-          <div className="workshops-explore-wrap">
-            <Link to="/workshops" className="secondary-btn workshops-explore-btn">
-              EXPLORE ALL WORKSHOPS
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 7. Instagram Section */}
       <section className="instagram-section section-padding">
         <div className="container">
           <div className="instagram-content">
@@ -913,141 +878,125 @@ const Home: React.FC = () => {
         </div>
       </section>
 
-      {/* 9. Student Testimonials */}
-      <section className="testimonials section-padding" id="reviews">
+      <ReviewsSection
+        subtitle={testimonialsSubtitle}
+        googleRating={googleRating}
+        googleReviewCount={googleReviewCount}
+        reviews={googleReviewCards}
+        videoTestimonials={videoTestimonials}
+      />
+
+      {/* 10. FAQ Section */}
+      <section className="faq-v3 section-padding">
         <div className="container">
-          <div className="section-header-v2" style={{ textAlign: 'left', marginBottom: '60px' }}>
-            <h2 className="section-title-v2" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <span style={{ fontSize: '40px' }}>❤️</span> {homeContent.reviewsSectionTitle || 'from Clients'}
+          <div className="services-section-header faq-v3-header">
+            <h2 className="section-title">
+              <span className="gradient-text">FAQ</span>
             </h2>
-            <p className="section-subtitle-v2" style={{ fontSize: '15px', opacity: 0.8, maxWidth: '350px' }}>
-              {testimonialsSubtitle}
+            <p className="section-desc">
+              {homeContent.faqSubtitle || settings?.faqSubtitle || 'We are Garima Dance Productions, helping all dance enthusiasts to live up to their dream'}
             </p>
           </div>
 
-          {/* Row 1: Google Reviews */}
-          <div className="google-reviews-grid">
-            <motion.div className="google-rating-card" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}>
-              <span className="google-label">Google Reviews</span>
-              <div className="rating-box">
-                <span className="rating-number">{googleRating}</span>
-              </div>
-              <div className="stars">★★★★★</div>
-              <span className="review-count">{googleReviewCount}</span>
-            </motion.div>
-
-            {googleReviewCards.map((review, i) => (
-              <motion.div key={i} className="google-review-card" initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}>
-                <div className="review-header">
-                  <div className="user-info">
-                    <img src={review.image} alt={review.name} />
-                    <div>
-                      <h4>{review.name}</h4>
-                      <p>{review.position}</p>
+          <div className="faq-v3-body">
+            <div className="faq-v3-list">
+              {faqs.map((faq, i) => {
+                const isOpen = openFaqIndex === i;
+                return (
+                  <div key={i} className={`faq-v3-item${isOpen ? ' is-open' : ''}`}>
+                    <button
+                      type="button"
+                      className="faq-v3-question"
+                      onClick={() => setOpenFaqIndex(isOpen ? null : i)}
+                      aria-expanded={isOpen}
+                    >
+                      <span className="faq-v3-num">{String(i + 1).padStart(2, '0')}</span>
+                      <span className="faq-v3-q">{faq.question}</span>
+                      <span className="faq-v3-icon" aria-hidden="true">{isOpen ? '−' : '+'}</span>
+                    </button>
+                    <div className="faq-v3-answer">
+                      <div className="faq-v3-answer-inner">
+                        <p>{faq.answer}</p>
+                      </div>
                     </div>
                   </div>
-                  <div className="more-dots">⋮</div>
-                </div>
-                <div className="review-stars">{renderStars(review.rating)} <span className="time">{review.time}</span></div>
-                <p className="review-text">
-                  {review.message} <span className="more-link">More</span>
-                </p>
-                <div className="review-footer">
-                  <div className="review-icons">👍 📤</div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Row 2: Video Testimonials */}
-          <div className="video-testimonials-grid">
-            {videoTestimonials.map((item: typeof DEFAULT_VIDEO_TESTIMONIALS[number], index: number) => (
-              <motion.div 
-                key={item.id} 
-                className="video-review-card"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <LazyVideo src={item.vid} className="testimonial-video-bg" scale={1.1} />
-                <div className="video-overlay-gradient"></div>
-                {index === 0 && <div className="carousel-arrow left">‹</div>}
-                {index === 3 && <div className="carousel-arrow right">›</div>}
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 10. New FAQ Section */}
-      <section className="faq-section-v2 section-padding">
-        <div className="container">
-          <div className="section-header-v2">
-                        <h2 className="section-title-v2">{homeContent.faqTitle || settings?.faqTitle || 'FAQ'}</h2>
-            <p className="section-subtitle-v2">{homeContent.faqSubtitle || settings?.faqSubtitle || 'We are Garima Dance Productions, helping all dance enthusiasts to live up to their dream'}</p>
-          </div>
-          <div className="faq-v2-wrapper">
-            <div className="faq-v2-list">
-              {faqs.map((faq, i) => (
-                <div key={i} className="faq-v2-item">
-                  <div className="faq-v2-question" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', padding: '15px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                    <span>{i + 1}. {faq.question}</span>
-                    <span className="faq-v2-icon">▾</span>
-                  </div>
-                  <div className="faq-v2-answer" style={{ padding: '15px 0', color: 'var(--text-gray)' }}>
-                    <p>{faq.answer}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
-            <div className="faq-v2-cta glass-card">
-              <div className="cta-icon-wrapper">
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" width="40" height="40">
-                  <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="var(--accent-color)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M21 21L16.65 16.65" stroke="var(--accent-color)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+
+            <aside className="faq-v3-cta">
+              <div className="faq-v3-cta-glow" aria-hidden="true" />
+              <div className="faq-v3-cta-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" width="28" height="28">
+                  <path d="M11 19C15.4183 19 19 15.4183 19 11C19 6.58172 15.4183 3 11 3C6.58172 3 3 6.58172 3 11C3 15.4183 6.58172 19 11 19Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M21 21L16.65 16.65" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </div>
-              <h3>Can't find what you're looking for?</h3>
-              <a href={`https://wa.me/${settings?.whatsappNumber || '1234567890'}`} target="_blank" rel="noopener noreferrer" className="whatsapp-btn-v2 small" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', textDecoration: 'none' }}>
-                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.185-.573c.948.517 2.031.888 3.144.889h.002c3.181 0 5.767-2.586 5.768-5.766a5.756 5.756 0 00-5.768-5.766zM12.03 16.79c-1.13 0-2.112-.34-2.956-.848l-1.266.33.336-1.228c-.51-.83-.87-1.801-.869-2.923.001-2.695 2.193-4.887 4.888-4.887 1.305 0 2.532.508 3.456 1.431a4.85 4.85 0 011.432 3.457c0 2.694-2.193 4.886-4.887 4.886z"/></svg>
+              <h3>Can&apos;t find what you&apos;re looking for?</h3>
+              <p>Reach out on WhatsApp — we&apos;ll help you pick the right class or program.</p>
+              <a
+                href={`https://wa.me/${settings?.whatsappNumber || '1234567890'}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="faq-v3-cta-btn"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" aria-hidden="true">
+                  <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.185-.573c.948.517 2.031.888 3.144.889h.002c3.181 0 5.767-2.586 5.768-5.766a5.756 5.756 0 00-5.768-5.766zM12.03 16.79c-1.13 0-2.112-.34-2.956-.848l-1.266.33.336-1.228c-.51-.83-.87-1.801-.869-2.923.001-2.695 2.193-4.887 4.888-4.887 1.305 0 2.532.508 3.456 1.431a4.85 4.85 0 011.432 3.457c0 2.694-2.193 4.886-4.887 4.886z"/>
+                </svg>
                 Ask us directly
               </a>
-            </div>
+            </aside>
           </div>
         </div>
       </section>
 
-      {/* 11. Contact Section ("Let's Catch up?") */}
-      <section id="contact" className="contact-section-v2 section-padding">
+      {/* 11. Contact Section */}
+      <section id="contact" className="contact-v3 section-padding">
         <div className="container">
-          <div className="contact-v2-wrapper">
-            <div className="contact-v2-text">
-              <motion.h2 
-                className="insta-title"
-                initial={{ opacity: 0, y: 30 }}
+          <div className="contact-v3-body">
+            <div className="contact-v3-text">
+              <span className="contact-v3-badge">Get in Touch</span>
+              <motion.h2
+                className="contact-v3-title"
+                initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
               >
-                {homeContent.contactSectionTitle || settings?.contactSectionTitle || "Let's"} <br /> <span className="gradient-text">{homeContent.contactSectionHighlight || settings?.contactSectionSubtitle || 'Catch up?'}</span>
+                {homeContent.contactSectionTitle || settings?.contactSectionTitle || "Let's"}{' '}
+                <span className="gradient-text">
+                  {homeContent.contactSectionHighlight || settings?.contactSectionSubtitle || 'Catch up?'}
+                </span>
               </motion.h2>
-              <p className="section-subtitle-v2">{homeContent.contactSectionText || 'We are Garima Dance Productions, helping all dance enthusiasts to live up to their dream'}</p>
-              <a href={`https://wa.me/${settings?.whatsappNumber || '9876543210'}`} target="_blank" rel="noopener noreferrer" className="whatsapp-btn-v2 large" style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', textDecoration: 'none' }}>
-                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.185-.573c.948.517 2.031.888 3.144.889h.002c3.181 0 5.767-2.586 5.768-5.766a5.756 5.756 0 00-5.768-5.766zM12.03 16.79c-1.13 0-2.112-.34-2.956-.848l-1.266.33.336-1.228c-.51-.83-.87-1.801-.869-2.923.001-2.695 2.193-4.887 4.888-4.887 1.305 0 2.532.508 3.456 1.431a4.85 4.85 0 011.432 3.457c0 2.694-2.193 4.886-4.887 4.886z"/></svg>
-                Connect on whatsapp
+              <p className="contact-v3-desc">
+                {homeContent.contactSectionText || 'We are Garima Dance Productions, helping all dance enthusiasts to live up to their dream'}
+              </p>
+              <a
+                href={`https://wa.me/${settings?.whatsappNumber || '9876543210'}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="contact-v3-wa-btn"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+                  <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.185-.573c.948.517 2.031.888 3.144.889h.002c3.181 0 5.767-2.586 5.768-5.766a5.756 5.756 0 00-5.768-5.766zM12.03 16.79c-1.13 0-2.112-.34-2.956-.848l-1.266.33.336-1.228c-.51-.83-.87-1.801-.869-2.923.001-2.695 2.193-4.887 4.888-4.887 1.305 0 2.532.508 3.456 1.431a4.85 4.85 0 011.432 3.457c0 2.694-2.193 4.886-4.887 4.886z"/>
+                </svg>
+                Connect on WhatsApp
               </a>
             </div>
-            <motion.div 
-              className="contact-v2-form-card glass-card"
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+
+            <motion.div
+              className="contact-v3-form-card"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
+              transition={{ delay: 0.08 }}
             >
+              <div className="contact-v3-form-glow" aria-hidden="true" />
               <h3>{homeContent.contactFormTitle || 'Or let us reach you!'}</h3>
-              <form className="contact-v2-form" onSubmit={handleCatchUpSubmit}>
-                <input type="text" name="name" placeholder="Full Name" className="v2-input" value={enquiryForm.name} onChange={handleEnquiryChange} required />
-                <input type="text" name="phone" placeholder="Contact Number" className="v2-input" value={enquiryForm.phone} onChange={handleEnquiryChange} required />
-                <input type="email" name="email" placeholder="Email ID" className="v2-input" value={enquiryForm.email} onChange={handleEnquiryChange} required />
-                <div className="checkbox-row-v2">
+              <form className="contact-v3-form" onSubmit={handleCatchUpSubmit}>
+                <input type="text" name="name" placeholder="Full Name" className="contact-v3-input" value={enquiryForm.name} onChange={handleEnquiryChange} required />
+                <input type="text" name="phone" placeholder="Contact Number" className="contact-v3-input" value={enquiryForm.phone} onChange={handleEnquiryChange} required />
+                <input type="email" name="email" placeholder="Email ID" className="contact-v3-input" value={enquiryForm.email} onChange={handleEnquiryChange} required />
+                <div className="contact-v3-checkbox">
                   <input
                     type="checkbox"
                     id="wa-consent-home"
@@ -1055,9 +1004,12 @@ const Home: React.FC = () => {
                     checked={enquiryForm.whatsappConsent}
                     onChange={handleEnquiryChange}
                   />
-                  <label htmlFor="wa-consent-home">I agree to receive messages on WhatsApp. <Link to="/terms" style={{ color: 'var(--accent-color)' }}>Terms & Conditions</Link></label>
+                  <label htmlFor="wa-consent-home">
+                    I agree to receive messages on WhatsApp.{' '}
+                    <Link to="/terms" className="contact-v3-terms">Terms &amp; Conditions</Link>
+                  </label>
                 </div>
-                <button type="submit" className="send-details-btn" disabled={isEnquirySubmitting}>
+                <button type="submit" className="contact-v3-submit" disabled={isEnquirySubmitting}>
                   {isEnquirySubmitting ? 'Sending…' : 'Send details'}
                 </button>
               </form>

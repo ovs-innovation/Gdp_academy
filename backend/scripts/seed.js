@@ -7,6 +7,7 @@ const GalleryItem = require("../models/galleryItemModel.js");
 const MembershipPlan = require("../models/membershipPlanModel.js");
 const PageContent = require("../models/pageContentModel.js");
 const SiteSettings = require("../models/siteSettings.js");
+const { upsertServices } = require("./seedServices.js");
 const { ensureDefaultRoles } = require("../controllers/roleController.js");
 
 const seed = async () => {
@@ -295,10 +296,18 @@ const seed = async () => {
         { label: "Home", href: "/" },
         { label: "About", href: "/about" },
         { label: "Services", href: "/services" },
-        { label: "Programs", href: "/programs" },
-        { label: "Workshops", href: "/workshops" },
-        { label: "Gallery", href: "/gallery" },
+        { label: "Review", href: "/#reviews" },
         { label: "Contact", href: "/contact" }
+      ],
+      footerLinks: [
+        { label: "Home", href: "/" },
+        { label: "About", href: "/about" },
+        { label: "Services", href: "/services" },
+        { label: "Review", href: "/#reviews" },
+        { label: "Contact", href: "/contact" },
+        { label: "Programs", href: "/programs" },
+        { label: "Upcoming Workshops", href: "/workshops" },
+        { label: "Gallery", href: "/gallery" }
       ],
       footerText: "© 2026 Garima Dance Production. Designed to inspire movement, elegance, and cultural legacy.",
       socialLinks: [
@@ -312,6 +321,9 @@ const seed = async () => {
     };
     await SiteSettings.create(settings);
     console.log("Site settings seeded successfully.");
+
+    // 9. Seed Homepage Services (CMS)
+    await upsertServices({ deactivateLegacy: true });
 
     console.log("=========================================");
     console.log("DATABASE SEEDING SUCCESSFUL! 🎉");

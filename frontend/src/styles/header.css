@@ -158,3 +158,231 @@
   text-transform: uppercase;
 }
 
+/* ================= Services Mega Menu ================= */
+.nav-item-services {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.nav-link-services {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 4px;
+  margin: -12px -4px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  opacity: 0.85;
+  transition: var(--transition-smooth);
+}
+
+.nav-link-services:hover {
+  opacity: 1;
+}
+
+.nav-item-services.open .nav-link-services,
+.nav-item-services.active .nav-link-services {
+  opacity: 1;
+  color: #1EFFE4;
+}
+
+.nav-chevron {
+  font-size: 10px;
+  transition: transform 0.2s;
+  opacity: 0.7;
+}
+
+.nav-item-services.open .nav-chevron {
+  transform: rotate(180deg);
+}
+
+.services-mega-wrap {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1100;
+  /* Invisible bridge — cursor stays in hover zone while moving to the panel */
+  padding-top: 10px;
+}
+
+.services-mega-wrap::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -24px;
+  right: -24px;
+  height: 14px;
+}
+
+.services-mega-menu {
+  width: min(640px, 92vw);
+  padding: 28px 32px;
+  border-radius: 18px;
+  background: rgba(14, 14, 16, 0.98);
+  border: 1px solid rgba(99, 75, 250, 0.25);
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.04) inset;
+  backdrop-filter: blur(24px);
+}
+
+.services-mega-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+
+.services-mega-label {
+  font-family: 'Krona One', sans-serif;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #634BFA;
+  margin: 0 0 16px;
+}
+
+.services-mega-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.services-mega-item {
+  display: block;
+  padding: 12px 14px;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.services-mega-item:hover {
+  background: rgba(99, 75, 250, 0.12);
+}
+
+.services-mega-item-title {
+  display: block;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 3px;
+}
+
+.services-mega-item-sub {
+  display: block;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1.4;
+}
+
+.services-mega-viewall {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1EFFE4;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.services-mega-viewall:hover {
+  opacity: 0.85;
+  text-decoration: underline;
+}
+
+/* Mobile services accordion */
+.mobile-services-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mobile-services-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  font-family: inherit;
+  color: inherit;
+}
+
+.mobile-services-panel {
+  padding: 8px 0 16px 12px;
+  border-left: 2px solid rgba(99, 75, 250, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.mobile-services-label {
+  font-family: 'Krona One', sans-serif;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #634BFA;
+  margin: 0 0 10px;
+}
+
+.mobile-services-link {
+  display: block;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.mobile-services-link strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.mobile-services-link span {
+  display: block;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.services-mega-item:not(:has(.services-mega-item-sub)) {
+  padding: 14px 14px;
+}
+
+.services-mega-item:not(:has(.services-mega-item-sub)) .services-mega-item-title {
+  margin-bottom: 0;
+}
+
+.mobile-services-viewall {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1EFFE4;
+  text-decoration: none;
+}
+
+@media (max-width: 1024px) {
+  .desktop-nav {
+    display: none;
+  }
+}
+
+@media (min-width: 1025px) {
+  .desktop-nav {
+    display: block;
+  }
+}
+

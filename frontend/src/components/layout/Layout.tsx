@@ -1,6 +1,7 @@
 import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import ScrollProgressBar from '../common/ScrollProgressBar';
 import { getSiteSettings, type SiteSettings } from '../../services/settingsService';
 import { getSiteSettings as getCmsSiteSettings } from '../../services/cmsService';
 
@@ -42,6 +43,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const bar = announcementBar;
   return (
     <div className="layout-wrapper">
+      <ScrollProgressBar />
       {bar?.enabled && bar.text ? (
         <div
           className="announcement-banner"

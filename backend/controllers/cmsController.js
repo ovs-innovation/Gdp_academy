@@ -87,7 +87,7 @@ const getCMSBySection = async (req, res, next) => {
     const cmsContent = await CMS.find({
       section,
       isActive: true,
-    }).sort({ createdAt: -1 });
+    }).sort({ "content.order": 1, createdAt: 1 });
 
     return res.json(cmsContent);
   } catch (error) {

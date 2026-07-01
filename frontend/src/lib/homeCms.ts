@@ -24,6 +24,6 @@ export function normalizeHomeContent(content: Record<string, unknown> = {}) {
     workshopsSubtitle,
     upcomingWorkshopsTitle: workshopsTitle,
     upcomingWorkshopsSubtitle: workshopsSubtitle,
-    heroCTAButtons: [{ label: ctaText || "GET STARTED", url: ctaUrl }],
+    heroCTAButtons: [{ label: ctaText || "Explore Our Services", url: ctaUrl || "/services" }],
   };
 }

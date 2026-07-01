@@ -1,39 +1,37 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 import Layout from "../components/layout/Layout";
 import SEO from "../components/SEO";
-
-import { getCMSBySection, type CMSContent } from "../services/cmsService";
-import {
-  getSiteSettings,
-  type SiteSettings,
-} from "../services/settingsService";
 import { usePageContent, renderMultiLineHeroTitle } from "../hooks/usePageContent";
+import {
+  EXPLORE_PROGRAMS,
+  SERVICES_MEGA_MENU,
+} from "../lib/servicesMenu";
 
 import "../styles/services.css";
 
 const Services: React.FC = () => {
+  const location = useLocation();
   const { content: pageContent } = usePageContent("services");
   const heroLines = renderMultiLineHeroTitle(pageContent, ["TRAIN.", "PERFORM.", "EVOLVE."]);
   const heroSubtitle =
     (pageContent.heroSubtitle as string) ||
     "Professional dance training designed for every performer.";
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
-  const [cmsServices, setCmsServices] = useState<CMSContent[]>([]);
 
   useEffect(() => {
-    getSiteSettings()
-      .then(setSettings)
-      .catch(() => setSettings(null));
-    getCMSBySection("services")
-      .then((data) => setCmsServices(data || []))
-      .catch((err) => {
-        console.error("Failed to fetch CMS services:", err);
-        setCmsServices([]);
-      });
-  }, []);
+    if (!location.hash) return;
+    const id = location.hash.replace("#", "");
+    const timer = window.setTimeout(() => {
+      const el = document.getElementById(id);
+      if (el) {
+        const top = el.getBoundingClientRect().top + window.scrollY - 100;
+        window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+      }
+    }, 120);
+    return () => window.clearTimeout(timer);
+  }, [location.hash]);
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 40 },
@@ -52,118 +50,13 @@ const Services: React.FC = () => {
     },
   };
 
-  const getLocalizedValue = (
-    val: string | { en: string; [key: string]: string } | undefined | null,
-    fallback: string,
-  ): string => {
-    if (!val) return fallback;
-    if (typeof val === "string") return val;
-    return val.en || Object.values(val)[0] || fallback;
-  };
-
-  const defaultServices = useMemo(
-    () => [
-      {
-        _id: "default-1",
-        key: "hiphop-street-foundations",
-        title: "HIP HOP & STREET FOUNDATIONS",
-        description:
-          "Master street foundations, grooves, and advanced textures in a high-energy environment. Perfect for beginners to advanced dancers looking to perfect their urban styles.",
-        features: [
-          "Rhythm & Bounce Control",
-          "Advanced Texture & Isolation",
-          "Freestyle & Cypher Training",
-        ],
-        imageUrl: "/svc-hiphop.png",
-        glowClass: "purple-glow",
-      },
-      {
-        _id: "default-2",
-        key: "stage-performance-choreography",
-        title: "STAGE PERFORMANCE & CHOREOGRAPHY",
-        description:
-          "Advanced training focused on camera awareness, stage blocking, and live audience impact. Learn complex routines and performance dynamics from elite mentors.",
-        features: [
-          "Masterclass Choreography",
-          "Stage Presence & Blocking",
-          "Commercial Dance Prep",
-        ],
-        imageUrl: "/svc-stage.png",
-        glowClass: "green-glow",
-      },
-      {
-        _id: "default-3",
-        key: "kids-teens-development",
-        title: "KIDS & TEENS DEVELOPMENT",
-        description:
-          "A fun, disciplined structure for young dancers to develop coordination, musicality, and creative expression in a safe and supportive environment.",
-        features: [
-          "Age-Appropriate Routines",
-          "Confidence & Discipline Building",
-          "Biannual Showcase Events",
-        ],
-        imageUrl: "/svc-kids.jpg",
-        glowClass: "purple-glow",
-      },
-      {
-        _id: "default-4",
-        key: "wedding-private-coaching",
-        title: "WEDDING & PRIVATE COACHING",
-        description:
-          "Custom elegant and cinematic choreography to make your special moments unforgettable. One-on-one sessions tailored completely to your song and style.",
-        features: [
-          "Custom Wedding First Dance",
-          "Group Sangeet Choreography",
-          "1-on-1 Private Mentorship",
-        ],
-        imageUrl: "/svc-wedding.jpg",
-        glowClass: "green-glow",
-      },
-    ],
-    [],
-  );
-
-  const servicesToRender = useMemo(() => {
-    return cmsServices && cmsServices.length > 0
-      ? cmsServices.map((svc, index) => {
-          const features = Array.isArray(svc.content?.features)
-            ? svc.content.features
-            : typeof svc.content?.features === "string"
-              ? svc.content.features.split(",").map((f: string) => f.trim())
-              : [];
-
-          return {
-            _id: svc._id,
-            key: svc.key,
-            title: getLocalizedValue(svc.title, ""),
-            description: getLocalizedValue(svc.description, ""),
-            features:
-              features.length > 0
-                ? features
-                : [
-                    "Expert Training",
-                    "Aesthetic Environment",
-                    "Cinematic Mastery",
-                  ],
-            imageUrl:
-              svc.images && svc.images.length > 0
-                ? svc.images[0].url
-                : `/svc-default.png`,
-            glowClass:
-              (svc.content as any)?.glowClass ||
-              (index % 2 === 0 ? "purple-glow" : "green-glow"),
-          };
-        })
-      : defaultServices;
-  }, [cmsServices, defaultServices]);
-
   return (
     <Layout>
       <SEO pageTitle="Services" />
       <div className="services-page-wrapper">
         <section className="svc-hero-section">
-          <div className="svc-hero-bg"></div>
-          <div className="svc-hero-smoke"></div>
+          <div className="svc-hero-bg" />
+          <div className="svc-hero-smoke" />
 
           <div className="container" style={{ zIndex: 2 }}>
             <motion.div
@@ -191,70 +84,6 @@ const Services: React.FC = () => {
           </div>
         </section>
 
-        <section className="svc-detailed-section">
-          <div className="container">
-            <div
-              className="svc-section-header"
-              style={{ textAlign: "center", marginBottom: "80px" }}
-            >
-              <div className="cyber-label" style={{ justifyContent: "center" }}>
-                {settings?.servicesHeroLabel || "OUR PROGRAMS"}
-              </div>
-              <h2 className="section-title">
-                {settings?.servicesTitle || "CORE SERVICES"}
-              </h2>
-            </div>
-
-            <div className="svc-blocks-container">
-              {servicesToRender.map((svc, index) => (
-                <motion.div
-                  key={svc._id || svc.key || index}
-                  className={`svc-block-row ${index % 2 !== 0 ? "reverse" : ""}`}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  transition={{ duration: 0.8 }}
-                >
-                  <div className="svc-block-content">
-                    <div className="svc-block-number">
-                      {String(index + 1).padStart(2, "0")}
-                    </div>
-                    <h3>{svc.title}</h3>
-                    <p>{svc.description}</p>
-                    <ul className="svc-feature-list">
-                      {svc.features.map((feature: string, fIdx: number) => (
-                        <li key={fIdx}>
-                          <span>✦</span> {feature}
-                        </li>
-                      ))}
-                    </ul>
-                    <Link
-                      to={`/services/${svc._id || svc.key}`}
-                      className="svc-btn-glow"
-                      style={{
-                        padding: "16px 32px",
-                        fontSize: "11px",
-                        marginTop: "10px",
-                      }}
-                    >
-                      EXPLORE PROGRAM
-                    </Link>
-                  </div>
-
-                  <div className="svc-block-visual">
-                    <div className={`svc-img-wrapper ${svc.glowClass}`}>
-                      <img
-                        src={svc.imageUrl}
-                        alt={`${svc.title} at GDP Studio`}
-                      />
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         <section className="svc-stats-strip">
           <div className="container">
             <motion.div
@@ -268,17 +97,14 @@ const Services: React.FC = () => {
                 <div className="svc-stat-num">5000+</div>
                 <div className="svc-stat-text">Students</div>
               </motion.div>
-
               <motion.div className="svc-stat-item" variants={fadeInUp}>
                 <div className="svc-stat-num">100+</div>
                 <div className="svc-stat-text">Performances</div>
               </motion.div>
-
               <motion.div className="svc-stat-item" variants={fadeInUp}>
                 <div className="svc-stat-num">20+</div>
                 <div className="svc-stat-text">Trainers</div>
               </motion.div>
-
               <motion.div className="svc-stat-item" variants={fadeInUp}>
                 <div className="svc-stat-num">ALL</div>
                 <div className="svc-stat-text">Age Groups</div>
@@ -287,51 +113,112 @@ const Services: React.FC = () => {
           </div>
         </section>
 
-        <section className="svc-why-gdp">
+        <section id="explore-programs" className="svc-explore-section">
           <div className="container">
-            <motion.h2
-              className="svc-why-title"
-              initial={{ opacity: 0, y: 30 }}
+            <motion.div
+              className="svc-explore-header"
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 0.7 }}
             >
-              WE BUILD PERFORMERS.
-            </motion.h2>
-
-            <motion.div
-              className="svc-why-blocks"
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-100px" }}
-              variants={staggerContainer}
-            >
-              <motion.div className="svc-why-block" variants={fadeInUp}>
-                <div className="svc-why-block-title">Creative Environment</div>
-                <div className="svc-why-block-text">
-                  Train in aesthetic, high-energy studios built to inspire
-                  freedom and individual expression.
-                </div>
-              </motion.div>
-
-              <motion.div className="svc-why-block" variants={fadeInUp}>
-                <div className="svc-why-block-title">Real Stage Experience</div>
-                <div className="svc-why-block-text">
-                  Step beyond the studio. Our programs are engineered to prepare
-                  you for actual industry stages.
-                </div>
-              </motion.div>
-
-              <motion.div className="svc-why-block" variants={fadeInUp}>
-                <div className="svc-why-block-title">Industry Mentorship</div>
-                <div className="svc-why-block-text">
-                  Learn directly from working professionals who bring real-world
-                  choreography and battle experience.
-                </div>
-              </motion.div>
+              <span className="svc-explore-badge">Discover GDP</span>
+              <h2 className="svc-explore-title">
+                What would you like to{" "}
+                <span className="svc-explore-highlight">Explore</span> today?
+              </h2>
             </motion.div>
+
+            <div className="svc-explore-list">
+              {EXPLORE_PROGRAMS.map((item, index) => (
+                <motion.div
+                  key={item.key}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.5, delay: index * 0.06 }}
+                >
+                  <Link to={item.href} className="svc-explore-row">
+                    <span className="svc-explore-num">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="svc-explore-icon">{item.icon}</span>
+                    <div className="svc-explore-copy">
+                      <h3>{item.title}</h3>
+                      <p>{item.subtitle}</p>
+                    </div>
+                    <span className="svc-explore-arrow" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </span>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </section>
+
+        {SERVICES_MEGA_MENU.map((group, groupIndex) => (
+          <section
+            key={group.label}
+            id={group.sectionId}
+            className="svc-wellness-section section-padding"
+          >
+            <div className="container">
+              <motion.div
+                className="svc-explore-header"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7 }}
+              >
+                <span className="svc-explore-badge">{group.label}</span>
+                <h2 className="svc-explore-title">
+                  {groupIndex === 0 ? (
+                    <>
+                      Heal your body.{" "}
+                      <span className="svc-explore-highlight">Learn to dance.</span>
+                    </>
+                  ) : (
+                    <>
+                      Get fit.{" "}
+                      <span className="svc-explore-highlight">Dance it out.</span>
+                    </>
+                  )}
+                </h2>
+              </motion.div>
+
+              <div className="svc-wellness-grid">
+                {group.items.map((item, index) => (
+                  <motion.div
+                    key={item.title}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: "-40px" }}
+                    transition={{ duration: 0.5, delay: index * 0.06 }}
+                  >
+                    <Link to="/contact" className="svc-wellness-card">
+                      {item.image ? (
+                        <img src={item.image} alt="" className="svc-wellness-card-img" />
+                      ) : null}
+                      <div className="svc-wellness-card-body">
+                        <h3>{item.title}</h3>
+                        {item.subtitle ? (
+                          <p className="svc-wellness-dept">{item.subtitle}</p>
+                        ) : null}
+                        {item.tagline ? (
+                          <p className="svc-wellness-tagline">{item.tagline}</p>
+                        ) : null}
+                        <span className="svc-wellness-link">Get in touch →</span>
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+        ))}
 
         <section className="svc-final-cta">
           <div className="container">
@@ -342,8 +229,8 @@ const Services: React.FC = () => {
               transition={{ duration: 0.8 }}
             >
               <h2 className="svc-final-cta-title">START YOUR JOURNEY</h2>
-              <Link to="/signup" className="svc-btn-glow">
-                JOIN THE STUDIO
+              <Link to="/contact" className="svc-btn-glow">
+                CONTACT US
               </Link>
             </motion.div>
           </div>
