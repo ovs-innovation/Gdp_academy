@@ -18,8 +18,8 @@ const DEFAULT_CONTENT: ContactContent = {
   headerTitle: "Get in Touch",
   headerSubtitle: "We love hearing from fellow dancers, prospective students, and collaborators! Reach out for general inquiries, booking details, or customized workshop sessions.",
   address: "123 Creative Rhythm Way, Dance Arts District, New Delhi, India",
-  phone: "+91 98765 43210",
-  email: "hello@gdpstudio.com"
+  phone: "+91 78384 16907",
+  email: "Gdp.info2019@gmail.com"
 };
 
 const Contact: React.FC = () => {
@@ -36,12 +36,14 @@ const Contact: React.FC = () => {
     getPageContentBySlug("contact")
       .then((page) => {
         if (page && page.content) {
+          const loadedPhone = page.content.phone || DEFAULT_CONTENT.phone;
+          const loadedEmail = page.content.email || DEFAULT_CONTENT.email;
           setContent({
             headerTitle: page.content.headerTitle || DEFAULT_CONTENT.headerTitle,
             headerSubtitle: page.content.headerSubtitle || DEFAULT_CONTENT.headerSubtitle,
             address: page.content.address || DEFAULT_CONTENT.address,
-            phone: page.content.phone || DEFAULT_CONTENT.phone,
-            email: page.content.email || DEFAULT_CONTENT.email
+            phone: loadedPhone === "+91 98765 43210" || loadedPhone === "9711384768" ? DEFAULT_CONTENT.phone : loadedPhone,
+            email: loadedEmail === "hello@gdpstudio.com" || loadedEmail === "hello@gdpacademy.com" ? DEFAULT_CONTENT.email : loadedEmail
           });
         }
       })

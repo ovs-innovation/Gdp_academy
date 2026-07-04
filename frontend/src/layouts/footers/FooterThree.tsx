@@ -20,7 +20,7 @@ const FooterThree = () => {
                            <p>201 S. Grand Ave., 1st Floor New York City, NY 28020</p>
                            <ul className="list-wrap">
                               <li><Link to="tel:0123456789">+123 88 9900 456</Link></li>
-                              <li className="email"><Link to="mailto:info@gmail.com">info@gmail.com</Link></li>
+                              <li className="email"><Link to="mailto:Gdp.info2019@gmail.com">Gdp.info2019@gmail.com</Link></li>
                            </ul>
                         </div>
                      </div>

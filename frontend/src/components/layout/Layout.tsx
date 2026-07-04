@@ -39,7 +39,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const whatsappNumber =
     cmsWhatsapp ||
     settings?.whatsappNumber?.replace(/\D/g, "") ||
-    "9711384768";
+    "7838416907";
   const bar = announcementBar;
   return (
     <div className="layout-wrapper">

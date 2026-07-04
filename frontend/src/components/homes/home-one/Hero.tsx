@@ -242,7 +242,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent }) => {
                     width: 100%;
                     max-width: 1200px;
                     display: grid;
-                    grid-template-columns: repeat(4, 1fr);
+                    grid-template-columns: repeat(${parsedStats.length}, 1fr);
                     background: rgba(255, 255, 255, 0.04);
                     border: 1px solid rgba(255, 255, 255, 0.08);
                     border-radius: 16px;
@@ -552,7 +552,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent }) => {
                 </div>
 
                 <div className="hero-social-row">
-                    <a href={`https://wa.me/${propSettings?.whatsappNumber || '9711384768'}`} target="_blank" rel="noopener noreferrer">
+                    <a href={`https://wa.me/${propSettings?.whatsappNumber || '7838416907'}`} target="_blank" rel="noopener noreferrer">
                         <i className="fab fa-whatsapp" style={{ color: '#25D366' }}></i> WhatsApp
                     </a>
                     <a href="https://youtube.com/@garimadanceproductions1146?si=XEMV40bqEVW6JM71" target="_blank" rel="noopener noreferrer">

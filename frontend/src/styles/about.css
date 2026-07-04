@@ -1410,3 +1410,25 @@
   .badge-bottom-left { bottom: -8px; left: 15px; }
   .badge-bottom-right { bottom: -8px; right: 15px; }
 }
+
+@media (max-width: 992px) {
+  .about-pillars-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  .ecosystem-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pillar-card {
+    padding: 30px 20px;
+  }
+  .ecosystem-card {
+    padding: 24px 20px;
+    flex-direction: column;
+    gap: 15px;
+  }
+}

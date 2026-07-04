@@ -32,11 +32,9 @@ export default defineConfig({
   ],
 
   server: {
-    host: "0.0.0.0",
+    host: true,
     port: 3000,
-
-    // Replace this if ngrok gives a new URL
-    allowedHosts: ["grandly-work-gigantic.ngrok-free.dev"],
+    allowedHosts: true,
 
     proxy: {
       '/api': {

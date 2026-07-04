@@ -98,3 +98,9 @@
   color: var(--primary-color);
   font-weight: 700;
 }
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 30px 16px;
+  }
+}

@@ -8,7 +8,7 @@ const HeaderTopThree = () => {
                <div className="col-lg-6">
                   <ul className="tg-header__top-info list-wrap">
                      <li><img src="/assets/img/icons/map_marker.svg" alt="Icon" /> <span>New Delhi, India</span></li>
-                     <li><img src="/assets/img/icons/map_marker.svg" alt="Icon" /> <a href="mailto:hello@gdpstudio.com">hello@gdpstudio.com</a></li>
+                     <li><img src="/assets/img/icons/map_marker.svg" alt="Icon" /> <a href="mailto:Gdp.info2019@gmail.com">Gdp.info2019@gmail.com</a></li>
                   </ul>
                </div>
                <div className="col-lg-6">

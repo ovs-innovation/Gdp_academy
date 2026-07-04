@@ -1648,7 +1648,11 @@ textarea.gdp-form-input {
   margin-bottom: 28px;
 }
 
-@media (max-width: 768px) {
+.gdp-mobile-toggle {
+  display: none;
+}
+
+@media (max-width: 992px) {
   .gdp-mobile-toggle {
     display: flex;
     align-items: center;

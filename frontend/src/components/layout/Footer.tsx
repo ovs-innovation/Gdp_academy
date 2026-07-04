@@ -25,7 +25,7 @@ const Footer: React.FC = () => {
   const defaultSocialLinks = [
     { platform: 'Instagram', url: 'https://www.instagram.com/gdp_garimadanceproductions?igsh=MWhueGpqZGQzZGN0ZA==' },
     { platform: 'YouTube', url: 'https://youtube.com/@garimadanceproductions1146?si=XEMV40bqEVW6JM71' },
-    { platform: 'WhatsApp', url: 'https://wa.me/919711384768' },
+    { platform: 'WhatsApp', url: 'https://wa.me/917838416907' },
   ];
   const defaultFooterLinks = [
     { label: 'Home', href: '/' },
@@ -62,8 +62,15 @@ const Footer: React.FC = () => {
   const address =
     contactPage?.content?.address ||
     'K-6, near SANDISH MEDICAL, Sector-12, Block-K, Pratap Vihar, Ghaziabad, Uttar Pradesh 201009';
-  const phone = contactPage?.content?.phone || '9711384768';
-  const email = contactPage?.content?.email || 'Garima@productions.com';
+  const rawPhone = contactPage?.content?.phone || '';
+  const phone = rawPhone === '9711384768' || rawPhone === '+91 98765 43210' || !rawPhone
+    ? '+91 78384 16907'
+    : rawPhone;
+
+  const rawEmail = contactPage?.content?.email || '';
+  const email = rawEmail === 'Garima@productions.com' || rawEmail === 'hello@gdpstudio.com' || !rawEmail
+    ? 'Gdp.info2019@gmail.com'
+    : rawEmail;
 
   return (
     <footer className="footer">

@@ -12,7 +12,7 @@ const HeaderTopOne = ({ style }: HeaderTopOneProps) => {
                <div className="col-lg-6">
                   {/* <ul className="tg-header__top-info list-wrap">
                      <li><img src="/assets/img/icons/map_marker.svg" alt="Icon" /> <span>{t('footer.address')}</span></li>
-                     <li><img src="/assets/img/icons/envelope.svg" alt="Icon" /> <Link to="mailto:hello@gdpstudio.com">hello@gdpstudio.com</Link></li>
+                     <li><img src="/assets/img/icons/envelope.svg" alt="Icon" /> <Link to="mailto:Gdp.info2019@gmail.com">Gdp.info2019@gmail.com</Link></li>
                   </ul> */}
                </div>
                <div className="col-lg-6">

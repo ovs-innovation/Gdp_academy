@@ -37,7 +37,7 @@
   display: flex;
   flex-direction: column;
   line-height: 1.1;
-  font-family: 'Krona One', sans-serif;
+  font-family: "Krona One", sans-serif;
   margin-left: -6px;
 }
 .site-text span {
@@ -60,13 +60,14 @@
   color: #fff;
   text-decoration: none;
   font-size: 14px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 600;
   transition: var(--transition-smooth);
   opacity: 0.85;
 }
 
-.nav-link:hover, .nav-link.active {
+.nav-link:hover,
+.nav-link.active {
   opacity: 1;
 }
 
@@ -77,13 +78,13 @@
 }
 
 .contact-btn {
-  background: #634BFA; /* Solid purple as requested */
+  background: #634bfa; /* Solid purple as requested */
   color: white !important;
   padding: 10px 24px;
   border-radius: 10px;
   text-decoration: none;
   font-size: 14px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 600;
   transition: var(--transition-smooth);
   box-shadow: 0 4px 15px rgba(99, 75, 250, 0.3);
@@ -107,14 +108,12 @@
   margin-left: 10px;
 }
 
-
 .join-btn {
   font-size: 11px;
   padding: 10px 24px;
   border-radius: 12px;
   background: var(--primary-color);
 }
-
 
 .mobile-toggle {
   display: none;
@@ -129,10 +128,11 @@
 }
 
 @media (max-width: 1024px) {
-  .nav-list, .login-link {
+  .nav-list,
+  .login-link {
     display: none;
   }
-  
+
   .mobile-toggle {
     display: block;
   }
@@ -145,17 +145,21 @@
   width: 100%;
   height: 100vh;
   background: #060606;
-  padding: 100px 40px;
+  padding: 100px 40px 60px 40px;
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  align-items: center;
+  text-align: center;
+  gap: 28px;
   z-index: 999;
+  overflow-y: auto;
 }
 
 .mobile-menu .nav-link {
-  font-size: 20px;
-  font-weight: 400;
+  font-size: 18px;
+  font-weight: 500;
   text-transform: uppercase;
+  width: 100%;
 }
 
 /* ================= Services Mega Menu ================= */
@@ -174,7 +178,7 @@
   gap: 6px;
   padding: 12px 4px;
   margin: -12px -4px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 14px;
   font-weight: 600;
   color: #fff;
@@ -189,7 +193,7 @@
 .nav-item-services.open .nav-link-services,
 .nav-item-services.active .nav-link-services {
   opacity: 1;
-  color: #1EFFE4;
+  color: #1effe4;
 }
 
 .nav-chevron {
@@ -213,7 +217,7 @@
 }
 
 .services-mega-wrap::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -24px;
@@ -240,11 +244,11 @@
 }
 
 .services-mega-label {
-  font-family: 'Krona One', sans-serif;
+  font-family: "Krona One", sans-serif;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.8px;
-  color: #634BFA;
+  color: #634bfa;
   margin: 0 0 16px;
 }
 
@@ -271,7 +275,7 @@
 
 .services-mega-item-title {
   display: block;
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-size: 14px;
   font-weight: 700;
   color: #fff;
@@ -290,7 +294,7 @@
   margin-top: 14px;
   font-size: 13px;
   font-weight: 600;
-  color: #1EFFE4;
+  color: #1effe4;
   text-decoration: none;
   transition: opacity 0.2s;
 }
@@ -308,69 +312,77 @@
 }
 
 .mobile-services-toggle {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   background: none;
   border: none;
-  cursor: pointer;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
   padding: 0;
   font-family: inherit;
   color: inherit;
+  width: 100%;
 }
 
 .mobile-services-panel {
-  padding: 8px 0 16px 12px;
-  border-left: 2px solid rgba(99, 75, 250, 0.35);
+  padding: 8px 0;
+  border-left: none;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  align-items: center;
+  gap: 12px;
 }
 
 .mobile-services-label {
-  font-family: 'Krona One', sans-serif;
+  font-family: "Krona One", sans-serif;
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 1px;
-  color: #634BFA;
-  margin: 0 0 10px;
+  color: #634bfa;
+  margin: 0 0 8px;
 }
 
 .mobile-services-link {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   text-decoration: none;
   color: rgba(255, 255, 255, 0.85);
-  padding: 10px 0;
+  padding: 6px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  width: 100%;
+  max-width: 280px;
 }
 
 .mobile-services-link strong {
   display: block;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
+  text-align: left;
 }
 
 .mobile-services-link span {
   display: block;
-  font-size: 12px;
+  font-size: 11px;
   color: rgba(255, 255, 255, 0.45);
+  text-align: left;
 }
 
 .services-mega-item:not(:has(.services-mega-item-sub)) {
   padding: 14px 14px;
 }
 
-.services-mega-item:not(:has(.services-mega-item-sub)) .services-mega-item-title {
+.services-mega-item:not(:has(.services-mega-item-sub))
+  .services-mega-item-title {
   margin-bottom: 0;
 }
 
 .mobile-services-viewall {
   font-size: 13px;
   font-weight: 600;
-  color: #1EFFE4;
+  color: #1effe4;
   text-decoration: none;
 }
 
@@ -386,3 +398,39 @@
   }
 }
 
+@media (max-width: 768px) {
+  .header {
+    padding: 6px 0;
+  }
+  .logo-container {
+    margin-left: 0;
+    gap: 4px;
+  }
+  .site-logo {
+    height: 48px;
+  }
+  .site-text span {
+    font-size: 8px;
+    letter-spacing: 0.6px;
+  }
+  .header-actions {
+    gap: 10px;
+  }
+  .contact-btn {
+    padding: 8px 14px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+  .mobile-toggle {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+  }
+  .toggle-icon {
+    font-size: 24px;
+    line-height: 1;
+  }
+}

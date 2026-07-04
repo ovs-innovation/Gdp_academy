@@ -432,7 +432,7 @@ const FaqArea = () => {
                 desc="Prefer email? Send us your query and we'll get back to you within 24 hours."
                 btnLabel="Send Email"
                 btnColor="#3b82f6"
-                href="mailto:hello@gdpstudio.com"
+                href="mailto:Gdp.info2019@gmail.com"
               />
             </div>
           </div>

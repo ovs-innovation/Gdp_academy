@@ -21,8 +21,9 @@ const backendTarget = getBackendTarget();
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
   server: {
-    host: "::",
+    host: true,
     port: 8080,
+    allowedHosts: true,
     proxy: {
       "/api": {
         target: backendTarget,

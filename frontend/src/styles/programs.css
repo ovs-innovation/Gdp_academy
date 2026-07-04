@@ -530,3 +530,10 @@
     text-align: center;
   }
 }
+
+@media (max-width: 480px) {
+  .prog-hero-title {
+    font-size: 32px;
+    letter-spacing: -1.5px;
+  }
+}

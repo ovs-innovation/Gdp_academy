@@ -1112,6 +1112,26 @@
   }
 }
 
+@media (max-width: 480px) {
+  .reviews-v3-carousel-item {
+    flex: 0 0 100%;
+  }
+
+  .reviews-v3-carousel-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+  }
+
+  .reviews-v3-carousel-btn--prev {
+    left: 4px;
+  }
+
+  .reviews-v3-carousel-btn--next {
+    right: 4px;
+  }
+}
+
 @media (max-width: 600px) {
   .services-v2-grid {
     gap: 32px 24px;
@@ -3104,5 +3124,19 @@
   background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.4) 100%);
   z-index: 2;
   pointer-events: none;
+}
+
+@media (max-width: 992px) {
+  .contact-v3-body {
+    grid-template-columns: 1fr;
+    gap: 36px;
+    max-width: 560px;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-v3-form-card {
+    padding: 24px 16px;
+  }
 }
 

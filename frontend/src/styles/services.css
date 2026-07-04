@@ -615,9 +615,23 @@
 }
 
 @media (max-width: 768px) {
+  .svc-hero-section {
+    padding: 80px 16px 40px;
+    min-height: auto;
+  }
+  .svc-explore-section {
+    padding: 60px 0;
+  }
+  .svc-wellness-section {
+    padding: 60px 0;
+  }
+  .svc-final-cta {
+    padding: 60px 0;
+  }
   .svc-stat-item {
     flex: 1 1 50%;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 30px 10px;
   }
   .svc-stat-item:nth-child(2) {
     border-right: none;
@@ -627,5 +641,12 @@
     top: -40px;
     left: 50%;
     transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 480px) {
+  .svc-hero-title {
+    font-size: 32px;
+    letter-spacing: -1.5px;
   }
 }

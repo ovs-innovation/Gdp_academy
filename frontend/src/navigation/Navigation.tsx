@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import AppPreloader from '../components/common/AppPreloader';
 import { routeConfig, prefetchAllRoutes } from './routeConfig';
 
@@ -13,6 +13,16 @@ const HydrationMarker: React.FC = () => {
   useEffect(() => {
     appHasRenderedOnce = true;
   }, []);
+  return null;
+};
+
+const ScrollToTopOnNavigate: React.FC = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
   return null;
 };
 
@@ -45,6 +55,7 @@ const AppNavigation: React.FC = () => {
   return (
     <Suspense fallback={<RouteFallback />}>
       <HydrationMarker />
+      <ScrollToTopOnNavigate />
       <Routes>
         {routeConfig.map((route, idx) => (
           <Route key={idx} path={route.path} element={route.element} />

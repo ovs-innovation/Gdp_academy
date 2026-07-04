@@ -696,8 +696,6 @@ const Home: React.FC = () => {
         </AnimatePresence>
       </section>
 
-      <WhyChooseGDPSection />
-
       <YouTubeShortsSection
         shorts={youtubeShorts}
         channel={youtubeChannel}
@@ -878,6 +876,8 @@ const Home: React.FC = () => {
         </div>
       </section>
 
+      <WhyChooseGDPSection />
+
       <ReviewsSection
         subtitle={testimonialsSubtitle}
         googleRating={googleRating}
@@ -935,7 +935,7 @@ const Home: React.FC = () => {
               <h3>Can&apos;t find what you&apos;re looking for?</h3>
               <p>Reach out on WhatsApp — we&apos;ll help you pick the right class or program.</p>
               <a
-                href={`https://wa.me/${settings?.whatsappNumber || '1234567890'}`}
+                href={`https://wa.me/${settings?.whatsappNumber || '7838416907'}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="faq-v3-cta-btn"
@@ -971,7 +971,7 @@ const Home: React.FC = () => {
                 {homeContent.contactSectionText || 'We are Garima Dance Productions, helping all dance enthusiasts to live up to their dream'}
               </p>
               <a
-                href={`https://wa.me/${settings?.whatsappNumber || '9876543210'}`}
+                href={`https://wa.me/${settings?.whatsappNumber || '7838416907'}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="contact-v3-wa-btn"

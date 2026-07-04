@@ -17,7 +17,7 @@ const ContactArea = () => {
                                     </div>
                                     <div className="content">
                                         <h5 className="mb-1" style={{ fontWeight: 700 }}>Student Support</h5>
-                                        <a href="mailto:support@gdpstudio.com" className="text-primary fw-bold" style={{ textDecoration: 'none' }}>support@gdpstudio.com</a>
+                                        <a href="mailto:Gdp.info2019@gmail.com" className="text-primary fw-bold" style={{ textDecoration: 'none' }}>Gdp.info2019@gmail.com</a>
                                         <p className="small opacity-60 m-0 mt-1">24/7 Training Assistance</p>
                                     </div>
                                 </div>
@@ -28,7 +28,7 @@ const ContactArea = () => {
                                     </div>
                                     <div className="content">
                                         <h5 className="mb-1" style={{ fontWeight: 700 }}>Studio Support</h5>
-                                        <a href="mailto:info@gdpstudio.com" className="text-primary fw-bold" style={{ textDecoration: 'none' }}>info@gdpstudio.com</a>
+                                        <a href="mailto:Gdp.info2019@gmail.com" className="text-primary fw-bold" style={{ textDecoration: 'none' }}>Gdp.info2019@gmail.com</a>
                                         <p className="small opacity-60 m-0 mt-1">General inquiries & administration</p>
                                     </div>
                                 </div>
@@ -39,7 +39,7 @@ const ContactArea = () => {
                                     </div>
                                     <div className="content">
                                         <h5 className="mb-1" style={{ fontWeight: 700 }}>Partnerships</h5>
-                                        <a href="mailto:partnerships@gdpstudio.com" className="text-primary fw-bold" style={{ textDecoration: 'none' }}>partnerships@gdpstudio.com</a>
+                                        <a href="mailto:Gdp.info2019@gmail.com" className="text-primary fw-bold" style={{ textDecoration: 'none' }}>Gdp.info2019@gmail.com</a>
                                         <p className="small opacity-60 m-0 mt-1">Corporate & Studio Collabs</p>
                                     </div>
                                 </div>

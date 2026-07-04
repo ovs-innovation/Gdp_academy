@@ -133,6 +133,11 @@
     padding-bottom: 40px;
   }
 
+  .workshops-hero .section-title {
+    font-size: 32px;
+    letter-spacing: -1.5px;
+  }
+
   .workshops-hero .container {
     padding-top: 12px;
   }

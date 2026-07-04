@@ -15,7 +15,7 @@ const LoginPage = () => {
   const [searchParams] = useSearchParams();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState('admin@gdpstudio.com');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [otp, setOtp] = useState('');
   const [requiresOTP, setRequiresOTP] = useState(false);
@@ -363,13 +363,7 @@ const LoginPage = () => {
               )}
             </form>
 
-            {!requiresOTP && !forgotMode && (
-              <div className="admin-login-note">
-                Default admin: <strong>admin@gdpstudio.com</strong> / <strong>adminpassword</strong>
-                <br />
-                Backend must be running on port <strong>8096</strong>.
-              </div>
-            )}
+
           </div>
         </main>
       </div>

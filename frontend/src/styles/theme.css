@@ -93,6 +93,12 @@ button {
   padding: 100px 0;
 }
 
+@media (max-width: 768px) {
+  .section-padding {
+    padding: 50px 0;
+  }
+}
+
 .container {
   max-width: 1320px;
   margin: 0 auto;

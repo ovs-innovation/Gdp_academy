@@ -15,7 +15,7 @@ const Social = () => {
             </Link>
          </li>
          <li>
-            <Link to="https://wa.me/919711384768" target="_blank">
+            <Link to="https://wa.me/917838416907" target="_blank">
                <InjectableSvg src="/assets/img/icons/whatsapp.svg" alt="img" className="injectable" />
             </Link>
          </li>
