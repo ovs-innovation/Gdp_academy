@@ -65,6 +65,19 @@ if (!fs.existsSync(uploadsPath)) {
 }
 app.use("/uploads", express.static(uploadsPath));
 
+app.get("/", (req, res) => {
+  res.status(200).send("GDP Backend API is running!");
+});
+
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "UP",
+    service: "GDP Backend",
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
+});
+
 app.get("/api/health", (_req, res) => {
   const db = getDbHealth();
   const status = db.ok ? 200 : 503;
