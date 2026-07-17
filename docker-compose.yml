@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  frontend:
+    build: ./frontend
+    container_name: gdp_frontend
+    restart: always
+    ports:
+      - "3040:80" # Maps VPS port 3040 to Nginx port 80 in container
+    env_file:
+      - ./frontend/.env
+
+  backend:
+    build: ./backend
+    container_name: gdp_backend
+    restart: always
+    ports:
+      - "3041:8096" # Maps VPS port 3041 to backend port 8096
+    env_file:
+      - ./backend/.env
+
+  admin:
+    build: ./admin
+    container_name: gdp_admin
+    restart: always
+    ports:
+      - "3042:80" # Maps VPS port 3042 to Nginx port 80 in container
+    env_file:
+      - ./admin/.env
