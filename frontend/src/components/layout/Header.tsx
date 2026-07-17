@@ -109,10 +109,13 @@ const Header: React.FC = () => {
         if (cmsServices && cmsServices.length > 0) {
           mapped = cmsServices
             .filter(
-              (svc: { key?: string; title?: { en?: string } | string }) =>
+              (svc: { key?: string; title?: unknown; description?: unknown }) =>
                 !isExcludedService({
                   key: svc.key,
-                  title: getLocalizedValue(svc.title, ""),
+                  title: getLocalizedValue(
+                    svc.title as string | { en: string; [key: string]: string } | null | undefined,
+                    "",
+                  ),
                 }),
             )
             .map((svc: any, index: number) => ({
