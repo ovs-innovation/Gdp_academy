@@ -1,4 +1,10 @@
 import type { ReactNode } from "react";
+import {
+  getServiceIcon,
+  OnlineComboFitnessIcon,
+  OnlineDanceClassesIcon,
+  WeddingChoreographyIcon,
+} from "../components/home/ServiceIcons";
 
 export type ServicesMenuItem = {
   title: string;
@@ -93,48 +99,23 @@ export const EXPLORE_PROGRAMS: {
     title: "Wedding Choreography",
     subtitle: "Virtual & In-Person Services Worldwide",
     href: "/contact",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-        <circle cx="12" cy="5" r="2.2" />
-        <path d="M8 21l2.5-7.5M16 21l-2.5-7.5M9.5 10.5l2.5 4 2.5-4" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
+    icon: <WeddingChoreographyIcon />,
   },
   {
     key: "online-dance-classes",
     title: "Online Dance Classes",
     subtitle: "Live Interactive Zoom Classes",
     href: "/contact",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-        <rect x="7" y="3" width="10" height="18" rx="2" />
-        <path d="M10 18h4" strokeLinecap="round" />
-      </svg>
-    ),
+    icon: <OnlineDanceClassesIcon />,
   },
   {
     key: "pre-recorded-courses",
     title: "Pre-Recorded Dance Courses",
     subtitle: "Learn At Your Own Pace",
     href: "/contact",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-        <circle cx="12" cy="12" r="8.5" />
-        <path d="M10.2 8.8v6.4L15.8 12z" fill="currentColor" stroke="none" />
-      </svg>
-    ),
-  },
-  {
-    key: "kids-teens-programs",
-    title: "Kids & Teens Programs",
-    subtitle: "Confidence & Creative Expression",
-    href: "/contact",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-        <circle cx="9" cy="7" r="2.2" />
-        <circle cx="15" cy="7" r="2.2" />
-        <path d="M6 20c.5-3 2-5 3-5s2.5 2 3 5M12 20c.5-3 2-5 3-5s2.5 2 3 5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
+    icon: <OnlineComboFitnessIcon />,
   },
 ];
+
+/** Resolve icon for CMS-driven or dynamic service entries */
+export { getServiceIcon };

@@ -11,11 +11,17 @@ import LazyVideo from '../components/common/LazyVideo';
 import FormResultModal, { type FormResultType } from '../components/common/FormResultModal';
 import Hero from '../components/homes/home-one/Hero';
 import YouTubeShortsSection from '../components/home/YouTubeShortsSection';
-import WhyChooseGDPSection from '../components/home/WhyChooseGDPSection';
+import HomeStatsBar from '../components/home/HomeStatsBar';
 import ReviewsSection from '../components/home/ReviewsSection';
 import { useScrollToHash } from '../hooks/useScrollToHash';
 import HomeMediaMarquee from '../components/home/HomeMediaMarquee';
 import MediaProfileAvatar from '../components/home/MediaProfileAvatar';
+import {
+  HomeFaqSkeleton,
+  HomeMediaSkeleton,
+  HomeReviewsSkeleton,
+  HomeServicesSkeleton,
+} from '../components/home/HomeSkeletons';
 import { normalizeShortsList, normalizeVideoSource } from '../utils/mediaUrl';
 import {
   DEFAULT_INSTAGRAM_PROFILE_URL,
@@ -26,7 +32,8 @@ import {
 import SEO from '../components/SEO';
 import '../styles/home.css';
 import { normalizeHomeContent } from '../lib/homeCms';
-import { DEFAULT_SERVICES, HOME_SERVICE_IMAGE_BY_KEY } from '../lib/defaultServices';
+import { DEFAULT_SERVICES, HOME_SERVICE_IMAGE_BY_KEY, isExcludedService } from '../lib/defaultServices';
+import { getServiceIcon } from '../components/home/ServiceIcons';
 
 interface HomeContent {
   aboutShortTitle: string;
@@ -225,14 +232,21 @@ const buildHomeServices = (
   cmsServices: CMSContent[],
   defaults: ReturnType<typeof mapCmsServiceToHomeCard>[],
 ) => {
-  if (!cmsServices?.length) return defaults;
+  const filteredDefaults = defaults.filter(
+    (s) => !isExcludedService({ key: s.key, title: s.title }),
+  );
 
-  const mapped = cmsServices.map(mapCmsServiceToHomeCard);
-  if (mapped.length >= 4) return mapped.slice(0, 4);
+  if (!cmsServices?.length) return filteredDefaults;
+
+  const mapped = cmsServices
+    .map(mapCmsServiceToHomeCard)
+    .filter((s) => !isExcludedService({ key: s.key, title: s.title }));
+
+  if (mapped.length >= 3) return mapped.slice(0, 3);
 
   const usedTitles = new Set(mapped.map((s) => s.title.toLowerCase()));
-  const fillers = defaults.filter((d) => !usedTitles.has(d.title.toLowerCase()));
-  return [...mapped, ...fillers].slice(0, 4);
+  const fillers = filteredDefaults.filter((d) => !usedTitles.has(d.title.toLowerCase()));
+  return [...mapped, ...fillers].slice(0, 3);
 };
 
 const Home: React.FC = () => {
@@ -246,6 +260,14 @@ const Home: React.FC = () => {
   const [featuredTestimonials, setFeaturedTestimonials] = useState<Testimonial[]>([]);
   const [enquiryForm, setEnquiryForm] = useState({ name: '', phone: '', email: '', message: '', whatsappConsent: false });
   const [isEnquirySubmitting, setIsEnquirySubmitting] = useState(false);
+  /** Per-section ready flags — show skeletons until each fetch settles (no static→dynamic flash). */
+  const [sectionReady, setSectionReady] = useState({
+    home: false,
+    settings: false,
+    services: false,
+    faqs: false,
+    testimonials: false,
+  });
   const [formModal, setFormModal] = useState<{
     open: boolean;
     type: FormResultType;
@@ -257,8 +279,13 @@ const Home: React.FC = () => {
     setFormModal({ open: true, type, title, message });
   };
 
+  const homeCopyReady = sectionReady.home && sectionReady.settings;
+
   useEffect(() => {
-    getSiteSettings().then(setSettings);
+    getSiteSettings()
+      .then(setSettings)
+      .catch(() => {})
+      .finally(() => setSectionReady((s) => ({ ...s, settings: true })));
 
     getFeaturedTestimonials(6)
       .then((data) => {
@@ -266,15 +293,17 @@ const Home: React.FC = () => {
           setFeaturedTestimonials(data);
         }
       })
-      .catch(() => {});
-    
+      .catch(() => {})
+      .finally(() => setSectionReady((s) => ({ ...s, testimonials: true })));
+
     getPageContentBySlug('home')
       .then((page) => {
         if (page && page.content) {
           setHomeContent(normalizeHomeContent(page.content));
         }
       })
-      .catch(() => setHomeContent(DEFAULT_HOME_CONTENT));
+      .catch(() => setHomeContent(DEFAULT_HOME_CONTENT))
+      .finally(() => setSectionReady((s) => ({ ...s, home: true })));
 
     getCMSBySection('services')
       .then((data) => {
@@ -282,7 +311,8 @@ const Home: React.FC = () => {
           setCmsServices(data);
         }
       })
-      .catch((err) => console.error("Error loading services for home:", err));
+      .catch((err) => console.error("Error loading services for home:", err))
+      .finally(() => setSectionReady((s) => ({ ...s, services: true })));
 
     getFAQs()
       .then((data) => {
@@ -292,7 +322,8 @@ const Home: React.FC = () => {
           setFaqs(DEFAULT_FAQS);
         }
       })
-      .catch(() => setFaqs(DEFAULT_FAQS));
+      .catch(() => setFaqs(DEFAULT_FAQS))
+      .finally(() => setSectionReady((s) => ({ ...s, faqs: true })));
   }, []);
 
   const handleEnquiryChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -381,11 +412,13 @@ const Home: React.FC = () => {
   }));
 
   const normalizedYoutubeShorts = normalizeShortsList(homeContent.youtubeShorts);
-  const youtubeShorts = padHomeMediaRow(
-    normalizedYoutubeShorts.length > 0 ? normalizedYoutubeShorts : DEFAULT_YOUTUBE_SHORTS,
-    DEFAULT_YOUTUBE_SHORTS,
-    HOME_MEDIA_ROW_COUNT,
-  );
+  const youtubeShorts = homeCopyReady
+    ? padHomeMediaRow(
+        normalizedYoutubeShorts.length > 0 ? normalizedYoutubeShorts : DEFAULT_YOUTUBE_SHORTS,
+        DEFAULT_YOUTUBE_SHORTS,
+        HOME_MEDIA_ROW_COUNT,
+      )
+    : [];
 
   const youtubeChannel = homeContent.youtubeChannel || DEFAULT_YOUTUBE_CHANNEL;
   const youtubeChannelUrl = resolveYoutubeChannelUrl(
@@ -403,11 +436,13 @@ const Home: React.FC = () => {
       comments: item?.comments || '',
     }))
     .filter((item) => Boolean(item.vid));
-  const instagramPosts = padHomeMediaRow(
-    normalizedInstagram.length > 0 ? normalizedInstagram : DEFAULT_INSTAGRAM_POSTS,
-    DEFAULT_INSTAGRAM_POSTS,
-    HOME_MEDIA_ROW_COUNT,
-  );
+  const instagramPosts = homeCopyReady
+    ? padHomeMediaRow(
+        normalizedInstagram.length > 0 ? normalizedInstagram : DEFAULT_INSTAGRAM_POSTS,
+        DEFAULT_INSTAGRAM_POSTS,
+        HOME_MEDIA_ROW_COUNT,
+      )
+    : [];
 
   const instagramHandle = homeContent.instagramHandle || '@GarimadanceProductions';
   const instagramChannelUrl = resolveInstagramProfileUrl(
@@ -419,8 +454,11 @@ const Home: React.FC = () => {
   const aboutYoutubeId = homeContent.aboutYoutubeId || DEFAULT_ABOUT_YOUTUBE_ID;
   const heroYoutubeId = homeContent.heroYoutubeId || DEFAULT_HERO_YOUTUBE_ID;
 
-  const videoTestimonials =
-    homeContent.videoTestimonials?.length > 0 ? homeContent.videoTestimonials : DEFAULT_VIDEO_TESTIMONIALS;
+  const videoTestimonials = homeCopyReady
+    ? homeContent.videoTestimonials?.length > 0
+      ? homeContent.videoTestimonials
+      : DEFAULT_VIDEO_TESTIMONIALS
+    : [];
 
   const testimonialsSubtitle =
     homeContent.testimonialsSubtitle || DEFAULT_TESTIMONIALS_SUBTITLE;
@@ -436,6 +474,7 @@ const Home: React.FC = () => {
   });
 
   const googleReviewCards: GoogleReviewCard[] = (() => {
+    if (!sectionReady.testimonials) return [];
     if (featuredTestimonials.length === 0) return DEFAULT_GOOGLE_REVIEWS;
     const mapped = featuredTestimonials.slice(0, 5).map(mapTestimonialToReview);
     while (mapped.length < 3) {
@@ -444,13 +483,17 @@ const Home: React.FC = () => {
     return mapped;
   })();
 
-  const servicesToRender = buildHomeServices(cmsServices, defaultServices);
+  const servicesToRender = sectionReady.services
+    ? buildHomeServices(cmsServices, defaultServices)
+    : [];
 
   const [isMuted, setIsMuted] = useState(true);
   const [isTheaterMode, setIsTheaterMode] = useState(false);
   const playerRef = useRef<any>(null);
 
   useEffect(() => {
+    if (!homeCopyReady) return;
+
     // Load YouTube API
     if (!(window as any).YT) {
       const tag = document.createElement('script');
@@ -461,57 +504,64 @@ const Home: React.FC = () => {
 
     const initPlayer = () => {
       // About Player
-      new (window as any).YT.Player('about-video-player', {
-        videoId: aboutYoutubeId,
-        playerVars: {
-          autoplay: 1,
-          mute: 1,
-          controls: 0,
-          loop: 1,
-          playlist: aboutYoutubeId,
-          modestbranding: 1,
-          rel: 0,
-          showinfo: 0,
-          iv_load_policy: 3,
-          origin: window.location.origin,
-          vq: 'hd1080'
-        },
-        events: {
-          onReady: (event: any) => {
-            playerRef.current = event.target;
-            event.target.playVideo();
+      if (document.getElementById('about-video-player') && !(document.getElementById('about-video-player') as HTMLElement)?.dataset?.ytReady) {
+        new (window as any).YT.Player('about-video-player', {
+          videoId: aboutYoutubeId,
+          playerVars: {
+            autoplay: 1,
+            mute: 1,
+            controls: 0,
+            loop: 1,
+            playlist: aboutYoutubeId,
+            modestbranding: 1,
+            rel: 0,
+            showinfo: 0,
+            iv_load_policy: 3,
+            origin: window.location.origin,
+            vq: 'hd1080'
+          },
+          events: {
+            onReady: (event: any) => {
+              const el = document.getElementById('about-video-player');
+              if (el) el.dataset.ytReady = '1';
+              playerRef.current = event.target;
+              event.target.playVideo();
+            }
           }
-        }
-      });
+        });
+      }
 
       // Hero Player
-      new (window as any).YT.Player('hero-video-player', {
-        videoId: heroYoutubeId,
-        playerVars: {
-          autoplay: 1,
-          mute: 1,
-          controls: 0,
-          loop: 1,
-          playlist: heroYoutubeId,
-          modestbranding: 1,
-          rel: 0,
-          showinfo: 0,
-          iv_load_policy: 3,
-          origin: window.location.origin,
-          vq: 'hd1080'
-        },
-        events: {
-          onReady: (event: any) => {
-            event.target.playVideo();
-            // Custom smooth loop for 42 seconds
-            setInterval(() => {
-              if (event.target.getCurrentTime() >= 42) {
-                event.target.seekTo(0);
-              }
-            }, 200);
+      if (document.getElementById('hero-video-player') && !(document.getElementById('hero-video-player') as HTMLElement)?.dataset?.ytReady) {
+        new (window as any).YT.Player('hero-video-player', {
+          videoId: heroYoutubeId,
+          playerVars: {
+            autoplay: 1,
+            mute: 1,
+            controls: 0,
+            loop: 1,
+            playlist: heroYoutubeId,
+            modestbranding: 1,
+            rel: 0,
+            showinfo: 0,
+            iv_load_policy: 3,
+            origin: window.location.origin,
+            vq: 'hd1080'
+          },
+          events: {
+            onReady: (event: any) => {
+              const el = document.getElementById('hero-video-player');
+              if (el) el.dataset.ytReady = '1';
+              event.target.playVideo();
+              setInterval(() => {
+                if (event.target.getCurrentTime() >= 42) {
+                  event.target.seekTo(0);
+                }
+              }, 200);
+            }
           }
-        }
-      });
+        });
+      }
     };
 
     (window as any).onYouTubeIframeAPIReady = initPlayer;
@@ -519,7 +569,7 @@ const Home: React.FC = () => {
     if ((window as any).YT && (window as any).YT.Player) {
       initPlayer();
     }
-  }, [aboutYoutubeId, heroYoutubeId]);
+  }, [homeCopyReady, aboutYoutubeId, heroYoutubeId]);
 
   const toggleMute = () => {
     if (playerRef.current) {
@@ -540,21 +590,40 @@ const Home: React.FC = () => {
         path="/"
       />
       {/* 1. Hero Section */}
-      <Hero settings={settings} homeContent={homeContent} />
+      <Hero settings={settings} homeContent={homeContent} contentReady={homeCopyReady} />
+
+      <HomeStatsBar stats={homeCopyReady ? homeContent.homeStats : undefined} />
 
       {/* 2. Services Section */}
       <section className="services-section section-padding">
         <div className="container">
           <div className="services-section-header">
-            <h2 className="section-title">{homeContent.servicesTitle || settings?.servicesTitle || 'Services'}</h2>
-            <p className="section-desc">{homeContent.servicesSubtitle || settings?.servicesSubtitle || 'Experience the ultimate dance training ecosystem.'}</p>
+            {!homeCopyReady ? (
+              <>
+                <div className="home-skel" style={{ height: 36, width: 180, margin: '0 auto 12px' }} />
+                <div className="home-skel" style={{ height: 16, width: '70%', maxWidth: 420, margin: '0 auto' }} />
+              </>
+            ) : (
+              <>
+                <h2 className="section-title">{homeContent.servicesTitle || settings?.servicesTitle || 'Services'}</h2>
+                <p className="section-desc">{homeContent.servicesSubtitle || settings?.servicesSubtitle || 'Experience the ultimate dance training ecosystem.'}</p>
+              </>
+            )}
           </div>
-          <div className="services-v2-grid">
-            {servicesToRender.map((service, index) => (
+          {!sectionReady.services ? (
+            <HomeServicesSkeleton />
+          ) : (
+          <div className="services-v2-carousel services-v2-carousel--auto" role="region" aria-label="Services">
+            <div className="services-v2-grid">
+            {[...servicesToRender, ...servicesToRender].map((service, index) => {
+              const isDuplicate = index >= servicesToRender.length;
+              return (
               <Link
-                key={service._id || service.key || index}
+                key={`${service._id || service.key || index}-${index}`}
                 to="/services"
                 className="service-card-link"
+                aria-hidden={isDuplicate}
+                tabIndex={isDuplicate ? -1 : 0}
               >
                 <motion.div
                   className="service-card-v2"
@@ -579,12 +648,18 @@ const Home: React.FC = () => {
                     <div className="img-overlay" />
                   </div>
                   <div className="service-card-footer">
+                    <span className="service-card-icon" aria-hidden="true">
+                      {getServiceIcon({ key: service.key, title: service.title })}
+                    </span>
                     <h3>{service.title}</h3>
                   </div>
                 </motion.div>
               </Link>
-            ))}
+            );
+            })}
+            </div>
           </div>
+          )}
           <div className="services-explore-wrap">
             <Link to="/services" className="services-explore-btn">
               Explore All Services
@@ -702,6 +777,7 @@ const Home: React.FC = () => {
         channelUrl={youtubeChannelUrl}
         channelId={homeContent.youtubeChannelId as string | undefined}
         logoUrl={settings?.logoUrl}
+        loading={!homeCopyReady}
       />
 
       {/* 3. About Section */}
@@ -767,12 +843,23 @@ const Home: React.FC = () => {
               </button>
             </div>
             <div className="about-text">
-              <h2 className="section-title" style={{ textTransform: 'uppercase' }}>
-                {homeContent.aboutShortTitle}
-              </h2>
-              <p>
-                {homeContent.aboutShortText}
-              </p>
+              {!homeCopyReady ? (
+                <>
+                  <div className="home-skel" style={{ height: 32, width: '80%', marginBottom: 16 }} />
+                  <div className="home-skel" style={{ height: 14, width: '100%', marginBottom: 8 }} />
+                  <div className="home-skel" style={{ height: 14, width: '92%', marginBottom: 8 }} />
+                  <div className="home-skel" style={{ height: 14, width: '70%', marginBottom: 20 }} />
+                </>
+              ) : (
+                <>
+                  <h2 className="section-title" style={{ textTransform: 'uppercase' }}>
+                    {homeContent.aboutShortTitle}
+                  </h2>
+                  <p>
+                    {homeContent.aboutShortText}
+                  </p>
+                </>
+              )}
               <Link to="/about" className="secondary-btn glass-btn" style={{ display: 'inline-block', textDecoration: 'none', textAlign: 'center' }}>
                 DISCOVER OUR LEGACY
               </Link>
@@ -791,7 +878,14 @@ const Home: React.FC = () => {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                {homeContent.instagramSectionTitle || 'Join us'} <br /> <span className="gradient-text">{homeContent.instagramSectionHighlight || 'on Instagram'}</span>
+                {homeCopyReady ? (
+                  <>
+                    {homeContent.instagramSectionTitle || 'Join us'} <br />{' '}
+                    <span className="gradient-text">{homeContent.instagramSectionHighlight || 'on Instagram'}</span>
+                  </>
+                ) : (
+                  <span className="home-skel" style={{ display: 'inline-block', height: 48, width: 220 }} />
+                )}
               </motion.h2>
               <div className="insta-header-actions">
                 <motion.a
@@ -833,8 +927,12 @@ const Home: React.FC = () => {
               </div>
             </div>
             
+            {!homeCopyReady ? (
+              <HomeMediaSkeleton count={4} ariaLabel="Loading Instagram reels" />
+            ) : (
             <HomeMediaMarquee
               items={instagramPosts}
+              ariaLabel="Instagram reels"
               renderItem={(item: typeof DEFAULT_INSTAGRAM_POSTS[number]) => (
                 <a
                   href={instagramChannelUrl}
@@ -872,12 +970,21 @@ const Home: React.FC = () => {
                 </a>
               )}
             />
+            )}
           </div>
         </div>
       </section>
 
-      <WhyChooseGDPSection />
-
+      {!sectionReady.testimonials || !homeCopyReady ? (
+        <section className="reviews-v3 section-padding">
+          <div className="container">
+            <div className="services-section-header">
+              <h2 className="section-title"><span className="gradient-text">Reviews</span></h2>
+            </div>
+            <HomeReviewsSkeleton />
+          </div>
+        </section>
+      ) : (
       <ReviewsSection
         subtitle={testimonialsSubtitle}
         googleRating={googleRating}
@@ -885,6 +992,7 @@ const Home: React.FC = () => {
         reviews={googleReviewCards}
         videoTestimonials={videoTestimonials}
       />
+      )}
 
       {/* 10. FAQ Section */}
       <section className="faq-v3 section-padding">
@@ -894,11 +1002,18 @@ const Home: React.FC = () => {
               <span className="gradient-text">FAQ</span>
             </h2>
             <p className="section-desc">
-              {homeContent.faqSubtitle || settings?.faqSubtitle || 'We are Garima Dance Productions, helping all dance enthusiasts to live up to their dream'}
+              {!homeCopyReady ? (
+                <span className="home-skel" style={{ display: 'block', height: 16, width: '70%', margin: '0 auto' }} />
+              ) : (
+                homeContent.faqSubtitle || settings?.faqSubtitle || 'We are Garima Dance Productions, helping all dance enthusiasts to live up to their dream'
+              )}
             </p>
           </div>
 
           <div className="faq-v3-body">
+            {!sectionReady.faqs ? (
+              <HomeFaqSkeleton />
+            ) : (
             <div className="faq-v3-list">
               {faqs.map((faq, i) => {
                 const isOpen = openFaqIndex === i;
@@ -923,6 +1038,7 @@ const Home: React.FC = () => {
                 );
               })}
             </div>
+            )}
 
             <aside className="faq-v3-cta">
               <div className="faq-v3-cta-glow" aria-hidden="true" />
@@ -956,20 +1072,30 @@ const Home: React.FC = () => {
           <div className="contact-v3-body">
             <div className="contact-v3-text">
               <span className="contact-v3-badge">Get in Touch</span>
-              <motion.h2
-                className="contact-v3-title"
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-              >
-                {homeContent.contactSectionTitle || settings?.contactSectionTitle || "Let's"}{' '}
-                <span className="gradient-text">
-                  {homeContent.contactSectionHighlight || settings?.contactSectionSubtitle || 'Catch up?'}
-                </span>
-              </motion.h2>
-              <p className="contact-v3-desc">
-                {homeContent.contactSectionText || 'We are Garima Dance Productions, helping all dance enthusiasts to live up to their dream'}
-              </p>
+              {!homeCopyReady ? (
+                <>
+                  <div className="home-skel" style={{ height: 40, width: '70%', marginBottom: 16 }} />
+                  <div className="home-skel" style={{ height: 14, width: '90%', marginBottom: 8 }} />
+                  <div className="home-skel" style={{ height: 14, width: '60%', marginBottom: 20 }} />
+                </>
+              ) : (
+                <>
+                  <motion.h2
+                    className="contact-v3-title"
+                    initial={{ opacity: 0, y: 24 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                  >
+                    {homeContent.contactSectionTitle || settings?.contactSectionTitle || "Let's"}{' '}
+                    <span className="gradient-text">
+                      {homeContent.contactSectionHighlight || settings?.contactSectionSubtitle || 'Catch up?'}
+                    </span>
+                  </motion.h2>
+                  <p className="contact-v3-desc">
+                    {homeContent.contactSectionText || 'We are Garima Dance Productions, helping all dance enthusiasts to live up to their dream'}
+                  </p>
+                </>
+              )}
               <a
                 href={`https://wa.me/${settings?.whatsappNumber || '7838416907'}`}
                 target="_blank"
@@ -991,7 +1117,7 @@ const Home: React.FC = () => {
               transition={{ delay: 0.08 }}
             >
               <div className="contact-v3-form-glow" aria-hidden="true" />
-              <h3>{homeContent.contactFormTitle || 'Or let us reach you!'}</h3>
+              <h3>{homeCopyReady ? (homeContent.contactFormTitle || 'Or let us reach you!') : '…'}</h3>
               <form className="contact-v3-form" onSubmit={handleCatchUpSubmit}>
                 <input type="text" name="name" placeholder="Full Name" className="contact-v3-input" value={enquiryForm.name} onChange={handleEnquiryChange} required />
                 <input type="text" name="phone" placeholder="Contact Number" className="contact-v3-input" value={enquiryForm.phone} onChange={handleEnquiryChange} required />

@@ -6,8 +6,17 @@ const ONLINE_IMG =
   "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&w=900&h=700&q=80";
 const RECORDED_IMG =
   "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&h=700&q=80";
-const KIDS_IMG =
-  "https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=900&h=700&q=80";
+
+export const EXCLUDED_SERVICE_KEYS = ["kids-teens-programs", "kids-teens-development"] as const;
+
+export const isExcludedService = (opts: { key?: string; title?: string }): boolean => {
+  const key = (opts.key || "").toLowerCase();
+  if (EXCLUDED_SERVICE_KEYS.includes(key as (typeof EXCLUDED_SERVICE_KEYS)[number])) {
+    return true;
+  }
+  const title = (opts.title || "").toLowerCase();
+  return title.includes("kids") || title.includes("teen");
+};
 
 export type DefaultServiceItem = {
   _id: string;
@@ -69,22 +78,6 @@ export const DEFAULT_SERVICES: DefaultServiceItem[] = [
     tagline: "24/7 Access | Self-Paced",
     imageUrl: RECORDED_IMG,
     glowClass: "purple-glow",
-  },
-  {
-    _id: "default-4",
-    key: "kids-teens-programs",
-    title: "Kids & Teens Programs",
-    description:
-      "A fun, disciplined structure for young dancers to build coordination, musicality, and creative expression in a safe and encouraging environment with age-appropriate routines.",
-    features: [
-      "Age-appropriate routines",
-      "Confidence & discipline building",
-      "Biannual showcase events",
-    ],
-    exploreSubtitle: "Confidence & Creative Expression",
-    tagline: "Ages 5–17 | All Styles",
-    imageUrl: KIDS_IMG,
-    glowClass: "green-glow",
   },
 ];
 

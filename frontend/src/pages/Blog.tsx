@@ -7,7 +7,7 @@ import { usePageContent, renderSplitHeroTitle } from '../hooks/usePageContent';
 import '../styles/blog.css';
 
 const Blog: React.FC = () => {
-  const { content } = usePageContent('blog');
+  const { content, loaded } = usePageContent('blog');
   const hero = renderSplitHeroTitle(content, { before: 'THE ', highlight: 'JOURNAL' });
   const heroSubtitle =
     (content.heroSubtitle as string) || 'Insights into technique, culture, and artistry.';
@@ -128,7 +128,11 @@ const Blog: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
-            {hero.before}<span>{hero.highlight}</span>
+            {!loaded ? (
+              <span className="home-skel" style={{ display: 'inline-block', height: 48, width: 260 }} />
+            ) : (
+              <>{hero.before}<span>{hero.highlight}</span></>
+            )}
           </motion.h1>
           
           <motion.div 
@@ -137,7 +141,11 @@ const Blog: React.FC = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 1 }}
           >
-            {heroSubtitle}
+            {!loaded ? (
+              <span className="home-skel" style={{ display: 'block', height: 16, width: 320, margin: '0 auto' }} />
+            ) : (
+              heroSubtitle
+            )}
           </motion.div>
         </section>
 

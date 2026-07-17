@@ -8,7 +8,7 @@ import SEO from '../components/SEO';
 import '../styles/workshops.css';
 
 const Workshops: React.FC = () => {
-  const { content } = usePageContent('workshops');
+  const { content, loaded } = usePageContent('workshops');
   const hero = renderSplitHeroTitle(content, { before: 'MASTER ', highlight: 'WORKSHOPS' });
   const heroSubtitle =
     (content.heroSubtitle as string) ||
@@ -35,14 +35,23 @@ const Workshops: React.FC = () => {
       />
       <section className="workshops-hero section-padding">
         <div className="container">
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="section-title"
-          >
-            {hero.before}<span className="gradient-text">{hero.highlight}</span>
-          </motion.h1>
-          <p className="hero-subtitle">{heroSubtitle}</p>
+          {!loaded ? (
+            <>
+              <div className="home-skel" style={{ height: 40, width: 300, margin: '0 auto 16px' }} />
+              <div className="home-skel" style={{ height: 16, width: '65%', maxWidth: 420, margin: '0 auto' }} />
+            </>
+          ) : (
+            <>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="section-title"
+              >
+                {hero.before}<span className="gradient-text">{hero.highlight}</span>
+              </motion.h1>
+              <p className="hero-subtitle">{heroSubtitle}</p>
+            </>
+          )}
         </div>
       </section>
 

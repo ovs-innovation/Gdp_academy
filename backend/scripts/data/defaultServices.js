@@ -102,39 +102,6 @@ const DEFAULT_CMS_SERVICES = [
     },
     isActive: true,
   },
-  {
-    key: "kids-teens-programs",
-    section: "services",
-    title: { en: "Kids & Teens Programs" },
-    description: {
-      en: "A fun, disciplined structure for young dancers to build coordination, musicality, and creative expression in a safe and encouraging environment with age-appropriate routines.",
-    },
-    content: {
-      tagline: "Ages 5–17 | All Styles",
-      exploreSubtitle: "Confidence & Creative Expression",
-      features: [
-        "Age-appropriate routines",
-        "Confidence & discipline building",
-        "Biannual showcase events",
-      ],
-      glowClass: "green-glow",
-      order: 4,
-    },
-    images: [
-      {
-        url: "https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&w=900&h=700&q=80",
-        alt: "Kids and Teens Dance Programs at Garima Dance Productions",
-        order: 0,
-      },
-    ],
-    metadata: {
-      seoTitle: "Kids & Teens Dance Programs | Garima Dance Productions",
-      seoDescription:
-        "Dance programs for kids and teens — build confidence, coordination, and stage presence.",
-      seoKeywords: ["kids dance classes", "teen dance training", "youth choreography"],
-    },
-    isActive: true,
-  },
 ];
 
 /** Legacy keys from older hardcoded defaults — deactivated when seeding fresh services */
@@ -142,6 +109,7 @@ const LEGACY_SERVICE_KEYS = [
   "hiphop-street-foundations",
   "stage-performance-choreography",
   "kids-teens-development",
+  "kids-teens-programs",
   "wedding-private-coaching",
 ];
 

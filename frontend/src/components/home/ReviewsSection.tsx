@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import LazyVideo from '../common/LazyVideo';
 
@@ -40,33 +40,291 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
   videoTestimonials = [],
 }) => {
   const reviewCountLabel = googleReviewCount.replace(/[()]/g, '').trim();
+  const cardsTrackRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
+  const cardsAutoPausedRef = useRef(false);
+  const videoAutoPausedRef = useRef(false);
+  const resumeCardsAutoTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const resumeVideoAutoTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
+  const [activeCardDot, setActiveCardDot] = useState(0);
   const [activeDot, setActiveDot] = useState(0);
 
-  const carouselItems = [
-    { type: 'intro' as const, id: 'intro' },
-    ...videoTestimonials.slice(0, 4).map((v, i) => ({
-      type: 'video' as const,
-      ...v,
-      id: v.id ?? i,
-      quote: v.quote ?? reviews[i % Math.max(reviews.length, 1)]?.message,
-    })),
-  ];
+  const textReviewCards = useMemo(
+    () => [{ type: 'google' as const, id: 'google' }, ...reviews.slice(0, 2).map((r, i) => ({ type: 'quote' as const, id: `${r.name}-${i}`, review: r, index: i }))],
+    [reviews],
+  );
+
+  const carouselItems = useMemo(
+    () => [
+      { type: 'intro' as const, id: 'intro' },
+      ...videoTestimonials.slice(0, 4).map((v, i) => ({
+        type: 'video' as const,
+        ...v,
+        id: v.id ?? i,
+        quote: v.quote ?? reviews[i % Math.max(reviews.length, 1)]?.message,
+      })),
+    ],
+    [videoTestimonials, reviews],
+  );
+
+  const getCardsStep = useCallback(() => {
+    const track = cardsTrackRef.current;
+    const card = track?.querySelector<HTMLElement>('.reviews-v3-card');
+    return card ? card.offsetWidth + 16 : 300;
+  }, []);
+
+  const scrollToCardIndex = useCallback(
+    (index: number, behavior: ScrollBehavior = 'smooth') => {
+      const track = cardsTrackRef.current;
+      if (!track) return;
+      const step = getCardsStep();
+      const maxIndex = Math.max(textReviewCards.length - 1, 0);
+      const nextIndex = Math.min(maxIndex, Math.max(0, index));
+      track.scrollTo({ left: nextIndex * step, behavior });
+      setActiveCardDot(nextIndex);
+    },
+    [textReviewCards.length, getCardsStep],
+  );
+
+  const pauseCardsAutoBriefly = useCallback((ms = 5000) => {
+    cardsAutoPausedRef.current = true;
+    if (resumeCardsAutoTimerRef.current) clearTimeout(resumeCardsAutoTimerRef.current);
+    resumeCardsAutoTimerRef.current = setTimeout(() => {
+      cardsAutoPausedRef.current = false;
+    }, ms);
+  }, []);
+
+  const getCarouselStep = useCallback(() => {
+    const track = trackRef.current;
+    const card = track?.querySelector<HTMLElement>('.reviews-v3-carousel-item');
+    return card ? card.offsetWidth + 16 : 280;
+  }, []);
+
+  const scrollToCarouselIndex = useCallback(
+    (index: number, behavior: ScrollBehavior = 'smooth') => {
+      const track = trackRef.current;
+      if (!track) return;
+      const step = getCarouselStep();
+      const maxIndex = Math.max(carouselItems.length - 1, 0);
+      const nextIndex = Math.min(maxIndex, Math.max(0, index));
+      track.scrollTo({ left: nextIndex * step, behavior });
+      setActiveDot(nextIndex);
+    },
+    [carouselItems.length, getCarouselStep],
+  );
+
+  const pauseVideoAutoBriefly = useCallback((ms = 5000) => {
+    videoAutoPausedRef.current = true;
+    if (resumeVideoAutoTimerRef.current) clearTimeout(resumeVideoAutoTimerRef.current);
+    resumeVideoAutoTimerRef.current = setTimeout(() => {
+      videoAutoPausedRef.current = false;
+    }, ms);
+  }, []);
 
   const scrollCarousel = (direction: -1 | 1) => {
-    const track = trackRef.current;
-    if (!track) return;
-    const card = track.querySelector<HTMLElement>('.reviews-v3-carousel-item');
-    const step = card ? card.offsetWidth + 16 : 280;
-    track.scrollBy({ left: direction * step, behavior: 'smooth' });
-    setActiveDot((prev) => {
-      const max = Math.max(carouselItems.length - 1, 0);
-      return Math.min(max, Math.max(0, prev + direction));
-    });
+    pauseVideoAutoBriefly();
+    scrollToCarouselIndex(activeDot + direction);
   };
 
+  useEffect(() => {
+    const track = cardsTrackRef.current;
+    if (!track || textReviewCards.length <= 1) return;
+
+    const syncDotFromScroll = () => {
+      const step = getCardsStep();
+      if (step <= 0) return;
+      const index = Math.round(track.scrollLeft / step);
+      setActiveCardDot(Math.min(textReviewCards.length - 1, Math.max(0, index)));
+    };
+
+    track.addEventListener('scroll', syncDotFromScroll, { passive: true });
+    return () => track.removeEventListener('scroll', syncDotFromScroll);
+  }, [textReviewCards.length, getCardsStep]);
+
+  useEffect(() => {
+    if (textReviewCards.length <= 1) return;
+    if (typeof window === 'undefined') return;
+
+    const mobileQuery = window.matchMedia('(max-width: 992px)');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    let intervalId: ReturnType<typeof setInterval> | undefined;
+    let resumeTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const pauseAuto = () => {
+      cardsAutoPausedRef.current = true;
+      if (resumeTimer) clearTimeout(resumeTimer);
+    };
+
+    const resumeAuto = (delayMs = 3500) => {
+      if (resumeTimer) clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(() => {
+        cardsAutoPausedRef.current = false;
+      }, delayMs);
+    };
+
+    const advance = () => {
+      if (cardsAutoPausedRef.current || !mobileQuery.matches || reducedMotion.matches) return;
+
+      const track = cardsTrackRef.current;
+      if (!track) return;
+
+      const step = getCardsStep();
+      const maxScroll = track.scrollWidth - track.clientWidth;
+      const atEnd = track.scrollLeft >= maxScroll - 8;
+
+      if (atEnd) {
+        scrollToCardIndex(0);
+      } else {
+        const nextIndex = Math.min(
+          textReviewCards.length - 1,
+          Math.round(track.scrollLeft / step) + 1,
+        );
+        scrollToCardIndex(nextIndex);
+      }
+    };
+
+    const startAuto = () => {
+      if (!mobileQuery.matches || reducedMotion.matches) return;
+      if (intervalId) clearInterval(intervalId);
+      intervalId = setInterval(advance, 4500);
+    };
+
+    const stopAuto = () => {
+      if (intervalId) clearInterval(intervalId);
+      intervalId = undefined;
+    };
+
+    const onMobileChange = () => {
+      cardsAutoPausedRef.current = false;
+      stopAuto();
+      startAuto();
+    };
+
+    startAuto();
+    mobileQuery.addEventListener('change', onMobileChange);
+    reducedMotion.addEventListener('change', onMobileChange);
+
+    const track = cardsTrackRef.current;
+    const onTouchEnd = () => resumeAuto();
+
+    track?.addEventListener('touchstart', pauseAuto, { passive: true });
+    track?.addEventListener('touchend', onTouchEnd, { passive: true });
+    track?.addEventListener('pointerdown', pauseAuto);
+
+    return () => {
+      stopAuto();
+      if (resumeTimer) clearTimeout(resumeTimer);
+      if (resumeCardsAutoTimerRef.current) clearTimeout(resumeCardsAutoTimerRef.current);
+      mobileQuery.removeEventListener('change', onMobileChange);
+      reducedMotion.removeEventListener('change', onMobileChange);
+      track?.removeEventListener('touchstart', pauseAuto);
+      track?.removeEventListener('touchend', onTouchEnd);
+      track?.removeEventListener('pointerdown', pauseAuto);
+    };
+  }, [textReviewCards.length, getCardsStep, scrollToCardIndex]);
+
+  useEffect(() => {
+    const track = trackRef.current;
+    if (!track || carouselItems.length <= 1) return;
+
+    const syncDotFromScroll = () => {
+      const step = getCarouselStep();
+      if (step <= 0) return;
+      const index = Math.round(track.scrollLeft / step);
+      setActiveDot(Math.min(carouselItems.length - 1, Math.max(0, index)));
+    };
+
+    track.addEventListener('scroll', syncDotFromScroll, { passive: true });
+    return () => track.removeEventListener('scroll', syncDotFromScroll);
+  }, [carouselItems.length, getCarouselStep]);
+
+  useEffect(() => {
+    if (carouselItems.length <= 1) return;
+    if (typeof window === 'undefined') return;
+
+    const mobileQuery = window.matchMedia('(max-width: 992px)');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    let intervalId: ReturnType<typeof setInterval> | undefined;
+    let resumeTimer: ReturnType<typeof setTimeout> | undefined;
+
+    const pauseAuto = () => {
+      videoAutoPausedRef.current = true;
+      if (resumeTimer) clearTimeout(resumeTimer);
+    };
+
+    const resumeAuto = (delayMs = 3500) => {
+      if (resumeTimer) clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(() => {
+        videoAutoPausedRef.current = false;
+      }, delayMs);
+    };
+
+    const advance = () => {
+      if (videoAutoPausedRef.current || !mobileQuery.matches || reducedMotion.matches) return;
+
+      const track = trackRef.current;
+      if (!track) return;
+
+      const step = getCarouselStep();
+      const maxScroll = track.scrollWidth - track.clientWidth;
+      const atEnd = track.scrollLeft >= maxScroll - 8;
+
+      if (atEnd) {
+        scrollToCarouselIndex(0);
+      } else {
+        const nextIndex = Math.min(
+          carouselItems.length - 1,
+          Math.round(track.scrollLeft / step) + 1,
+        );
+        scrollToCarouselIndex(nextIndex);
+      }
+    };
+
+    const startAuto = () => {
+      if (!mobileQuery.matches || reducedMotion.matches) return;
+      if (intervalId) clearInterval(intervalId);
+      intervalId = setInterval(advance, 4000);
+    };
+
+    const stopAuto = () => {
+      if (intervalId) clearInterval(intervalId);
+      intervalId = undefined;
+    };
+
+    const onMobileChange = () => {
+      videoAutoPausedRef.current = false;
+      stopAuto();
+      startAuto();
+    };
+
+    startAuto();
+    mobileQuery.addEventListener('change', onMobileChange);
+    reducedMotion.addEventListener('change', onMobileChange);
+
+    const track = trackRef.current;
+    const onTouchEnd = () => resumeAuto();
+
+    track?.addEventListener('touchstart', pauseAuto, { passive: true });
+    track?.addEventListener('touchend', onTouchEnd, { passive: true });
+    track?.addEventListener('pointerdown', pauseAuto);
+
+    return () => {
+      stopAuto();
+      if (resumeTimer) clearTimeout(resumeTimer);
+      if (resumeVideoAutoTimerRef.current) clearTimeout(resumeVideoAutoTimerRef.current);
+      mobileQuery.removeEventListener('change', onMobileChange);
+      reducedMotion.removeEventListener('change', onMobileChange);
+      track?.removeEventListener('touchstart', pauseAuto);
+      track?.removeEventListener('touchend', onTouchEnd);
+      track?.removeEventListener('pointerdown', pauseAuto);
+    };
+  }, [carouselItems.length, getCarouselStep, scrollToCarouselIndex]);
+
   const toggleExpand = (index: number) => {
+    pauseCardsAutoBriefly();
     setExpanded((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 
@@ -90,7 +348,8 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
         </header>
 
         <div className="reviews-v3-body">
-        <div className="reviews-v3-cards">
+        <div className="reviews-v3-cards-section reviews-v3-cards-section--mobile-auto">
+        <div className="reviews-v3-cards" ref={cardsTrackRef}>
           <motion.article
             className="reviews-v3-card reviews-v3-google"
             initial={{ opacity: 0, y: 20 }}
@@ -152,8 +411,27 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
           })}
         </div>
 
+        {textReviewCards.length > 1 && (
+          <div className="reviews-v3-dots reviews-v3-dots--cards" role="tablist" aria-label="Review cards">
+            {textReviewCards.map((item, i) => (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-selected={activeCardDot === i}
+                className={`reviews-v3-dot${activeCardDot === i ? ' is-active' : ''}`}
+                onClick={() => {
+                  pauseCardsAutoBriefly();
+                  scrollToCardIndex(i);
+                }}
+              />
+            ))}
+          </div>
+        )}
+        </div>
+
         {carouselItems.length > 1 && (
-          <div className="reviews-v3-carousel-section">
+          <div className="reviews-v3-carousel-section reviews-v3-carousel-section--mobile-auto">
             <div className="reviews-v3-carousel-viewport">
               <button
                 type="button"
@@ -215,11 +493,8 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                   aria-selected={activeDot === i}
                   className={`reviews-v3-dot${activeDot === i ? ' is-active' : ''}`}
                   onClick={() => {
-                    const track = trackRef.current;
-                    const card = track?.querySelector<HTMLElement>('.reviews-v3-carousel-item');
-                    const step = card ? card.offsetWidth + 16 : 280;
-                    track?.scrollTo({ left: i * step, behavior: 'smooth' });
-                    setActiveDot(i);
+                    pauseVideoAutoBriefly();
+                    scrollToCarouselIndex(i);
                   }}
                 />
               ))}

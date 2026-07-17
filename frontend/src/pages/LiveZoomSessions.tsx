@@ -46,6 +46,7 @@ const LiveZoomSessions: React.FC = () => {
   const [joinSteps, setJoinSteps] = useState<JoinStep[]>(DEFAULT_JOIN_STEPS);
   const [heroTitle, setHeroTitle] = useState(DEFAULT_HERO_TITLE);
   const [heroSubtitle, setHeroSubtitle] = useState(DEFAULT_HERO_SUBTITLE);
+  const [heroReady, setHeroReady] = useState(false);
 
   useEffect(() => {
     fetchLiveZoomSessions()
@@ -76,7 +77,8 @@ const LiveZoomSessions: React.FC = () => {
         if (c.heroTitle) setHeroTitle(c.heroTitle);
         if (c.heroSubtitle) setHeroSubtitle(c.heroSubtitle);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setHeroReady(true));
   }, []);
 
   const titleParts = heroTitle.split(' ');
@@ -87,20 +89,29 @@ const LiveZoomSessions: React.FC = () => {
     <Layout>
       <section className="live-hero section-padding">
         <div className="container">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="section-title"
-          >
-            {titleAccent ? (
-              <>
-                {titleLead} <span className="gradient-text">{titleAccent}</span>
-              </>
-            ) : (
-              titleLead
-            )}
-          </motion.h1>
-          <p className="hero-subtitle">{heroSubtitle}</p>
+          {!heroReady ? (
+            <>
+              <div className="home-skel" style={{ height: 40, width: 320, margin: '0 auto 16px' }} />
+              <div className="home-skel" style={{ height: 16, width: '70%', maxWidth: 520, margin: '0 auto' }} />
+            </>
+          ) : (
+            <>
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="section-title"
+              >
+                {titleAccent ? (
+                  <>
+                    {titleLead} <span className="gradient-text">{titleAccent}</span>
+                  </>
+                ) : (
+                  titleLead
+                )}
+              </motion.h1>
+              <p className="hero-subtitle">{heroSubtitle}</p>
+            </>
+          )}
         </div>
       </section>
 

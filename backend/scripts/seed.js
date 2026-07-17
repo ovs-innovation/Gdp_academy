@@ -8,6 +8,7 @@ const MembershipPlan = require("../models/membershipPlanModel.js");
 const PageContent = require("../models/pageContentModel.js");
 const SiteSettings = require("../models/siteSettings.js");
 const { upsertServices } = require("./seedServices.js");
+const { DEFAULT_HOME_PAGE } = require("./data/defaultHomePage.js");
 const { ensureDefaultRoles } = require("../controllers/roleController.js");
 
 const seed = async () => {
@@ -186,22 +187,12 @@ const seed = async () => {
     console.log("Seeding Page Content...");
     const pages = [
       {
-        slug: "home",
-        title: "Garima Dance Production | Experience the Joy of Movement",
-        content: {
-          heroTitle: "Unleash Your Inner Dancer",
-          heroSubtitle: "Premium Kathak, Contemporary, and Bollywood dance classes tailored for students worldwide. Discover rhythm, precision, and passion under expert guidance.",
-          ctaText: "Explore Programs",
-          aboutShortTitle: "Dance with Grace and Power",
-          aboutShortText: "Garima Dance Production has been a pioneer in creating transformative dance experiences. We nurture beginner students into elegant performers and support seasoned artists in refining their technique through standard classical and modern fusion modules.",
-          heroBadgeText: "EXPERIENCE THE JOY OF MOVEMENT",
-          heroVideoUrl: "/hero.mp4",
-          statistics: "230+ Students, 10+ Masterclasses, 5+ Specializations",
-          trustLogos: "Kathak, Contemporary, Bollywood fusion",
-        },
-        metaTitle: "Garima Dance Production | Premium Dance Classes & Training",
-        metaDescription: "Experience professional online & offline dance coaching with Garima Dance Production. Explore Kathak, Bollywood, and Contemporary fusion classes.",
-        status: "published"
+        slug: DEFAULT_HOME_PAGE.slug,
+        title: DEFAULT_HOME_PAGE.title,
+        content: DEFAULT_HOME_PAGE.content,
+        metaTitle: DEFAULT_HOME_PAGE.metaTitle,
+        metaDescription: DEFAULT_HOME_PAGE.metaDescription,
+        status: DEFAULT_HOME_PAGE.status,
       },
       {
         slug: "about",

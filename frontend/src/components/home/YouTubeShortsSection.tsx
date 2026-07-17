@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import LazyVideo from '../common/LazyVideo';
 import HomeMediaMarquee from './HomeMediaMarquee';
+import { HomeMediaSkeleton } from './HomeSkeletons';
 import MediaProfileAvatar from './MediaProfileAvatar';
 import YouTubeSubscribeButton from './YouTubeSubscribeButton';
 
@@ -19,9 +20,17 @@ type Props = {
   channelUrl: string;
   channelId?: string | null;
   logoUrl?: string | null;
+  loading?: boolean;
 };
 
-const YouTubeShortsSection: React.FC<Props> = ({ shorts, channel, channelUrl, channelId, logoUrl }) => {
+const YouTubeShortsSection: React.FC<Props> = ({
+  shorts,
+  channel,
+  channelUrl,
+  channelId,
+  logoUrl,
+  loading = false,
+}) => {
   const openChannel = () => {
     window.open(channelUrl, '_blank', 'noopener,noreferrer');
   };
@@ -39,6 +48,7 @@ const YouTubeShortsSection: React.FC<Props> = ({ shorts, channel, channelUrl, ch
           >
             Join us <br /> <span className="gradient-text youtube-gradient">on YouTube</span>
           </motion.h2>
+          {!loading && (
           <div className="youtube-header-actions">
             <motion.a
               href={channelUrl}
@@ -69,10 +79,15 @@ const YouTubeShortsSection: React.FC<Props> = ({ shorts, channel, channelUrl, ch
               />
             </motion.div>
           </div>
+          )}
         </div>
 
+        {loading ? (
+          <HomeMediaSkeleton count={4} ariaLabel="Loading YouTube shorts" />
+        ) : (
         <HomeMediaMarquee
           items={shorts}
+          ariaLabel="YouTube shorts"
           renderItem={(item) => (
             <div
               role="link"
@@ -144,6 +159,7 @@ const YouTubeShortsSection: React.FC<Props> = ({ shorts, channel, channelUrl, ch
             </div>
           )}
         />
+        )}
       </motion.div>
     </div>
   </section>

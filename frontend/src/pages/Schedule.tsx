@@ -29,6 +29,7 @@ const Schedule: React.FC = () => {
   const [scheduleData, setScheduleData] = useState<ScheduleRow[]>(DEFAULT_SCHEDULE);
   const [heroTitle, setHeroTitle] = useState(DEFAULT_HERO_TITLE);
   const [heroSubtitle, setHeroSubtitle] = useState(DEFAULT_HERO_SUBTITLE);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     getPageContentBySlug('schedule')
@@ -45,30 +46,40 @@ const Schedule: React.FC = () => {
           setHeroSubtitle(c.heroSubtitle);
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setReady(true));
   }, []);
 
   return (
     <Layout>
       <section className="schedule-hero section-padding" style={{ paddingBottom: '40px' }}>
         <div className="container">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="section-title"
-          >
-            {heroTitle.includes(' ') ? (
-              <>
-                {heroTitle.split(' ').slice(0, -1).join(' ')}{' '}
-                <span className="gradient-text">{heroTitle.split(' ').slice(-1)[0]}</span>
-              </>
-            ) : (
-              <>
-                SESSION <span className="gradient-text">{heroTitle}</span>
-              </>
-            )}
-          </motion.h1>
-          <p className="hero-subtitle">{heroSubtitle}</p>
+          {!ready ? (
+            <>
+              <div className="home-skel" style={{ height: 40, width: 280, margin: '0 auto 16px' }} />
+              <div className="home-skel" style={{ height: 16, width: '60%', maxWidth: 480, margin: '0 auto' }} />
+            </>
+          ) : (
+            <>
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="section-title"
+              >
+                {heroTitle.includes(' ') ? (
+                  <>
+                    {heroTitle.split(' ').slice(0, -1).join(' ')}{' '}
+                    <span className="gradient-text">{heroTitle.split(' ').slice(-1)[0]}</span>
+                  </>
+                ) : (
+                  <>
+                    SESSION <span className="gradient-text">{heroTitle}</span>
+                  </>
+                )}
+              </motion.h1>
+              <p className="hero-subtitle">{heroSubtitle}</p>
+            </>
+          )}
         </div>
       </section>
 

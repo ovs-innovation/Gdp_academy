@@ -91,6 +91,7 @@ const DEFAULT_CONTENT: AboutContent = {
 
 const About: React.FC = () => {
   const [content, setContent] = useState<AboutContent>(DEFAULT_CONTENT);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     getPageContentBySlug("about")
@@ -115,7 +116,8 @@ const About: React.FC = () => {
       })
       .catch(() => {
         setContent(DEFAULT_CONTENT);
-      });
+      })
+      .finally(() => setReady(true));
   }, []);
 
   // Framer Motion Animation Presets
@@ -192,7 +194,15 @@ const About: React.FC = () => {
                   More Than Dance — A Movement.
                 </p>
                 <p className="lead-desc" style={{ fontSize: '17px', lineHeight: '1.8', color: 'rgba(255, 255, 255, 0.85)' }}>
-                  {content.heroText}
+                  {!ready ? (
+                    <>
+                      <span className="home-skel" style={{ display: 'block', height: 14, width: '100%', marginBottom: 8 }} />
+                      <span className="home-skel" style={{ display: 'block', height: 14, width: '92%', marginBottom: 8 }} />
+                      <span className="home-skel" style={{ display: 'block', height: 14, width: '78%' }} />
+                    </>
+                  ) : (
+                    content.heroText
+                  )}
                 </p>
                 <div className="futuristic-cta-wrapper" style={{ marginTop: '35px' }}>
                   <Link to="/signup" className="glow-btn-primary">

@@ -138,7 +138,7 @@ const formatPrice = (program: Program) => {
 };
 
 const Programs: React.FC = () => {
-  const { content: pageContent } = usePageContent('programs');
+  const { content: pageContent, loaded } = usePageContent('programs');
   const [programs, setPrograms] = useState<Program[]>(fallbackPrograms);
   const heroLines = renderMultiLineHeroTitle(pageContent, ['LEARN.', 'PERFORM.', 'EVOLVE.']);
   const heroBadge = (pageContent.heroBadge as string) || 'GDP STUDIO PROGRAMS';
@@ -220,12 +220,26 @@ const Programs: React.FC = () => {
             </div>
 
             <h1 className="prog-hero-title">
-              <span>{heroLines[0]}</span>
-              <span>{heroLines[1]}</span>
-              <span>{heroLines[2]}</span>
+              {!loaded ? (
+                <>
+                  <span className="home-skel" style={{ display: 'block', height: 44, width: 200, marginBottom: 10 }} />
+                  <span className="home-skel" style={{ display: 'block', height: 44, width: 240, marginBottom: 10 }} />
+                  <span className="home-skel" style={{ display: 'block', height: 44, width: 180 }} />
+                </>
+              ) : (
+                <>
+                  <span>{heroLines[0]}</span>
+                  <span>{heroLines[1]}</span>
+                  <span>{heroLines[2]}</span>
+                </>
+              )}
             </h1>
 
-            <p className="prog-hero-subtitle">{heroSubtitle}</p>
+            <p className="prog-hero-subtitle">
+              {loaded ? heroSubtitle : (
+                <span className="home-skel" style={{ display: 'block', height: 16, width: '70%', margin: '12px auto 0' }} />
+              )}
+            </p>
 
             <div className="prog-hero-actions">
               <a href={ctaPrimaryUrl} className="prog-btn-glow">{ctaPrimary}</a>

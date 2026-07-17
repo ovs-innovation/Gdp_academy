@@ -418,24 +418,33 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.02);
-  color: rgba(255, 255, 255, 0.75);
-  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+  color: #ffffff;
+  transition: color 0.3s ease, transform 0.3s ease;
 }
 
-.svc-explore-icon svg {
-  width: 24px;
-  height: 24px;
+.svc-explore-icon svg,
+.svc-explore-icon .service-icon-img {
+  width: 44px;
+  height: 44px;
+  display: block;
+  shape-rendering: geometricPrecision;
+}
+
+.svc-explore-icon .service-icon-img {
+  object-fit: contain;
+  object-position: center;
+  mix-blend-mode: lighten;
 }
 
 .svc-explore-row:hover .svc-explore-icon {
-  background: var(--svc-purple);
-  border-color: var(--svc-purple);
+  background: transparent;
+  border-color: transparent;
   color: #fff;
   transform: scale(1.04);
-  box-shadow: 0 8px 24px rgba(99, 75, 250, 0.35);
+  box-shadow: none;
 }
 
 .svc-explore-copy h3 {

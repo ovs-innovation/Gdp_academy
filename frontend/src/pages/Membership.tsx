@@ -14,7 +14,7 @@ const DEFAULT_PLANS = [
 ];
 
 const Membership: React.FC = () => {
-  const { content } = usePageContent('membership');
+  const { content, loaded } = usePageContent('membership');
   const hero = renderSplitHeroTitle(content, { before: 'CHOOSE YOUR ', highlight: 'MEMBERSHIP' });
   const heroSubtitle =
     (content.heroSubtitle as string) ||
@@ -51,8 +51,17 @@ const Membership: React.FC = () => {
       />
       <section className="membership-hero">
         <div className="container">
-          <h1 className="section-title">{hero.before}<span className="gradient-text">{hero.highlight}</span></h1>
-          <p className="hero-subtitle">{heroSubtitle}</p>
+          {!loaded ? (
+            <>
+              <div className="home-skel" style={{ height: 40, width: 320, margin: '0 auto 16px' }} />
+              <div className="home-skel" style={{ height: 16, width: '70%', maxWidth: 480, margin: '0 auto' }} />
+            </>
+          ) : (
+            <>
+              <h1 className="section-title">{hero.before}<span className="gradient-text">{hero.highlight}</span></h1>
+              <p className="hero-subtitle">{heroSubtitle}</p>
+            </>
+          )}
         </div>
       </section>
 

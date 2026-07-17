@@ -14,7 +14,7 @@ import "../styles/services.css";
 
 const Services: React.FC = () => {
   const location = useLocation();
-  const { content: pageContent } = usePageContent("services");
+  const { content: pageContent, loaded } = usePageContent("services");
   const heroLines = renderMultiLineHeroTitle(pageContent, ["TRAIN.", "PERFORM.", "EVOLVE."]);
   const heroSubtitle =
     (pageContent.heroSubtitle as string) ||
@@ -66,13 +66,27 @@ const Services: React.FC = () => {
               variants={staggerContainer}
             >
               <motion.h1 className="svc-hero-title" variants={fadeInUp}>
-                <span>{heroLines[0]}</span>
-                <span>{heroLines[1]}</span>
-                <span>{heroLines[2]}</span>
+                {!loaded ? (
+                  <>
+                    <span className="home-skel" style={{ display: "block", height: 48, width: 220, margin: "0 auto 10px" }} />
+                    <span className="home-skel" style={{ display: "block", height: 48, width: 260, margin: "0 auto 10px" }} />
+                    <span className="home-skel" style={{ display: "block", height: 48, width: 200, margin: "0 auto" }} />
+                  </>
+                ) : (
+                  <>
+                    <span>{heroLines[0]}</span>
+                    <span>{heroLines[1]}</span>
+                    <span>{heroLines[2]}</span>
+                  </>
+                )}
               </motion.h1>
 
               <motion.p className="svc-hero-subtitle" variants={fadeInUp}>
-                {heroSubtitle}
+                {!loaded ? (
+                  <span className="home-skel" style={{ display: "block", height: 16, width: "70%", margin: "0 auto" }} />
+                ) : (
+                  heroSubtitle
+                )}
               </motion.p>
 
               <motion.div variants={fadeInUp}>

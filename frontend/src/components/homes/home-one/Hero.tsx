@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import type { SiteSettings } from '../../../services/settingsService';
-import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface HeroProps {
-  settings?: SiteSettings;
+  settings?: SiteSettings | null;
   homeContent?: any;
+  /** When false, show skeletons — never flash hardcoded copy then CMS text. */
+  contentReady?: boolean;
 }
 
-const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent }) => {
+const FALLBACK_SUBTITLE =
+  'Premium Kathak, Contemporary, and Bollywood dance classes tailored for students worldwide. Discover rhythm, precision, and passion under expert guidance.';
+
+const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, contentReady = true }) => {
     const defaultVideos = [
         '/hero.mp4', 
         '/services.mp4', 
@@ -32,7 +36,9 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent }) => {
         { type: 'video', src: '/hero.mp4' }
     ];
 
-    const gridItems = homeContent?.heroGridItems?.length > 0
+    const gridItems = !contentReady
+      ? defaultGridItems
+      : homeContent?.heroGridItems?.length > 0
         ? homeContent.heroGridItems
             .filter((item: { url?: string; src?: string }) => (item.url || item.src || "").trim())
             .map((item: { type?: string; url?: string; src?: string }) => ({
@@ -56,30 +62,18 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent }) => {
     const uniqueVideos = dynamicVideos;
     const [state, setState] = useState(1);
 
-    const welcomeLine1 = homeContent?.heroTitleLine1 || 'Welcome to';
-    const welcomeLine2 = homeContent?.heroTitleLine2 || homeContent?.heroTitleHighlight || 'Garima Dance';
-    const welcomeLine3 = homeContent?.heroTitleLine3 || 'Productions';
-    const heroSubtitle = homeContent?.heroSubtitle || propSettings?.heroSubtitle || 'From unforgettable wedding performances to live online dance classes and professional dance education GDP helps you learn, aspire, dance and celebrate.';
-    const heroStatsRaw = homeContent?.heroStatistics || homeContent?.statistics || propSettings?.heroStatistics || '';
-    const ctaButton = (homeContent?.heroCTAButtons && homeContent.heroCTAButtons[0]) || (homeContent?.ctaText ? { label: homeContent.ctaText, url: homeContent.ctaUrl || '/services' } : null) || propSettings?.heroCTAButtons?.[0] || { label: 'Explore Our Services', url: '/services' };
-
-    const defaultStats = [
-        { value: '250K+', label: 'SOCIAL COMMUNITY' },
-        { value: '15+', label: 'YEARS OF EXPERIENCE' },
-        { value: '700+', label: 'WEDDINGS CHOREOGRAPHED' },
-        { value: '50,000+', label: 'STUDENTS TRAINED' },
-    ];
-
-    const parsedStats = heroStatsRaw
-        ? heroStatsRaw.split(',').map((stat: string) => {
-            const trimmed = stat.trim();
-            const firstSpaceIdx = trimmed.indexOf(' ');
-            return {
-                value: firstSpaceIdx !== -1 ? trimmed.slice(0, firstSpaceIdx) : trimmed,
-                label: firstSpaceIdx !== -1 ? trimmed.slice(firstSpaceIdx + 1).toUpperCase() : '',
-            };
-        }).filter((s: { value: string }) => s.value)
-        : defaultStats;
+    const welcomeLine1 = contentReady
+      ? (homeContent?.heroTitleLine1 || 'Welcome to')
+      : '';
+    const welcomeLine2 = contentReady
+      ? (homeContent?.heroTitleLine2 || homeContent?.heroTitleHighlight || 'Garima Dance')
+      : '';
+    const welcomeLine3 = contentReady
+      ? (homeContent?.heroTitleLine3 || 'Productions')
+      : '';
+    const heroSubtitle = contentReady
+      ? (homeContent?.heroSubtitle || propSettings?.heroSubtitle || FALLBACK_SUBTITLE)
+      : '';
 
     const [singleIndex, setSingleIndex] = useState(0);
     const [leftIndex, setLeftIndex] = useState(1);
@@ -105,7 +99,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent }) => {
             }, 3000);
         }
         return () => clearInterval(interval);
-    }, [state]);
+    }, [state, uniqueVideos.length]);
 
     useEffect(() => {
         let leftInterval: ReturnType<typeof setInterval>;
@@ -122,7 +116,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent }) => {
             clearInterval(leftInterval);
             clearInterval(rightInterval);
         };
-    }, [state]);
+    }, [state, uniqueVideos.length]);
 
     return (
         <>
@@ -153,6 +147,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent }) => {
                     max-width: 900px;
                     margin: 0 auto 32px;
                     position: relative;
+                    min-height: 180px;
                 }
 
                 .hero-intro::before {
@@ -201,117 +196,37 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent }) => {
                     font-weight: 400;
                 }
 
-                .hero-cta-row {
+                .hero-text-skel {
                     display: flex;
-                    justify-content: center;
-                    margin-top: 36px;
-                    margin-bottom: 32px;
-                }
-
-                .hero-explore-btn {
-                    display: inline-flex;
+                    flex-direction: column;
                     align-items: center;
-                    justify-content: center;
-                    gap: 10px;
-                    background-color: var(--primary-color, #634BFA);
-                    color: #FFFFFF;
-                    font-family: var(--font-body, 'Montserrat', sans-serif);
-                    font-weight: 700;
-                    font-size: 1rem;
-                    padding: 16px 36px;
-                    border-radius: 50px;
-                    text-decoration: none;
-                    letter-spacing: 0.5px;
-                    transition: all 0.3s ease;
-                    border: none;
-                }
-
-                .hero-explore-btn:hover {
-                    background-color: #5038e0;
-                    color: #ffffff;
-                    transform: translateY(-2px);
-                    box-shadow: 0 8px 24px rgba(99, 75, 250, 0.35);
-                }
-
-                .hero-explore-btn .arrow {
-                    font-size: 1.2rem;
-                    line-height: 1;
-                }
-
-                .hero-stats-bar {
+                    gap: 14px;
                     width: 100%;
-                    max-width: 1200px;
-                    display: grid;
-                    grid-template-columns: repeat(${parsedStats.length}, 1fr);
-                    background: rgba(255, 255, 255, 0.04);
-                    border: 1px solid rgba(255, 255, 255, 0.08);
-                    border-radius: 16px;
-                    overflow: hidden;
-                    margin-bottom: 0;
                 }
 
-                .hero-stats-bar .stat-col {
-                    text-align: center;
-                    padding: 28px 16px;
-                    position: relative;
+                .hero-text-skel .home-skel {
+                    border-radius: 8px;
                 }
 
-                .hero-stats-bar .stat-col:not(:last-child)::after {
-                    content: '';
-                    position: absolute;
-                    right: 0;
-                    top: 20%;
-                    height: 60%;
-                    width: 1px;
-                    background: rgba(255, 255, 255, 0.1);
+                .hero-skel-title {
+                    height: clamp(36px, 5vw, 56px);
+                    width: min(70%, 520px);
                 }
 
-                .hero-stats-bar .stat-value {
-                    font-family: var(--font-title, 'Krona One', sans-serif);
-                    font-size: clamp(22px, 2.5vw, 36px);
-                    font-weight: 400;
-                    color: var(--primary-color, #634BFA);
-                    line-height: 1.2;
-                    margin-bottom: 8px;
+                .hero-skel-title-sm {
+                    height: clamp(28px, 4vw, 44px);
+                    width: min(48%, 340px);
                 }
 
-                .hero-stats-bar .stat-label {
-                    font-family: var(--font-body, 'Montserrat', sans-serif);
-                    font-size: clamp(9px, 0.9vw, 11px);
-                    color: rgba(255, 255, 255, 0.5);
-                    text-transform: uppercase;
-                    letter-spacing: 1.5px;
-                    font-weight: 600;
+                .hero-skel-sub {
+                    height: 18px;
+                    width: min(90%, 640px);
+                    margin-top: 8px;
                 }
 
-                .hero-social-row {
-                    display: flex;
-                    justify-content: center;
-                    gap: 28px;
-                    align-items: center;
-                    flex-wrap: wrap;
-                    margin-top: 28px;
-                }
-
-                .hero-social-row a {
-                    color: rgba(255, 255, 255, 0.7);
-                    font-size: 0.95rem;
-                    font-family: var(--font-body, 'Montserrat', sans-serif);
-                    font-weight: 600;
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    text-decoration: none;
-                    transition: all 0.3s ease;
-                }
-
-                .hero-social-row a:hover {
-                    color: #ffffff;
-                    transform: translateY(-2px);
-                }
-
-                .hero-social-row i {
-                    font-size: 1.35rem;
+                .hero-skel-sub-2 {
+                    height: 18px;
+                    width: min(72%, 480px);
                 }
 
                 .hero-video-stage {
@@ -377,12 +292,6 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent }) => {
                 }
 
                 @media (max-width: 992px) {
-                    .hero-stats-bar {
-                        grid-template-columns: repeat(2, 1fr);
-                    }
-                    .hero-stats-bar .stat-col:nth-child(2)::after {
-                        display: none;
-                    }
                     .steezy-complex-hero {
                         width: 100%;
                         max-width: 100%;
@@ -403,41 +312,31 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent }) => {
                         height: 45vh;
                         min-height: 320px;
                     }
-                    .hero-stats-bar {
-                        grid-template-columns: 1fr 1fr;
-                    }
-                    .hero-stats-bar .stat-col {
-                        padding: 20px 12px;
-                    }
-                    .hero-stats-bar .stat-col:nth-child(odd):not(:last-child)::after {
-                        display: block;
-                    }
-                    .hero-stats-bar .stat-col:nth-child(even)::after {
-                        display: none;
-                    }
-                }
-
-                @media (max-width: 480px) {
-                    .hero-stats-bar {
-                        grid-template-columns: 1fr;
-                    }
-                    .hero-stats-bar .stat-col::after {
-                        display: none !important;
-                    }
-                    .hero-stats-bar .stat-col:not(:last-child) {
-                        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                    .hero-intro {
+                        min-height: 150px;
                     }
                 }
             `}</style>
 
             <section className="hero-wrapper">
-                <div className="hero-intro">
-                    <h1 className="hero-welcome-title">
-                        {welcomeLine1}<br />
-                        <span className="highlight-line">{welcomeLine2}</span><br />
-                        {welcomeLine3}
-                    </h1>
-                    <p className="hero-welcome-subtext">{heroSubtitle}</p>
+                <div className="hero-intro" aria-busy={!contentReady}>
+                    {!contentReady ? (
+                      <div className="hero-text-skel" role="status" aria-label="Loading hero">
+                        <div className="home-skel hero-skel-title" />
+                        <div className="home-skel hero-skel-title-sm" />
+                        <div className="home-skel hero-skel-sub" />
+                        <div className="home-skel hero-skel-sub-2" />
+                      </div>
+                    ) : (
+                      <>
+                        <h1 className="hero-welcome-title">
+                            {welcomeLine1}<br />
+                            <span className="highlight-line">{welcomeLine2}</span><br />
+                            {welcomeLine3}
+                        </h1>
+                        <p className="hero-welcome-subtext">{heroSubtitle}</p>
+                      </>
+                    )}
                 </div>
 
                 <div className="hero-video-stage">
@@ -535,38 +434,9 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent }) => {
                 </div>
                 </div>
 
-                <div className="hero-cta-row">
-                    <Link to={ctaButton.url} className="hero-explore-btn">
-                        {ctaButton.label}
-                        <span className="arrow" aria-hidden="true">→</span>
-                    </Link>
-                </div>
-
-                <div className="hero-stats-bar">
-                    {parsedStats.map((stat: { value: string; label: string }, i: number) => (
-                        <div key={i} className="stat-col">
-                            <div className="stat-value">{stat.value}</div>
-                            <div className="stat-label">{stat.label}</div>
-                        </div>
-                    ))}
-                </div>
-
-                <div className="hero-social-row">
-                    <a href={`https://wa.me/${propSettings?.whatsappNumber || '7838416907'}`} target="_blank" rel="noopener noreferrer">
-                        <i className="fab fa-whatsapp" style={{ color: '#25D366' }}></i> WhatsApp
-                    </a>
-                    <a href="https://youtube.com/@garimadanceproductions1146?si=XEMV40bqEVW6JM71" target="_blank" rel="noopener noreferrer">
-                        <i className="fab fa-youtube" style={{ color: '#FF0000' }}></i> YouTube
-                    </a>
-                    <a href="https://www.instagram.com/gdp_garimadanceproductions?igsh=MWhueGpqZGQzZGN0ZA==" target="_blank" rel="noopener noreferrer">
-                        <i className="fab fa-instagram" style={{ color: '#E1306C' }}></i> Instagram
-                    </a>
-                </div>
             </section>
         </>
     );
 };
 
 export default Hero;
-
-

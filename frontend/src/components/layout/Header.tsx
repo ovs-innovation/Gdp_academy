@@ -11,6 +11,7 @@ import ServicesMegaMenu from "./ServicesMegaMenu";
 import {
   DEFAULT_SERVICES,
   HOME_SERVICE_IMAGE_BY_KEY,
+  isExcludedService,
 } from "../../lib/defaultServices";
 import { getLocalizedValue } from "../../utils/contentHelper";
 import "../../styles/header.css";
@@ -93,7 +94,9 @@ const Header: React.FC = () => {
 
     getCMSBySection("services")
       .then((cmsServices) => {
-        const defaultServices = DEFAULT_SERVICES.map((service) => ({
+        const defaultServices = DEFAULT_SERVICES.filter(
+          (service) => !isExcludedService({ key: service.key, title: service.title }),
+        ).map((service) => ({
           _id: service._id,
           key: service.key,
           title: service.title,
@@ -104,7 +107,15 @@ const Header: React.FC = () => {
 
         let mapped = [];
         if (cmsServices && cmsServices.length > 0) {
-          mapped = cmsServices.map((svc: any, index: number) => ({
+          mapped = cmsServices
+            .filter(
+              (svc: { key?: string; title?: { en?: string } | string }) =>
+                !isExcludedService({
+                  key: svc.key,
+                  title: getLocalizedValue(svc.title, ""),
+                }),
+            )
+            .map((svc: any, index: number) => ({
             _id: svc._id,
             key: svc.key,
             title: getLocalizedValue(svc.title, ""),
@@ -125,14 +136,14 @@ const Header: React.FC = () => {
           mapped = defaultServices;
         }
 
-        if (mapped.length < 4) {
+        if (mapped.length < 3) {
           const usedTitles = new Set(mapped.map((s) => s.title.toLowerCase()));
           const fillers = defaultServices.filter(
             (d) => !usedTitles.has(d.title.toLowerCase()),
           );
-          mapped = [...mapped, ...fillers].slice(0, 4);
+          mapped = [...mapped, ...fillers].slice(0, 3);
         } else {
-          mapped = mapped.slice(0, 4);
+          mapped = mapped.slice(0, 3);
         }
 
         // Add Fitness option at the end
@@ -151,7 +162,9 @@ const Header: React.FC = () => {
       })
       .catch((err) => {
         console.error("Error loading services in header:", err);
-        const mapped = DEFAULT_SERVICES.map((s) => ({
+        const mapped = DEFAULT_SERVICES.filter(
+          (s) => !isExcludedService({ key: s.key, title: s.title }),
+        ).map((s) => ({
           _id: s._id,
           key: s.key,
           title: s.title,
@@ -243,6 +256,16 @@ const Header: React.FC = () => {
   return (
     <header className={`header ${isScrolled ? "scrolled" : ""}`}>
       <div className="container header-container">
+        <button
+          type="button"
+          className="mobile-toggle"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Menu"
+          aria-expanded={isMobileMenuOpen}
+        >
+          <span className="toggle-icon">{isMobileMenuOpen ? "✕" : "☰"}</span>
+        </button>
+
         <Link to="/" className="logo-container">
           <SiteLogo
             logoUrl={settings?.logoUrl}
@@ -324,13 +347,6 @@ const Header: React.FC = () => {
           <Link to="/login" className="contact-btn">
             Join Studio
           </Link>
-          <button
-            className="mobile-toggle"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Menu"
-          >
-            <span className="toggle-icon">{isMobileMenuOpen ? "✕" : "☰"}</span>
-          </button>
         </div>
       </div>
 

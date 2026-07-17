@@ -71,6 +71,7 @@ const Gallery: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [heroTitle, setHeroTitle] = useState(DEFAULT_HERO_TITLE);
   const [heroSubtitle, setHeroSubtitle] = useState(DEFAULT_HERO_SUBTITLE);
+  const [heroReady, setHeroReady] = useState(false);
 
   useEffect(() => {
     getPageContentBySlug('gallery')
@@ -80,7 +81,8 @@ const Gallery: React.FC = () => {
         if (c.heroTitle) setHeroTitle(c.heroTitle);
         if (c.heroSubtitle) setHeroSubtitle(c.heroSubtitle);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setHeroReady(true));
 
     getGalleryItems()
       .then((items) => {
@@ -139,7 +141,9 @@ const Gallery: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
-            {heroTitle.includes(' ') ? (
+            {!heroReady ? (
+              <span className="home-skel" style={{ display: 'inline-block', height: 48, width: 280 }} />
+            ) : heroTitle.includes(' ') ? (
               <>
                 {heroTitle.split(' ').slice(0, -1).join(' ')} <span>{heroTitle.split(' ').slice(-1)[0]}</span>
               </>
@@ -154,7 +158,11 @@ const Gallery: React.FC = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 1 }}
           >
-            {heroSubtitle}
+            {!heroReady ? (
+              <span className="home-skel" style={{ display: 'block', height: 16, width: 240, margin: '0 auto' }} />
+            ) : (
+              heroSubtitle
+            )}
           </motion.div>
         </section>
 

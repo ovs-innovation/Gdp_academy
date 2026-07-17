@@ -25,11 +25,12 @@ const DEFAULT_FAQS = [
 ];
 
 const FAQ: React.FC = () => {
-  const { content } = usePageContent('faq');
+  const { content, loaded } = usePageContent('faq');
   const hero = renderSplitHeroTitle(content, { before: 'COMMON ', highlight: 'QUESTIONS' });
   const heroSubtitle =
     (content.heroSubtitle as string) || 'Everything you need to know about joining GDP Studio.';
   const [faqs, setFaqs] = useState<any[]>([]);
+  const [faqsReady, setFaqsReady] = useState(false);
 
   useEffect(() => {
     getFAQs()
@@ -40,7 +41,8 @@ const FAQ: React.FC = () => {
           setFaqs(DEFAULT_FAQS);
         }
       })
-      .catch(() => setFaqs(DEFAULT_FAQS));
+      .catch(() => setFaqs(DEFAULT_FAQS))
+      .finally(() => setFaqsReady(true));
   }, []);
 
   return (
@@ -52,21 +54,35 @@ const FAQ: React.FC = () => {
       />
       <section className="faq-hero section-padding">
         <div className="container">
-          <motion.h1 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="section-title"
-          >
-            {hero.before}<span className="gradient-text">{hero.highlight}</span>
-          </motion.h1>
-          <p className="hero-subtitle">{heroSubtitle}</p>
+          {!loaded ? (
+            <>
+              <div className="home-skel" style={{ height: 40, width: 280, margin: '0 auto 16px' }} />
+              <div className="home-skel" style={{ height: 16, width: '60%', maxWidth: 420, margin: '0 auto' }} />
+            </>
+          ) : (
+            <>
+              <motion.h1 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="section-title"
+              >
+                {hero.before}<span className="gradient-text">{hero.highlight}</span>
+              </motion.h1>
+              <p className="hero-subtitle">{heroSubtitle}</p>
+            </>
+          )}
         </div>
       </section>
 
       <section className="faq-content section-padding" style={{ paddingTop: '0' }}>
         <div className="container">
           <div className="faq-list" style={{ maxWidth: '800px', margin: '0 auto' }}>
-            {faqs.map((faq, i) => (
+            {!faqsReady ? (
+              Array.from({ length: 4 }, (_, i) => (
+                <div key={i} className="home-skel" style={{ height: 100, marginBottom: 20, borderRadius: 16 }} />
+              ))
+            ) : (
+              faqs.map((faq, i) => (
               <motion.div 
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -79,7 +95,8 @@ const FAQ: React.FC = () => {
                 <h3 style={{ fontSize: '18px', color: 'var(--accent-color)', marginBottom: '15px', letterSpacing: '1px' }}>{faq.question}</h3>
                 <p style={{ color: 'var(--text-gray)', lineHeight: '1.6', fontSize: '15px' }}>{faq.answer}</p>
               </motion.div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </section>
