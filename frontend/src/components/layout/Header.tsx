@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  getSiteSettings,
-  getCMSBySection,
-  type SiteSettings,
-} from "../../services/cmsService";
 import SiteLogo from "../common/SiteLogo";
+import LazyImage from "../common/LazyImage";
 import ServicesMegaMenu from "./ServicesMegaMenu";
+import { useSiteData } from "../../contexts/SiteDataContext";
 import {
   DEFAULT_SERVICES,
   HOME_SERVICE_IMAGE_BY_KEY,
@@ -71,7 +68,7 @@ const Header: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isMobileServicesOpen, setIsMobileServicesOpen] = useState(false);
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const { cmsSettings: settings, servicesCms } = useSiteData();
   const servicesRef = useRef<HTMLLIElement>(null);
   const location = useLocation();
 
@@ -84,110 +81,80 @@ const Header: React.FC = () => {
   const [services, setServices] = useState<any[]>([]);
 
   useEffect(() => {
-    getSiteSettings()
-      .then((data) => {
-        if (data) setSettings(data);
-      })
-      .catch((err) =>
-        console.error("Error loading header site settings:", err),
+    const cmsServices = servicesCms;
+    const defaultServices = DEFAULT_SERVICES.filter(
+      (service) =>
+        !isExcludedService({ key: service.key, title: service.title }),
+    ).map((service) => ({
+      _id: service._id,
+      key: service.key,
+      title: service.title,
+      image: service.imageUrl,
+      tagline: service.tagline,
+      mainTitle: service.description.split(".")[0] || service.title,
+    }));
+
+    let mapped = [];
+    if (cmsServices && cmsServices.length > 0) {
+      mapped = cmsServices
+        .filter(
+          (svc: { key?: string; title?: unknown; description?: unknown }) =>
+            !isExcludedService({
+              key: svc.key,
+              title: getLocalizedValue(
+                svc.title as
+                  | string
+                  | { en: string; [key: string]: string }
+                  | null
+                  | undefined,
+                "",
+              ),
+            }),
+        )
+        .map((svc: any, index: number) => ({
+          _id: svc._id,
+          key: svc.key,
+          title: getLocalizedValue(svc.title, ""),
+          image: resolveHomeServiceImage(
+            {
+              key: svc.key,
+              title: getLocalizedValue(svc.title, ""),
+              cmsImage: svc.images?.[0]?.url,
+            },
+            index,
+          ),
+          tagline: svc.content?.tagline || "All Levels | Expert Guided",
+          mainTitle:
+            getLocalizedValue(svc.description, "").split(".")[0] ||
+            "Unleash your creative potential",
+        }));
+    } else {
+      mapped = defaultServices;
+    }
+
+    if (mapped.length < 3) {
+      const usedTitles = new Set(mapped.map((s) => s.title.toLowerCase()));
+      const fillers = defaultServices.filter(
+        (d) => !usedTitles.has(d.title.toLowerCase()),
       );
+      mapped = [...mapped, ...fillers].slice(0, 3);
+    } else {
+      mapped = mapped.slice(0, 3);
+    }
 
-    getCMSBySection("services")
-      .then((cmsServices) => {
-        const defaultServices = DEFAULT_SERVICES.filter(
-          (service) => !isExcludedService({ key: service.key, title: service.title }),
-        ).map((service) => ({
-          _id: service._id,
-          key: service.key,
-          title: service.title,
-          image: service.imageUrl,
-          tagline: service.tagline,
-          mainTitle: service.description.split(".")[0] || service.title,
-        }));
+    const fitnessItem = {
+      _id: "fitness-item-mega",
+      key: "fitness-classes",
+      title: "Fitness Classes",
+      image:
+        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&h=700&q=80",
+      tagline: "Zumba, HIIT, Yoga & health programs",
+      href: "/services#fitness-classes",
+      isFitness: true,
+    };
 
-        let mapped = [];
-        if (cmsServices && cmsServices.length > 0) {
-          mapped = cmsServices
-            .filter(
-              (svc: { key?: string; title?: unknown; description?: unknown }) =>
-                !isExcludedService({
-                  key: svc.key,
-                  title: getLocalizedValue(
-                    svc.title as string | { en: string; [key: string]: string } | null | undefined,
-                    "",
-                  ),
-                }),
-            )
-            .map((svc: any, index: number) => ({
-            _id: svc._id,
-            key: svc.key,
-            title: getLocalizedValue(svc.title, ""),
-            image: resolveHomeServiceImage(
-              {
-                key: svc.key,
-                title: getLocalizedValue(svc.title, ""),
-                cmsImage: svc.images?.[0]?.url,
-              },
-              index,
-            ),
-            tagline: svc.content?.tagline || "All Levels | Expert Guided",
-            mainTitle:
-              getLocalizedValue(svc.description, "").split(".")[0] ||
-              "Unleash your creative potential",
-          }));
-        } else {
-          mapped = defaultServices;
-        }
-
-        if (mapped.length < 3) {
-          const usedTitles = new Set(mapped.map((s) => s.title.toLowerCase()));
-          const fillers = defaultServices.filter(
-            (d) => !usedTitles.has(d.title.toLowerCase()),
-          );
-          mapped = [...mapped, ...fillers].slice(0, 3);
-        } else {
-          mapped = mapped.slice(0, 3);
-        }
-
-        // Add Fitness option at the end
-        const fitnessItem = {
-          _id: "fitness-item-mega",
-          key: "fitness-classes",
-          title: "Fitness Classes",
-          image:
-            "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&h=700&q=80",
-          tagline: "Zumba, HIIT, Yoga & health programs",
-          href: "/services#fitness-classes",
-          isFitness: true,
-        };
-
-        setServices([...mapped, fitnessItem]);
-      })
-      .catch((err) => {
-        console.error("Error loading services in header:", err);
-        const mapped = DEFAULT_SERVICES.filter(
-          (s) => !isExcludedService({ key: s.key, title: s.title }),
-        ).map((s) => ({
-          _id: s._id,
-          key: s.key,
-          title: s.title,
-          image: s.imageUrl,
-          tagline: s.tagline,
-          mainTitle: s.description.split(".")[0] || s.title,
-        }));
-        const fitnessItem = {
-          _id: "fitness-item-mega",
-          key: "fitness-classes",
-          title: "Fitness Classes",
-          image:
-            "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&h=700&q=80",
-          tagline: "Zumba, HIIT, Yoga & health programs",
-          href: "/services#fitness-classes",
-          isFitness: true,
-        };
-        setServices([...mapped, fitnessItem]);
-      });
-  }, []);
+    setServices([...mapped, fitnessItem]);
+  }, [servicesCms]);
 
   useEffect(() => {
     setIsServicesOpen(false);
@@ -393,15 +360,16 @@ const Header: React.FC = () => {
                         gap: "12px",
                       }}
                     >
-                      <img
+                      <LazyImage
                         src={item.image}
+                        alt={item.title}
+                        rootMargin="80px"
                         style={{
                           width: "40px",
                           height: "40px",
                           borderRadius: "6px",
                           objectFit: "cover",
                         }}
-                        alt=""
                       />
                       <div>
                         <strong style={{ fontSize: "14px" }}>
@@ -437,6 +405,13 @@ const Header: React.FC = () => {
             ))}
             <Link to="/login" onClick={closeMobile} className="nav-link">
               Login
+            </Link>
+            <Link
+              to="/login"
+              onClick={closeMobile}
+              className="contact-btn mobile-join-cta"
+            >
+              Join Studio
             </Link>
           </motion.div>
         )}

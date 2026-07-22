@@ -9,6 +9,7 @@ const PageContent = require("../models/pageContentModel.js");
 const SiteSettings = require("../models/siteSettings.js");
 const { upsertServices } = require("./seedServices.js");
 const { DEFAULT_HOME_PAGE } = require("./data/defaultHomePage.js");
+const { DEFAULT_WORKSHOPS_PAGE_CONTENT } = require("./data/defaultWorkshopsPage.js");
 const { ensureDefaultRoles } = require("../controllers/roleController.js");
 
 const seed = async () => {
@@ -194,6 +195,7 @@ const seed = async () => {
         metaDescription: DEFAULT_HOME_PAGE.metaDescription,
         status: DEFAULT_HOME_PAGE.status,
       },
+      DEFAULT_WORKSHOPS_PAGE_CONTENT,
       {
         slug: "about",
         title: "About Garima Dance Production",

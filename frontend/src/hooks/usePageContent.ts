@@ -6,11 +6,10 @@ export type PageContentFields = Record<string, string | string[] | unknown>;
 /** Load published page content by slug from CMS (MongoDB). */
 export function usePageContent(slug: string) {
   const [content, setContent] = useState<PageContentFields>({});
-  const [loaded, setLoaded] = useState(false);
+  const [loaded, setLoaded] = useState(true);
 
   useEffect(() => {
     let mounted = true;
-    setLoaded(false);
     getPageContentBySlug(slug)
       .then((page) => {
         if (mounted) setContent(page?.content || {});

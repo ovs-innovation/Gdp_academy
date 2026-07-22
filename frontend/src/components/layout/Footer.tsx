@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getSiteSettings, getPageContentBySlug, type SiteSettings, type PageContent } from '../../services/cmsService';
+import { type PageContent } from '../../services/cmsService';
 import SiteLogo from '../common/SiteLogo';
+import { useSiteData } from '../../contexts/SiteDataContext';
+import { getPageContentBySlug } from '../../services/cmsService';
 import '../../styles/footer.css';
 
 const Footer: React.FC = () => {
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const { cmsSettings: settings } = useSiteData();
   const [contactPage, setContactPage] = useState<PageContent | null>(null);
 
   useEffect(() => {
-    getSiteSettings()
-      .then((data) => {
-        if (data) setSettings(data);
-      })
-      .catch((err) => console.error('Error loading footer site settings:', err));
-
     getPageContentBySlug('contact')
       .then((data) => {
         if (data) setContactPage(data);

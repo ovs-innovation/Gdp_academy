@@ -1,0 +1,49 @@
+.lazy-image {
+  background: rgba(255, 255, 255, 0.04);
+  transition: opacity 0.35s ease;
+  opacity: 0.35;
+}
+
+.lazy-image.is-loaded {
+  opacity: 1;
+}
+
+.lazy-section:not(.is-visible) {
+  position: relative;
+}
+
+.lazy-section:not(.is-visible)::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.03) 0%,
+    rgba(255, 255, 255, 0.07) 50%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  background-size: 200% 100%;
+  animation: lazySectionShimmer 1.4s ease-in-out infinite;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+@keyframes lazySectionShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lazy-section:not(.is-visible)::after {
+    animation: none;
+    opacity: 0.4;
+  }
+
+  .lazy-image {
+    transition: none;
+  }
+}

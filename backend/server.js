@@ -6,8 +6,11 @@ const { startExchangeRateJob, stopExchangeRateJob } = require("./jobs/exchangeRa
 const { ensureDefaultRoles } = require("./controllers/roleController.js");
 const { ensureDefaultAdmin } = require("./lib/ensureDefaultAdmin.js");
 const { initEmailTransport } = require("./lib/emailTransport.js");
+const { printDevNetworkGuide, getLanAddresses } = require("../scripts/lan-urls.cjs");
+const { readBackendPort } = require("../scripts/dev-backend-url.cjs");
 
-const PORT = process.env.PORT || 5000;
+const PORT = Number(process.env.PORT) || readBackendPort();
+const HOST = process.env.HOST || "0.0.0.0";
 
 const server = http.createServer(app);
 
@@ -62,8 +65,13 @@ process.on("SIGTERM", () => shutdown("SIGTERM"));
 const startServer = async () => {
   try {
     await initializeServices();
-    server.listen(PORT, () => {
+    server.listen(PORT, HOST, () => {
       console.log(`Server running on http://localhost:${PORT}`);
+      const ips = getLanAddresses();
+      if (ips.length) {
+        ips.forEach((ip) => console.log(`  LAN API:  http://${ip}:${PORT}/api/health`));
+      }
+      printDevNetworkGuide({ frontend: 3000, admin: 8080, backend: PORT });
     });
   } catch (error) {
     console.error("Critical Failure during service initialization ❌:");

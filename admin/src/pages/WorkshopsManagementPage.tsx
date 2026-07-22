@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { PermissionGate } from '@/components/PermissionGate';
 import { Button } from '@/components/ui/button';
@@ -243,7 +244,11 @@ const WorkshopsManagementPage = () => {
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-foreground">Workshop Management</h1>
             <p className="mt-1 text-muted-foreground">
-              Create and manage limited-time dance workshops and intensives.
+              Add workshop cards shown on the website. For page text, images & reviews, edit{' '}
+              <Link to="/cms" className="text-primary underline">
+                Website Content → Workshops Page
+              </Link>
+              .
             </p>
           </div>
           <div className="flex items-center gap-3">

@@ -106,6 +106,9 @@ const toProgramDto = (course) => {
   courseObj.name = getLanguageValue(courseObj.name);
   courseObj.description = getLanguageValue(courseObj.description);
   courseObj.slug = getLanguageValue(courseObj.slug);
+  if (!courseObj.slug) {
+    courseObj.slug = slugify(courseObj.name) || String(courseObj._id || "");
+  }
   courseObj.DanceStyle = courseObj.danceStyle || courseObj.category || "";
   return courseObj;
 };
@@ -217,13 +220,8 @@ const getPrograms = async (req, res, next) => {
 
     const courses = await Program.find(query)
       .populate("createdBy", "name email")
-      .sort({ createdAt: -1 });
-
-    // Backfill slug for older records created before slug existed
-    for (const c of courses) {
-      // eslint-disable-next-line no-await-in-loop
-      await ensureProgramSlug(c);
-    }
+      .sort({ createdAt: -1 })
+      .lean();
 
     const coursesData = courses.map(toProgramDto);
 

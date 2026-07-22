@@ -1,9 +1,13 @@
 const Settings = require("../models/settingsModel.js");
+const { withPublicCache } = require("../utils/publicCache.js");
 
 const getSettings = async (req, res, next) => {
   try {
-    const settings = await Settings.getSettings();
-    res.json({ settings });
+    const body = await withPublicCache("app-settings", 120_000, async () => {
+      const settings = await Settings.getSettings();
+      return { settings };
+    });
+    res.json(body);
   } catch (err) {
     next(err);
   }

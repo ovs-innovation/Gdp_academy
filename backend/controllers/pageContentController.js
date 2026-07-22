@@ -1,4 +1,5 @@
 const PageContent = require("../models/pageContentModel.js");
+const { withPublicCache } = require("../utils/publicCache.js");
 
 // Create page content (admin only)
 const createPageContent = async (req, res, next) => {
@@ -32,16 +33,25 @@ const getAllPageContent = async (req, res, next) => {
 const getPageContentBySlug = async (req, res, next) => {
   try {
     const { slug } = req.params;
-    const query = { slug };
     const isAdmin =
       req.user &&
       (req.user.role === "admin" || req.user.role === "super_admin");
-    if (!isAdmin) {
-      query.status = "published";
+
+    if (isAdmin) {
+      const query = { slug };
+      const page = await PageContent.findOne(query);
+      if (!page) return res.status(404).json({ message: "Page not found" });
+      return res.json({ page });
     }
-    const page = await PageContent.findOne(query);
-    if (!page) return res.status(404).json({ message: "Page not found" });
-    res.json({ page });
+
+    const body = await withPublicCache(`page:${slug}`, 120_000, async () => {
+      const page = await PageContent.findOne({ slug, status: "published" }).lean();
+      if (!page) return null;
+      return { page };
+    });
+
+    if (!body) return res.status(404).json({ message: "Page not found" });
+    res.json(body);
   } catch (err) {
     next(err);
   }

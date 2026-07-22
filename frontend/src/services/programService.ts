@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "../lib/apiConfig";
+import { cachedFetch } from "../lib/apiCache";
 
 export interface Program {
   _id: string;
@@ -85,17 +86,21 @@ export const fetchPrograms = async (params?: {
   }
   queryParams.append("type", "program");
 
-  const response = await fetch(
-    `${API_BASE_URL}/public/courses?${queryParams.toString()}`,
-  );
+  const cacheKey = `programs:${queryParams.toString()}`;
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch Programs");
-  }
+  return cachedFetch(cacheKey, async () => {
+    const response = await fetch(
+      `${API_BASE_URL}/public/courses?${queryParams.toString()}`,
+    );
 
-  const data = await response.json();
-  const programs = data.Programs || data.courses || data.programs || [];
-  return { Programs: programs, programs, courses: programs, count: data.count || programs.length };
+    if (!response.ok) {
+      throw new Error("Failed to fetch Programs");
+    }
+
+    const data = await response.json();
+    const programs = data.Programs || data.courses || data.programs || [];
+    return { Programs: programs, programs, courses: programs, count: data.count || programs.length };
+  });
 };
 
 export const fetchProgram = async (
@@ -315,15 +320,19 @@ export const fetchWorkshops = async (params?: {
   if (params?.page) queryParams.append("page", params.page.toString());
   if (params?.limit) queryParams.append("limit", params.limit.toString());
 
-  const response = await fetch(
-    `${API_BASE_URL}/public/courses?${queryParams.toString()}`,
-  );
+  const cacheKey = `workshops:${queryParams.toString()}`;
 
-  if (!response.ok) {
-    throw new Error("Failed to fetch workshops");
-  }
+  return cachedFetch(cacheKey, async () => {
+    const response = await fetch(
+      `${API_BASE_URL}/public/courses?${queryParams.toString()}`,
+    );
 
-  return response.json();
+    if (!response.ok) {
+      throw new Error("Failed to fetch workshops");
+    }
+
+    return response.json();
+  });
 };
 
 export const fetchWorkshop = async (

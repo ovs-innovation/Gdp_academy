@@ -1,4 +1,5 @@
 const CMS = require("../models/cmsModel.js");
+const { withPublicCache } = require("../utils/publicCache.js");
 
 // Create or update CMS content
 const saveCMS = async (req, res, next) => {
@@ -83,12 +84,14 @@ const getCMSByKey = async (req, res, next) => {
 const getCMSBySection = async (req, res, next) => {
   try {
     const { section } = req.params;
-
-    const cmsContent = await CMS.find({
-      section,
-      isActive: true,
-    }).sort({ "content.order": 1, createdAt: 1 });
-
+    const cmsContent = await withPublicCache(`cms-section:${section}`, 120_000, () =>
+      CMS.find({
+        section,
+        isActive: true,
+      })
+        .sort({ "content.order": 1, createdAt: 1 })
+        .lean(),
+    );
     return res.json(cmsContent);
   } catch (error) {
     next(error);

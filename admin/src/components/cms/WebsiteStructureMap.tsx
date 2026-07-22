@@ -40,8 +40,9 @@ const WEBSITE_MAP = [
     page: "Workshops (/workshops)",
     slug: "workshops",
     sections: [
-      { name: "Page hero", edit: "Website Content → Workshops", path: "/cms" },
-      { name: "Workshop cards", edit: "Workshops admin", path: "/workshops" },
+      { name: "Step 1–5: Offer, featured, benefits, reviews, about", edit: "Website Content → Workshops Page", path: "/cms" },
+      { name: "Step 6: Upcoming list heading", edit: "Website Content → Workshops Page", path: "/cms" },
+      { name: "Workshop cards (date, price, image)", edit: "Workshops admin", path: "/workshops" },
     ],
   },
   {

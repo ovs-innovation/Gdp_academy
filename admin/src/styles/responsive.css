@@ -1,0 +1,65 @@
+/* Admin panel — all devices (Android, iPhone, tablet, desktop) */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+/* Touch-friendly controls */
+@media (hover: none) and (pointer: coarse) {
+  button,
+  a,
+  [role="button"],
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+
+  button[data-sidebar="trigger"],
+  .h-8.w-8 {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Scrollable data tables on small screens */
+.admin-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin-table-wrap table {
+  min-width: 640px;
+}
+
+/* Form grids stack on mobile */
+@media (max-width: 767px) {
+  .admin-page-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+
+  .admin-page-header .flex.gap-2,
+  .admin-page-header .flex.gap-3 {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+}
+
+/* Safe area for notched phones */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .admin-mobile-sidebar {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import LazyImage from "../common/LazyImage";
 
 type ServicesMegaMenuProps = {
   services: any[];
@@ -30,9 +31,10 @@ const ServicesMegaMenu: React.FC<ServicesMegaMenuProps> = ({
               padding: "10px 12px",
             }}
           >
-            <img
+            <LazyImage
               src={item.image}
               alt={item.title}
+              rootMargin="100px"
               style={{
                 width: "56px",
                 height: "56px",

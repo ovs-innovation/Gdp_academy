@@ -1,5 +1,6 @@
 import axios from "axios";
 import { API_BASE_URL } from "../lib/apiConfig";
+import { cachedFetch } from "../lib/apiCache";
 
 const API_URL = API_BASE_URL;
 
@@ -120,8 +121,10 @@ const DEFAULT_SITE_SETTINGS: SiteSettings = {
 
 export const getSiteSettings = async (): Promise<SiteSettings> => {
   try {
-    const response = await axios.get(`${API_URL}/settings`);
-    return response.data.settings;
+    return await cachedFetch("app-settings", async () => {
+      const response = await axios.get(`${API_URL}/settings`);
+      return response.data.settings;
+    });
   } catch (error) {
     console.warn(
       "Using default site settings because the API is unavailable.",

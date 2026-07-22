@@ -9,10 +9,12 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Save, FileText, Settings, Layout, Plus, Trash2, ArrowUp, ArrowDown, Info, MapPin } from "lucide-react";
 import { HomePageCMSEditor } from "@/components/cms/HomePageCMSEditor";
+import { WorkshopsPageCMSEditor } from "@/components/cms/WorkshopsPageCMSEditor";
 import { PageHeroEditor } from "@/components/cms/PageHeroEditor";
 import { WebsiteStructureMap } from "@/components/cms/WebsiteStructureMap";
 import { MediaUrlField } from "@/components/cms/MediaUrlField";
 import { normalizeHomeContentForSave } from "@/lib/homeCms";
+import { normalizeWorkshopsPageContentForSave } from "@/lib/workshopsPageCms";
 
 type ActiveTab = "pages" | "settings" | "map";
 type PageSlug =
@@ -94,7 +96,14 @@ const CMSPage = () => {
     setPageLoading(true);
     try {
       const data = await PageContentAPI.getBySlug(slug);
-      setPageData(data.page);
+      let page = data.page;
+      if (slug === "workshops" && page) {
+        page = {
+          ...page,
+          content: normalizeWorkshopsPageContentForSave(page.content || {}),
+        };
+      }
+      setPageData(page);
     } catch (err: any) {
       setPageData({
         _id: "",
@@ -139,7 +148,9 @@ const CMSPage = () => {
         content:
           selectedSlug === "home"
             ? normalizeHomeContentForSave(pageData.content || {})
-            : pageData.content,
+            : selectedSlug === "workshops"
+              ? normalizeWorkshopsPageContentForSave(pageData.content || {})
+              : pageData.content,
         metaTitle: pageData.metaTitle,
         metaDescription: pageData.metaDescription,
         canonicalUrl: pageData.canonicalUrl,
@@ -257,9 +268,11 @@ const CMSPage = () => {
         />
       );
     }
-    if (selectedSlug === "workshops" || selectedSlug === "faq" || selectedSlug === "testimonials" || selectedSlug === "membership") {
+    if (selectedSlug === "workshops") {
+      return null;
+    }
+    if (selectedSlug === "faq" || selectedSlug === "testimonials" || selectedSlug === "membership") {
       const loc: Record<string, string> = {
-        workshops: "/workshops page → top hero",
         faq: "/faq page → top hero",
         testimonials: "/testimonials page → top hero",
         membership: "/membership page → top hero",
@@ -381,6 +394,15 @@ const CMSPage = () => {
 
                     {selectedSlug === "home" && (
                       <HomePageCMSEditor content={pageData.content || {}} onChange={handleContentChange} />
+                    )}
+
+                    {selectedSlug === "workshops" && (
+                      <>
+                        <p className="text-sm text-muted-foreground -mt-2 mb-4">
+                          Edit the /workshops landing page in 6 simple steps below. Workshop cards at the bottom are managed separately in Workshops admin.
+                        </p>
+                        <WorkshopsPageCMSEditor content={pageData.content || {}} onChange={handleContentChange} />
+                      </>
                     )}
 
                     {renderPageHeroEditors()}

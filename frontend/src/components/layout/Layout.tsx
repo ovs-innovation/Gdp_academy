@@ -2,42 +2,26 @@ import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import ScrollProgressBar from '../common/ScrollProgressBar';
-import { getSiteSettings, type SiteSettings } from '../../services/settingsService';
-import { getSiteSettings as getCmsSiteSettings } from '../../services/cmsService';
+import { useSiteData } from '../../contexts/SiteDataContext';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const [settings, setSettings] = React.useState<SiteSettings | null>(null);
-  const [announcementBar, setAnnouncementBar] = React.useState<
-    NonNullable<import('../../services/cmsService').SiteSettings['announcementBar']> | null
-  >(null);
-  const [cmsWhatsapp, setCmsWhatsapp] = React.useState<string | null>(null);
+  const { appSettings: settings, cmsSettings } = useSiteData();
+  const announcementBar = cmsSettings?.announcementBar ?? null;
 
   React.useEffect(() => {
-    getSiteSettings().then((s) => {
-      setSettings(s);
-      const cleanSiteName = s.siteName && s.siteName !== "AdminHub" ? s.siteName : "GDP";
-      if (window.location.pathname === "/") {
-        document.title = `${cleanSiteName} | Garima Dance Productions`;
-      }
-    });
-    getCmsSiteSettings()
-      .then((cms) => {
-        if (cms?.announcementBar) {
-          setAnnouncementBar(cms.announcementBar);
-        }
-        if (cms?.whatsappNumber) {
-          setCmsWhatsapp(cms.whatsappNumber.replace(/\D/g, ""));
-        }
-      })
-      .catch(() => {});
-  }, []);
+    if (!settings) return;
+    const cleanSiteName = settings.siteName && settings.siteName !== "AdminHub" ? settings.siteName : "GDP";
+    if (window.location.pathname === "/") {
+      document.title = `${cleanSiteName} | Garima Dance Productions`;
+    }
+  }, [settings]);
 
   const whatsappNumber =
-    cmsWhatsapp ||
+    cmsSettings?.whatsappNumber?.replace(/\D/g, "") ||
     settings?.whatsappNumber?.replace(/\D/g, "") ||
     "7838416907";
   const bar = announcementBar;

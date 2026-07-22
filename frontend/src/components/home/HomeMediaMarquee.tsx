@@ -6,53 +6,42 @@ type Props<T> = {
   rowClassName?: string;
   /** Accessible label for the scroll region */
   ariaLabel?: string;
+  layout?: 'media' | 'services';
 };
 
-/** Horizontal media strip with ‹ › arrow controls (no free swipe UX). */
+const LAYOUT = {
+  media: {
+    carousel: 'home-media-carousel',
+    track: 'home-media-marquee',
+    row: 'home-media-marquee-row',
+  },
+  services: {
+    carousel: 'services-v2-carousel',
+    track: 'services-v2-track',
+    row: 'services-v2-grid',
+  },
+} as const;
+
+/** Horizontal strip — manual swipe/scroll, no arrow controls. */
 function HomeMediaMarquee<T>({
   items,
   renderItem,
   rowClassName = '',
   ariaLabel = 'Media gallery',
+  layout = 'media',
 }: Props<T>) {
   const trackRef = useRef<HTMLDivElement>(null);
-
-  const scrollByCard = (direction: -1 | 1) => {
-    const track = trackRef.current;
-    if (!track) return;
-    const card = track.querySelector<HTMLElement>('.home-media-marquee-row > *');
-    const gap = 24;
-    const step = card ? card.offsetWidth + gap : 304;
-    track.scrollBy({ left: direction * step, behavior: 'smooth' });
-  };
+  const config = LAYOUT[layout];
 
   return (
-    <div className="home-media-carousel" role="region" aria-label={ariaLabel}>
-      <button
-        type="button"
-        className="home-media-arrow home-media-arrow--prev"
-        onClick={() => scrollByCard(-1)}
-        aria-label="Previous"
-      >
-        ‹
-      </button>
-
-      <div className="home-media-marquee" ref={trackRef}>
-        <div className={`home-media-marquee-row ${rowClassName}`.trim()}>
+    <div className={config.carousel} role="region" aria-label={ariaLabel}>
+      <div className={config.track} ref={trackRef}>
+        <div className={`${config.row} ${rowClassName}`.trim()}>
           {items.map((item, index) => (
             <React.Fragment key={index}>{renderItem(item, index)}</React.Fragment>
           ))}
         </div>
       </div>
-
-      <button
-        type="button"
-        className="home-media-arrow home-media-arrow--next"
-        onClick={() => scrollByCard(1)}
-        aria-label="Next"
-      >
-        ›
-      </button>
     </div>
   );
 }

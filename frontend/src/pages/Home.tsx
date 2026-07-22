@@ -2,12 +2,14 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '../components/layout/Layout';
-import { getSiteSettings, type SiteSettings } from '../services/settingsService';
-import { getFAQs, getPageContentBySlug, getCMSBySection, type CMSContent } from '../services/cmsService';
+import { getFAQs, getPageContentBySlug, type CMSContent } from '../services/cmsService';
+import { useSiteData } from '../contexts/SiteDataContext';
 import { submitEnquiry } from '../services/enquiryService';
 import { getFeaturedTestimonials, type Testimonial } from '../services/testimonialService';
 import { getLocalizedValue } from '../utils/contentHelper';
 import LazyVideo from '../components/common/LazyVideo';
+import LazyImage from '../components/common/LazyImage';
+import LazySection from '../components/common/LazySection';
 import FormResultModal, { type FormResultType } from '../components/common/FormResultModal';
 import Hero from '../components/homes/home-one/Hero';
 import YouTubeShortsSection from '../components/home/YouTubeShortsSection';
@@ -34,6 +36,13 @@ import '../styles/home.css';
 import { normalizeHomeContent } from '../lib/homeCms';
 import { DEFAULT_SERVICES, HOME_SERVICE_IMAGE_BY_KEY, isExcludedService } from '../lib/defaultServices';
 import { getServiceIcon } from '../components/home/ServiceIcons';
+import {
+  type EnquiryField,
+  type EnquiryFieldErrors,
+  hasEnquiryErrors,
+  validateEnquiryField,
+  validateEnquiryForm,
+} from '../utils/enquiryValidation';
 
 interface HomeContent {
   aboutShortTitle: string;
@@ -251,7 +260,7 @@ const buildHomeServices = (
 
 const Home: React.FC = () => {
   useScrollToHash();
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
+  const { appSettings: settings, servicesCms, ready: siteDataReady } = useSiteData();
   const [homeContent, setHomeContent] = useState<any>(DEFAULT_HOME_CONTENT);
   const [cmsServices, setCmsServices] = useState<CMSContent[]>([]);
   const [selectedService, setSelectedService] = useState<any>(null);
@@ -259,11 +268,12 @@ const Home: React.FC = () => {
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [featuredTestimonials, setFeaturedTestimonials] = useState<Testimonial[]>([]);
   const [enquiryForm, setEnquiryForm] = useState({ name: '', phone: '', email: '', message: '', whatsappConsent: false });
+  const [enquiryErrors, setEnquiryErrors] = useState<EnquiryFieldErrors>({});
   const [isEnquirySubmitting, setIsEnquirySubmitting] = useState(false);
   /** Per-section ready flags — show skeletons until each fetch settles (no static→dynamic flash). */
   const [sectionReady, setSectionReady] = useState({
     home: false,
-    settings: false,
+    settings: true,
     services: false,
     faqs: false,
     testimonials: false,
@@ -282,11 +292,21 @@ const Home: React.FC = () => {
   const homeCopyReady = sectionReady.home && sectionReady.settings;
 
   useEffect(() => {
-    getSiteSettings()
-      .then(setSettings)
-      .catch(() => {})
-      .finally(() => setSectionReady((s) => ({ ...s, settings: true })));
+    if (siteDataReady) {
+      setSectionReady((s) => ({ ...s, settings: true }));
+    }
+  }, [siteDataReady]);
 
+  useEffect(() => {
+    if (servicesCms.length > 0) {
+      setCmsServices(servicesCms);
+    }
+    if (siteDataReady) {
+      setSectionReady((s) => ({ ...s, services: true }));
+    }
+  }, [servicesCms, siteDataReady]);
+
+  useEffect(() => {
     getFeaturedTestimonials(6)
       .then((data) => {
         if (data && data.length > 0) {
@@ -305,15 +325,6 @@ const Home: React.FC = () => {
       .catch(() => setHomeContent(DEFAULT_HOME_CONTENT))
       .finally(() => setSectionReady((s) => ({ ...s, home: true })));
 
-    getCMSBySection('services')
-      .then((data) => {
-        if (data && data.length > 0) {
-          setCmsServices(data);
-        }
-      })
-      .catch((err) => console.error("Error loading services for home:", err))
-      .finally(() => setSectionReady((s) => ({ ...s, services: true })));
-
     getFAQs()
       .then((data) => {
         if (data && data.length > 0) {
@@ -329,17 +340,44 @@ const Home: React.FC = () => {
   const handleEnquiryChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     const checked = type === 'checkbox' && 'checked' in e.target ? e.target.checked : false;
-    setEnquiryForm(prev => ({
+    const fieldName = name as EnquiryField | 'whatsappConsent';
+
+    setEnquiryForm((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
+
+    if (fieldName !== 'whatsappConsent') {
+      setEnquiryErrors((prev) => {
+        if (!prev[fieldName]) return prev;
+        const next = { ...prev };
+        delete next[fieldName];
+        return next;
+      });
+    }
+  };
+
+  const handleEnquiryBlur = (
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
+    requireMessage = false,
+  ) => {
+    const field = e.target.name as EnquiryField;
+    const error = validateEnquiryField(field, e.target.value, { requireMessage });
+    setEnquiryErrors((prev) => {
+      const next = { ...prev };
+      if (error) next[field] = error;
+      else delete next[field];
+      return next;
+    });
   };
 
   const handleCatchUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!enquiryForm.name.trim() || !enquiryForm.phone.trim() || !enquiryForm.email.trim()) {
-      showFormModal('error', 'Almost there', 'Please fill in your name, phone, and email.');
+    const errors = validateEnquiryForm(enquiryForm);
+    if (hasEnquiryErrors(errors)) {
+      setEnquiryErrors(errors);
+      showFormModal('error', 'Almost there', 'Please fix the highlighted fields and try again.');
       return;
     }
 
@@ -357,6 +395,7 @@ const Home: React.FC = () => {
         source: 'contact_form',
       });
       setEnquiryForm({ name: '', phone: '', email: '', message: '', whatsappConsent: false });
+      setEnquiryErrors({});
       showFormModal(
         'success',
         'Message sent!',
@@ -373,12 +412,19 @@ const Home: React.FC = () => {
     e.preventDefault();
     if (!selectedService) return;
 
+    const errors = validateEnquiryForm(enquiryForm, { requireMessage: true });
+    if (hasEnquiryErrors(errors)) {
+      setEnquiryErrors(errors);
+      showFormModal('error', 'Almost there', 'Please fill in all required fields correctly.');
+      return;
+    }
+
     setIsEnquirySubmitting(true);
     try {
       await submitEnquiry({
-        name: enquiryForm.name,
-        phone: enquiryForm.phone,
-        email: enquiryForm.email,
+        name: enquiryForm.name.trim(),
+        phone: enquiryForm.phone.trim(),
+        email: enquiryForm.email.trim(),
         message:
           enquiryForm.message?.trim() ||
           `Enquiry about ${selectedService.title} from homepage services section`,
@@ -387,6 +433,7 @@ const Home: React.FC = () => {
         source: 'general',
       });
       setEnquiryForm({ name: '', phone: '', email: '', message: '', whatsappConsent: false });
+      setEnquiryErrors({});
       setSelectedService(null);
       showFormModal(
         'success',
@@ -399,6 +446,13 @@ const Home: React.FC = () => {
       setIsEnquirySubmitting(false);
     }
   };
+
+  const renderEnquiryFieldError = (field: EnquiryField) =>
+    enquiryErrors[field] ? (
+      <p className="enquiry-field-error" role="alert">
+        {enquiryErrors[field]}
+      </p>
+    ) : null;
 
   const defaultServices = DEFAULT_SERVICES.map((service, index) => ({
     _id: service._id,
@@ -489,6 +543,7 @@ const Home: React.FC = () => {
 
   const [isMuted, setIsMuted] = useState(true);
   const [isTheaterMode, setIsTheaterMode] = useState(false);
+  const [aboutSectionVisible, setAboutSectionVisible] = useState(false);
   const playerRef = useRef<any>(null);
 
   useEffect(() => {
@@ -503,8 +558,12 @@ const Home: React.FC = () => {
     }
 
     const initPlayer = () => {
-      // About Player
-      if (document.getElementById('about-video-player') && !(document.getElementById('about-video-player') as HTMLElement)?.dataset?.ytReady) {
+      // About Player — only when section scrolls into view
+      if (
+        aboutSectionVisible &&
+        document.getElementById('about-video-player') &&
+        !(document.getElementById('about-video-player') as HTMLElement)?.dataset?.ytReady
+      ) {
         new (window as any).YT.Player('about-video-player', {
           videoId: aboutYoutubeId,
           playerVars: {
@@ -569,7 +628,7 @@ const Home: React.FC = () => {
     if ((window as any).YT && (window as any).YT.Player) {
       initPlayer();
     }
-  }, [homeCopyReady, aboutYoutubeId, heroYoutubeId]);
+  }, [homeCopyReady, aboutYoutubeId, heroYoutubeId, aboutSectionVisible]);
 
   const toggleMute = () => {
     if (playerRef.current) {
@@ -613,17 +672,15 @@ const Home: React.FC = () => {
           {!sectionReady.services ? (
             <HomeServicesSkeleton />
           ) : (
-          <div className="services-v2-carousel services-v2-carousel--auto" role="region" aria-label="Services">
-            <div className="services-v2-grid">
-            {[...servicesToRender, ...servicesToRender].map((service, index) => {
-              const isDuplicate = index >= servicesToRender.length;
-              return (
+          <HomeMediaMarquee
+            layout="services"
+            ariaLabel="Services"
+            items={servicesToRender}
+            renderItem={(service, index) => (
               <Link
-                key={`${service._id || service.key || index}-${index}`}
+                key={service._id || service.key || index}
                 to="/services"
                 className="service-card-link"
-                aria-hidden={isDuplicate}
-                tabIndex={isDuplicate ? -1 : 0}
               >
                 <motion.div
                   className="service-card-v2"
@@ -633,12 +690,11 @@ const Home: React.FC = () => {
                   viewport={{ once: true }}
                 >
                   <div className="service-card-img">
-                    <img
+                    <LazyImage
                       src={service.image}
                       className="service-video"
                       alt={service.title}
-                      loading="lazy"
-                      decoding="async"
+                      rootMargin="300px"
                       onError={(e) => {
                         const img = e.currentTarget;
                         const fallback = HOME_SERVICE_IMAGE_LIST[index % HOME_SERVICE_IMAGE_LIST.length];
@@ -655,10 +711,8 @@ const Home: React.FC = () => {
                   </div>
                 </motion.div>
               </Link>
-            );
-            })}
-            </div>
-          </div>
+            )}
+          />
           )}
           <div className="services-explore-wrap">
             <Link to="/services" className="services-explore-btn">
@@ -725,10 +779,9 @@ const Home: React.FC = () => {
                   <div className="modal-gallery-preview">
                     <p className="gallery-label">Check out our Gallery</p>
                     <div className="gallery-thumbs">
-                      <img src="https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&q=80" alt="G1" />
-                      <img src="https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&q=80" alt="G2" />
-                      <img src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&q=80" alt="G3" />
-                      <div className="thumb-next">›</div>
+                      <LazyImage src="https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&q=80" alt="G1" />
+                      <LazyImage src="https://images.unsplash.com/photo-1547153760-18fc86324498?auto=format&fit=crop&q=80" alt="G2" />
+                      <LazyImage src="https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&q=80" alt="G3" />
                     </div>
                   </div>
                 </div>
@@ -736,18 +789,53 @@ const Home: React.FC = () => {
                 <div className="modal-right">
                   <div className="contact-form-box">
                     <h3>Let us reach you!</h3>
-                    <form className="modal-form" onSubmit={handleServiceEnquirySubmit}>
+                    <form className="modal-form" onSubmit={handleServiceEnquirySubmit} noValidate>
                       <div className="input-group">
-                        <input type="text" name="name" placeholder="Full Name" value={enquiryForm.name} onChange={handleEnquiryChange} required />
+                        <input
+                          type="text"
+                          name="name"
+                          placeholder="Full Name"
+                          value={enquiryForm.name}
+                          onChange={handleEnquiryChange}
+                          onBlur={(e) => handleEnquiryBlur(e, true)}
+                          className={enquiryErrors.name ? 'has-error' : ''}
+                        />
+                        {renderEnquiryFieldError('name')}
                       </div>
                       <div className="input-group">
-                        <input type="text" name="phone" placeholder="Contact Number" value={enquiryForm.phone} onChange={handleEnquiryChange} required />
+                        <input
+                          type="tel"
+                          name="phone"
+                          placeholder="Contact Number"
+                          value={enquiryForm.phone}
+                          onChange={handleEnquiryChange}
+                          onBlur={(e) => handleEnquiryBlur(e, true)}
+                          className={enquiryErrors.phone ? 'has-error' : ''}
+                        />
+                        {renderEnquiryFieldError('phone')}
                       </div>
                       <div className="input-group">
-                        <input type="email" name="email" placeholder="Email ID" value={enquiryForm.email} onChange={handleEnquiryChange} required />
+                        <input
+                          type="email"
+                          name="email"
+                          placeholder="Email ID"
+                          value={enquiryForm.email}
+                          onChange={handleEnquiryChange}
+                          onBlur={(e) => handleEnquiryBlur(e, true)}
+                          className={enquiryErrors.email ? 'has-error' : ''}
+                        />
+                        {renderEnquiryFieldError('email')}
                       </div>
                       <div className="input-group">
-                        <textarea name="message" placeholder="Your Message" value={enquiryForm.message} onChange={handleEnquiryChange} required></textarea>
+                        <textarea
+                          name="message"
+                          placeholder="Your Message"
+                          value={enquiryForm.message}
+                          onChange={handleEnquiryChange}
+                          onBlur={(e) => handleEnquiryBlur(e, true)}
+                          className={enquiryErrors.message ? 'has-error' : ''}
+                        />
+                        {renderEnquiryFieldError('message')}
                       </div>
                       <div className="checkbox-group">
                         <input
@@ -771,6 +859,7 @@ const Home: React.FC = () => {
         </AnimatePresence>
       </section>
 
+      <LazySection minHeight={520} rootMargin="400px">
       <YouTubeShortsSection
         shorts={youtubeShorts}
         channel={youtubeChannel}
@@ -779,8 +868,10 @@ const Home: React.FC = () => {
         logoUrl={settings?.logoUrl}
         loading={!homeCopyReady}
       />
+      </LazySection>
 
       {/* 3. About Section */}
+      <LazySection minHeight={480} rootMargin="400px" onVisible={() => setAboutSectionVisible(true)}>
       <section className="about-section section-padding">
         <div className="container">
           <div className={`about-content-wrapper ${isTheaterMode ? 'theater-mode' : ''}`}>
@@ -867,7 +958,9 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+      </LazySection>
 
+      <LazySection minHeight={520} rootMargin="400px">
       <section className="instagram-section section-padding">
         <div className="container">
           <div className="instagram-content">
@@ -974,7 +1067,9 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+      </LazySection>
 
+      <LazySection minHeight={560} rootMargin="400px">
       {!sectionReady.testimonials || !homeCopyReady ? (
         <section className="reviews-v3 section-padding">
           <div className="container">
@@ -993,8 +1088,10 @@ const Home: React.FC = () => {
         videoTestimonials={videoTestimonials}
       />
       )}
+      </LazySection>
 
       {/* 10. FAQ Section */}
+      <LazySection minHeight={420} rootMargin="400px">
       <section className="faq-v3 section-padding">
         <div className="container">
           <div className="services-section-header faq-v3-header">
@@ -1065,8 +1162,10 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+      </LazySection>
 
       {/* 11. Contact Section */}
+      <LazySection minHeight={480} rootMargin="400px">
       <section id="contact" className="contact-v3 section-padding">
         <div className="container">
           <div className="contact-v3-body">
@@ -1118,10 +1217,37 @@ const Home: React.FC = () => {
             >
               <div className="contact-v3-form-glow" aria-hidden="true" />
               <h3>{homeCopyReady ? (homeContent.contactFormTitle || 'Or let us reach you!') : '…'}</h3>
-              <form className="contact-v3-form" onSubmit={handleCatchUpSubmit}>
-                <input type="text" name="name" placeholder="Full Name" className="contact-v3-input" value={enquiryForm.name} onChange={handleEnquiryChange} required />
-                <input type="text" name="phone" placeholder="Contact Number" className="contact-v3-input" value={enquiryForm.phone} onChange={handleEnquiryChange} required />
-                <input type="email" name="email" placeholder="Email ID" className="contact-v3-input" value={enquiryForm.email} onChange={handleEnquiryChange} required />
+              <form className="contact-v3-form" onSubmit={handleCatchUpSubmit} noValidate>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Full Name"
+                  className={`contact-v3-input${enquiryErrors.name ? ' has-error' : ''}`}
+                  value={enquiryForm.name}
+                  onChange={handleEnquiryChange}
+                  onBlur={(e) => handleEnquiryBlur(e)}
+                />
+                {renderEnquiryFieldError('name')}
+                <input
+                  type="tel"
+                  name="phone"
+                  placeholder="Contact Number"
+                  className={`contact-v3-input${enquiryErrors.phone ? ' has-error' : ''}`}
+                  value={enquiryForm.phone}
+                  onChange={handleEnquiryChange}
+                  onBlur={(e) => handleEnquiryBlur(e)}
+                />
+                {renderEnquiryFieldError('phone')}
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Email ID"
+                  className={`contact-v3-input${enquiryErrors.email ? ' has-error' : ''}`}
+                  value={enquiryForm.email}
+                  onChange={handleEnquiryChange}
+                  onBlur={(e) => handleEnquiryBlur(e)}
+                />
+                {renderEnquiryFieldError('email')}
                 <div className="contact-v3-checkbox">
                   <input
                     type="checkbox"
@@ -1143,6 +1269,7 @@ const Home: React.FC = () => {
           </div>
         </div>
       </section>
+      </LazySection>
       <FormResultModal
         open={formModal.open}
         type={formModal.type}

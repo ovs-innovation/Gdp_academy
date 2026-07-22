@@ -343,16 +343,24 @@
   margin: 0;
 }
 
-/* Services V2 (Homepage) — auto horizontal carousel */
+/* Services V2 (Homepage) — manual horizontal carousel */
 .services-v2-carousel {
+  position: relative;
   width: 100%;
-  overflow-x: hidden;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
+  overflow: visible;
 }
 
-.services-v2-carousel::-webkit-scrollbar {
+.services-v2-track {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.services-v2-track::-webkit-scrollbar {
   display: none;
 }
 
@@ -363,31 +371,6 @@
   gap: 28px;
   width: max-content;
   padding: 4px 4px 12px;
-}
-
-.services-v2-carousel--auto .services-v2-grid {
-  animation: servicesAutoScroll 28s linear infinite;
-  will-change: transform;
-}
-
-.services-v2-carousel--auto:hover .services-v2-grid,
-.services-v2-carousel--auto:focus-within .services-v2-grid {
-  animation-play-state: paused;
-}
-
-@keyframes servicesAutoScroll {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .services-v2-carousel--auto .services-v2-grid {
-    animation: none;
-  }
 }
 
 .service-card-link {
@@ -1042,36 +1025,6 @@
   margin: 4px 0 0;
 }
 
-.reviews-v3-carousel-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(6, 6, 6, 0.75);
-  color: #fff;
-  font-size: 20px;
-  line-height: 1;
-  cursor: pointer;
-  z-index: 6;
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.reviews-v3-carousel-btn:hover {
-  background: rgba(99, 75, 250, 0.35);
-  border-color: rgba(99, 75, 250, 0.45);
-}
-
-.reviews-v3-carousel-btn--prev {
-  left: 10px;
-}
-
-.reviews-v3-carousel-btn--next {
-  right: 10px;
-}
-
 .reviews-v3-dots {
   display: flex;
   justify-content: center;
@@ -1082,12 +1035,18 @@
 .reviews-v3-dot {
   width: 8px;
   height: 8px;
+  min-width: 8px !important;
+  min-height: 8px !important;
+  max-width: 8px;
+  max-height: 8px;
   padding: 0;
   border: none;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.2);
   cursor: pointer;
   transition: background 0.2s ease, transform 0.2s ease;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
 
 .reviews-v3-dot.is-active {
@@ -1142,20 +1101,6 @@
 @media (max-width: 480px) {
   .reviews-v3-carousel-item {
     flex: 0 0 100%;
-  }
-
-  .reviews-v3-carousel-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-  }
-
-  .reviews-v3-carousel-btn--prev {
-    left: 4px;
-  }
-
-  .reviews-v3-carousel-btn--next {
-    right: 4px;
   }
 }
 
@@ -1340,7 +1285,7 @@
   letter-spacing: 0.5px;
 }
 
-/* Shorts / reels — arrow controls (‹ ›), not free swipe */
+/* Shorts / reels — swipe/scroll carousel, no arrow controls */
 .home-media-carousel {
   position: relative;
   margin-top: 60px;
@@ -1367,50 +1312,13 @@
   gap: 24px;
   align-items: stretch;
   width: max-content;
-  padding: 0 44px 8px;
+  padding: 0 4px 8px;
 }
 
 .home-media-marquee-row > * {
   flex: 0 0 280px;
   width: 280px;
   scroll-snap-align: start;
-}
-
-.home-media-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 8;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(6, 6, 6, 0.82);
-  color: #fff;
-  font-size: 28px;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-}
-
-.home-media-arrow:hover {
-  background: rgba(99, 75, 250, 0.4);
-  border-color: rgba(99, 75, 250, 0.5);
-}
-
-.home-media-arrow:active {
-  transform: translateY(-50%) scale(0.96);
-}
-
-.home-media-arrow--prev {
-  left: 0;
-}
-
-.home-media-arrow--next {
-  right: 0;
 }
 
 /* Lightweight section skeletons — CSS-only, no layout shift flash */
@@ -1714,18 +1622,12 @@
 
 @media (max-width: 1024px) {
   .home-media-marquee-row {
-    padding: 0 40px 8px;
+    padding: 0 4px 8px;
   }
 
   .home-media-marquee-row > * {
     flex: 0 0 260px;
     width: 260px;
-  }
-
-  .home-media-arrow {
-    width: 36px;
-    height: 36px;
-    font-size: 24px;
   }
 
   .yt-short-card,
@@ -1736,18 +1638,12 @@
 
 @media (max-width: 600px) {
   .home-media-marquee-row {
-    padding: 0 36px 8px;
+    padding: 0 4px 8px;
   }
 
   .home-media-marquee-row > * {
     flex: 0 0 240px;
     width: 240px;
-  }
-
-  .home-media-arrow {
-    width: 34px;
-    height: 34px;
-    font-size: 22px;
   }
 
   .yt-short-card,
@@ -2793,6 +2689,28 @@
   gap: 14px;
 }
 
+.contact-v3-input.has-error,
+.modal-form .input-group input.has-error,
+.modal-form .input-group textarea.has-error {
+  border-color: rgba(255, 99, 99, 0.75);
+  box-shadow: 0 0 0 1px rgba(255, 99, 99, 0.25);
+}
+
+.enquiry-field-error {
+  margin: -6px 0 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #ff8a8a;
+}
+
+.contact-v3-form .enquiry-field-error {
+  margin: -8px 0 12px;
+}
+
+.modal-form .enquiry-field-error {
+  margin: 4px 0 0;
+}
+
 .contact-v3-input {
   width: 100%;
   padding: 16px 18px;
@@ -3186,19 +3104,6 @@
 }
 
 .gallery-thumbs img:hover { transform: scale(1.05); }
-
-.thumb-next {
-  width: 40px;
-  height: 40px;
-  background: rgba(255,255,255,0.05);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 24px;
-  cursor: pointer;
-}
 
 .modal-right {
   flex: 1;

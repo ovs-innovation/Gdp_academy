@@ -22,7 +22,10 @@ const Login: React.FC = () => {
         toast.success(`Welcome back, ${response.user.name}!`);
         
         if (response.user.role === 'admin' || response.user.role === 'superadmin' || response.user.role === 'super_admin') {
-          window.location.href = `http://localhost:8080/login?token=${response.token}`;
+          const adminBase =
+            import.meta.env.VITE_ADMIN_URL ||
+            `${window.location.protocol}//${window.location.hostname}:8080`;
+          window.location.href = `${adminBase.replace(/\/$/, '')}/login?token=${response.token}`;
         } else {
           window.location.href = '/dashboard';
         }
