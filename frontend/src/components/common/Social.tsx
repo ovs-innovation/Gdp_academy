@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom"
 import InjectableSvg from "../../hooks/InjectableSvg"
+import { buildWhatsAppUrl } from "../../utils/whatsapp"
 
 const Social = () => {
    return (
@@ -15,7 +16,7 @@ const Social = () => {
             </Link>
          </li>
          <li>
-            <Link to="https://wa.me/917838416907" target="_blank">
+            <Link to={buildWhatsAppUrl("917838416907")} target="_blank">
                <InjectableSvg src="/assets/img/icons/whatsapp.svg" alt="img" className="injectable" />
             </Link>
          </li>

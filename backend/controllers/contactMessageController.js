@@ -2,24 +2,34 @@ const ContactMessage = require("../models/contactMessageModel");
 const {
   sendContactMessageNotificationToAdmin,
 } = require("../utils/emailService.js");
+const { validateLeadFields } = require("../utils/enquiryValidation.js");
 
 // Public – submit a contact message
 const submitContactMessage = async (req, res, next) => {
   try {
     const { name, email, phone, subject, message } = req.body;
 
-    if (!name?.trim() || !email?.trim() || !phone?.trim() || !message?.trim()) {
+    const validation = validateLeadFields({ name, email, phone, message });
+    if (!validation.ok) {
       return res.status(400).json({
-        message: "Name, email, phone, and message are required",
+        message: validation.errors[0],
+        errors: validation.errors,
       });
     }
 
+    const {
+      name: cleanName,
+      email: cleanEmail,
+      phone: cleanPhone,
+      message: cleanMessage,
+    } = validation.values;
+
     const contact = await ContactMessage.create({
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      phone: phone.trim(),
+      name: cleanName,
+      email: cleanEmail,
+      phone: cleanPhone,
       subject: subject?.trim() || "Contact Page Enquiry",
-      message: message.trim(),
+      message: cleanMessage,
       source: "contact_page",
     });
 

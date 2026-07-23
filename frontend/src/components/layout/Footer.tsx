@@ -4,6 +4,7 @@ import { type PageContent } from '../../services/cmsService';
 import SiteLogo from '../common/SiteLogo';
 import { useSiteData } from '../../contexts/SiteDataContext';
 import { getPageContentBySlug } from '../../services/cmsService';
+import { buildWhatsAppUrl } from '../../utils/whatsapp';
 import '../../styles/footer.css';
 
 const Footer: React.FC = () => {
@@ -21,7 +22,7 @@ const Footer: React.FC = () => {
   const defaultSocialLinks = [
     { platform: 'Instagram', url: 'https://www.instagram.com/gdp_garimadanceproductions?igsh=MWhueGpqZGQzZGN0ZA==' },
     { platform: 'YouTube', url: 'https://youtube.com/@garimadanceproductions1146?si=XEMV40bqEVW6JM71' },
-    { platform: 'WhatsApp', url: 'https://wa.me/917838416907' },
+    { platform: 'WhatsApp', url: buildWhatsAppUrl('917838416907') },
   ];
   const defaultFooterLinks = [
     { label: 'Home', href: '/' },
@@ -84,6 +85,21 @@ const Footer: React.FC = () => {
   const phone = contactPage?.content?.phone || '+91 78384 16907';
   const email = contactPage?.content?.email || 'Gdp.info2019@gmail.com';
 
+  const resolveSocialUrl = (link: { platform: string; url: string }) => {
+    if (
+      link.platform.toLowerCase() === 'whatsapp' ||
+      link.url.includes('wa.me') ||
+      link.url.includes('api.whatsapp.com')
+    ) {
+      const phone =
+        settings?.whatsappNumber ||
+        link.url.match(/wa\.me\/(\d+)/)?.[1] ||
+        '7838416907';
+      return buildWhatsAppUrl(phone);
+    }
+    return link.url;
+  };
+
   return (
     <footer className="footer">
       <div className="container">
@@ -127,7 +143,7 @@ const Footer: React.FC = () => {
             <ul>
               {socialLinks.map((link, idx) => (
                 <li key={idx}>
-                  <a href={link.url} target="_blank" rel="noreferrer">
+                  <a href={resolveSocialUrl(link)} target="_blank" rel="noreferrer">
                     {link.platform}
                   </a>
                 </li>

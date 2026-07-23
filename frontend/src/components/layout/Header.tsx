@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import SiteLogo from "../common/SiteLogo";
 import LazyImage from "../common/LazyImage";
@@ -71,6 +71,7 @@ const Header: React.FC = () => {
   const { cmsSettings: settings, servicesCms } = useSiteData();
   const servicesRef = useRef<HTMLLIElement>(null);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -205,18 +206,23 @@ const Header: React.FC = () => {
   const brandLine1 = settings?.brandLine1 || "Garima";
   const brandLine2 = settings?.brandLine2 || "Dance";
   const brandLine3 = settings?.brandLine3 || "Productions";
-  const headerCtaLabel = settings?.headerCtaLabel || "Join Studio";
-  const headerCtaUrl = settings?.headerCtaUrl || "/login";
 
-  const handleNavClick = (path: string) => {
-    if (isReviewsNav(path) && location.pathname === "/") {
-      const el = document.getElementById("reviews");
-      if (el) {
-        const top = el.getBoundingClientRect().top + window.scrollY - 100;
-        window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-        window.history.replaceState(null, "", "/#reviews");
-      }
+  const scrollToReviews = () => {
+    const el = document.getElementById("reviews");
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY - 100;
+    window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    window.history.replaceState(null, "", "/#reviews");
+  };
+
+  const handleReviewClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    closeMobile();
+    if (location.pathname === "/") {
+      scrollToReviews();
+      return;
     }
+    navigate("/#reviews");
   };
 
   const closeMobile = () => {
@@ -294,11 +300,24 @@ const Header: React.FC = () => {
                 );
               }
 
+              if (isReviewsNav(link.path)) {
+                return (
+                  <li key={link.name}>
+                    <a
+                      href="/#reviews"
+                      onClick={handleReviewClick}
+                      className={`nav-link ${isNavActive(link.path) ? "active" : ""}`}
+                    >
+                      {link.name}
+                    </a>
+                  </li>
+                );
+              }
+
               return (
                 <li key={link.name}>
                   <Link
                     to={link.path}
-                    onClick={() => handleNavClick(link.path)}
                     className={`nav-link ${isNavActive(link.path) ? "active" : ""}`}
                   >
                     {link.name}
@@ -308,12 +327,6 @@ const Header: React.FC = () => {
             })}
           </ul>
         </nav>
-
-        <div className="header-actions">
-          <Link to={headerCtaUrl} className="contact-btn">
-            {headerCtaLabel}
-          </Link>
-        </div>
       </div>
 
       <AnimatePresence>
@@ -384,30 +397,30 @@ const Header: React.FC = () => {
                 );
               }
 
+              if (isReviewsNav(link.path)) {
+                return (
+                  <a
+                    key={link.name}
+                    href="/#reviews"
+                    onClick={handleReviewClick}
+                    className={`nav-link ${isNavActive(link.path) ? "active" : ""}`}
+                  >
+                    {link.name}
+                  </a>
+                );
+              }
+
               return (
                 <Link
                   key={link.name}
                   to={link.path}
-                  onClick={() => {
-                    handleNavClick(link.path);
-                    closeMobile();
-                  }}
+                  onClick={closeMobile}
                   className={`nav-link ${isNavActive(link.path) ? "active" : ""}`}
                 >
                   {link.name}
                 </Link>
               );
             })}
-            <Link to={headerCtaUrl} onClick={closeMobile} className="nav-link">
-              {headerCtaLabel}
-            </Link>
-            <Link
-              to={headerCtaUrl}
-              onClick={closeMobile}
-              className="contact-btn mobile-join-cta"
-            >
-              {headerCtaLabel}
-            </Link>
           </motion.div>
         )}
       </AnimatePresence>

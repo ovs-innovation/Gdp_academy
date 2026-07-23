@@ -10,14 +10,25 @@ export function useScrollToHash(offset = HEADER_OFFSET) {
     if (!location.hash) return;
 
     const id = location.hash.replace('#', '');
+    let attempts = 0;
+    let timer: number | undefined;
+
     const scrollToTarget = () => {
       const el = document.getElementById(id);
-      if (!el) return;
-      const top = el.getBoundingClientRect().top + window.scrollY - offset;
-      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+      if (el) {
+        const top = el.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+        return;
+      }
+      if (attempts < 24) {
+        attempts += 1;
+        timer = window.setTimeout(scrollToTarget, 150);
+      }
     };
 
-    const timer = window.setTimeout(scrollToTarget, 120);
-    return () => window.clearTimeout(timer);
+    timer = window.setTimeout(scrollToTarget, 120);
+    return () => {
+      if (timer) window.clearTimeout(timer);
+    };
   }, [location.hash, location.pathname, offset]);
 }

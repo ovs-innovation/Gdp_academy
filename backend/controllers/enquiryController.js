@@ -9,6 +9,7 @@ const {
   sendEnquiryConfirmationEmail,
   sendEnquiryNotificationToAdmin,
 } = require("../utils/emailService.js");
+const { validateLeadFields } = require("../utils/enquiryValidation.js");
 
 const POPULATE = [
   { path: "userId", select: "name email" },
@@ -55,11 +56,20 @@ const createEnquiry = async (req, res, next) => {
     const { name, email, phone, message, programId, workshopId, source, subject, whatsappConsent } =
       req.body;
 
-    if (!name || !email || !phone || !message) {
+    const validation = validateLeadFields({ name, email, phone, message });
+    if (!validation.ok) {
       return res.status(400).json({
-        message: "Name, email, phone, and message are required",
+        message: validation.errors[0],
+        errors: validation.errors,
       });
     }
+
+    const {
+      name: cleanName,
+      email: cleanEmail,
+      phone: cleanPhone,
+      message: cleanMessage,
+    } = validation.values;
 
     const validSources = ["program", "workshop", "contact_form", "general"];
     if (source && !validSources.includes(source)) {
@@ -69,10 +79,10 @@ const createEnquiry = async (req, res, next) => {
     }
 
     const enquiry = await Enquiry.create({
-      name,
-      email,
-      phone,
-      message,
+      name: cleanName,
+      email: cleanEmail,
+      phone: cleanPhone,
+      message: cleanMessage,
       subject: subject || "",
       whatsappConsent: Boolean(whatsappConsent),
       programId: programId || null,

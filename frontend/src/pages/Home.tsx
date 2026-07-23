@@ -16,6 +16,7 @@ import YouTubeShortsSection from '../components/home/YouTubeShortsSection';
 import HomeStatsBar from '../components/home/HomeStatsBar';
 import ReviewsSection from '../components/home/ReviewsSection';
 import { useScrollToHash } from '../hooks/useScrollToHash';
+import { buildWhatsAppUrl } from '../utils/whatsapp';
 import HomeMediaMarquee from '../components/home/HomeMediaMarquee';
 import MediaProfileAvatar from '../components/home/MediaProfileAvatar';
 import {
@@ -42,6 +43,7 @@ import {
   hasEnquiryErrors,
   validateEnquiryField,
   validateEnquiryForm,
+  sanitizeEnquiryField,
 } from '../utils/enquiryValidation';
 
 interface HomeContent {
@@ -342,19 +344,23 @@ const Home: React.FC = () => {
     const checked = type === 'checkbox' && 'checked' in e.target ? e.target.checked : false;
     const fieldName = name as EnquiryField | 'whatsappConsent';
 
+    if (fieldName === 'whatsappConsent') {
+      setEnquiryForm((prev) => ({ ...prev, whatsappConsent: checked }));
+      return;
+    }
+
+    const sanitized = sanitizeEnquiryField(fieldName, value);
     setEnquiryForm((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
+      [name]: sanitized,
     }));
 
-    if (fieldName !== 'whatsappConsent') {
-      setEnquiryErrors((prev) => {
-        if (!prev[fieldName]) return prev;
-        const next = { ...prev };
-        delete next[fieldName];
-        return next;
-      });
-    }
+    setEnquiryErrors((prev) => {
+      if (!prev[fieldName]) return prev;
+      const next = { ...prev };
+      delete next[fieldName];
+      return next;
+    });
   };
 
   const handleEnquiryBlur = (
@@ -799,6 +805,8 @@ const Home: React.FC = () => {
                           onChange={handleEnquiryChange}
                           onBlur={(e) => handleEnquiryBlur(e, true)}
                           className={enquiryErrors.name ? 'has-error' : ''}
+                          maxLength={60}
+                          autoComplete="name"
                         />
                         {renderEnquiryFieldError('name')}
                       </div>
@@ -806,11 +814,14 @@ const Home: React.FC = () => {
                         <input
                           type="tel"
                           name="phone"
-                          placeholder="Contact Number"
+                          inputMode="numeric"
+                          placeholder="10-digit mobile number"
                           value={enquiryForm.phone}
                           onChange={handleEnquiryChange}
                           onBlur={(e) => handleEnquiryBlur(e, true)}
                           className={enquiryErrors.phone ? 'has-error' : ''}
+                          maxLength={10}
+                          autoComplete="tel"
                         />
                         {renderEnquiryFieldError('phone')}
                       </div>
@@ -823,6 +834,8 @@ const Home: React.FC = () => {
                           onChange={handleEnquiryChange}
                           onBlur={(e) => handleEnquiryBlur(e, true)}
                           className={enquiryErrors.email ? 'has-error' : ''}
+                          maxLength={100}
+                          autoComplete="email"
                         />
                         {renderEnquiryFieldError('email')}
                       </div>
@@ -834,6 +847,7 @@ const Home: React.FC = () => {
                           onChange={handleEnquiryChange}
                           onBlur={(e) => handleEnquiryBlur(e, true)}
                           className={enquiryErrors.message ? 'has-error' : ''}
+                          maxLength={500}
                         />
                         {renderEnquiryFieldError('message')}
                       </div>
@@ -1071,7 +1085,7 @@ const Home: React.FC = () => {
 
       <LazySection minHeight={560} rootMargin="400px">
       {!sectionReady.testimonials || !homeCopyReady ? (
-        <section className="reviews-v3 section-padding">
+        <section className="reviews-v3 section-padding" id="reviews">
           <div className="container">
             <div className="services-section-header">
               <h2 className="section-title"><span className="gradient-text">Reviews</span></h2>
@@ -1151,7 +1165,7 @@ const Home: React.FC = () => {
               <h3>Can&apos;t find what you&apos;re looking for?</h3>
               <p>Reach out on WhatsApp — we&apos;ll help you pick the right class or program.</p>
               <a
-                href={`https://wa.me/${settings?.whatsappNumber || '7838416907'}`}
+                href={buildWhatsAppUrl(settings?.whatsappNumber || '7838416907')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="faq-v3-cta-btn"
@@ -1199,7 +1213,7 @@ const Home: React.FC = () => {
                 </>
               )}
               <a
-                href={`https://wa.me/${settings?.whatsappNumber || '7838416907'}`}
+                href={buildWhatsAppUrl(settings?.whatsappNumber || '7838416907')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="contact-v3-wa-btn"
@@ -1229,16 +1243,21 @@ const Home: React.FC = () => {
                   value={enquiryForm.name}
                   onChange={handleEnquiryChange}
                   onBlur={(e) => handleEnquiryBlur(e)}
+                  maxLength={60}
+                  autoComplete="name"
                 />
                 {renderEnquiryFieldError('name')}
                 <input
                   type="tel"
                   name="phone"
-                  placeholder="Contact Number"
+                  inputMode="numeric"
+                  placeholder="10-digit mobile number"
                   className={`contact-v3-input${enquiryErrors.phone ? ' has-error' : ''}`}
                   value={enquiryForm.phone}
                   onChange={handleEnquiryChange}
                   onBlur={(e) => handleEnquiryBlur(e)}
+                  maxLength={10}
+                  autoComplete="tel"
                 />
                 {renderEnquiryFieldError('phone')}
                 <input
@@ -1249,6 +1268,8 @@ const Home: React.FC = () => {
                   value={enquiryForm.email}
                   onChange={handleEnquiryChange}
                   onBlur={(e) => handleEnquiryBlur(e)}
+                  maxLength={100}
+                  autoComplete="email"
                 />
                 {renderEnquiryFieldError('email')}
                 <div className="contact-v3-checkbox">

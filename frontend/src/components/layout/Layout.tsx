@@ -3,6 +3,7 @@ import Header from './Header';
 import Footer from './Footer';
 import ScrollProgressBar from '../common/ScrollProgressBar';
 import { useSiteData } from '../../contexts/SiteDataContext';
+import { buildWhatsAppUrl } from '../../utils/whatsapp';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -60,7 +61,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       
       {/* WhatsApp Chatbot / Floating Button */}
       <a 
-        href={`https://wa.me/${whatsappNumber}`} 
+        href={buildWhatsAppUrl(whatsappNumber)} 
         className="whatsapp-float" 
         target="_blank" 
         rel="noopener noreferrer"
