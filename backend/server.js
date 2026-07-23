@@ -6,10 +6,17 @@ const { startExchangeRateJob, stopExchangeRateJob } = require("./jobs/exchangeRa
 const { ensureDefaultRoles } = require("./controllers/roleController.js");
 const { ensureDefaultAdmin } = require("./lib/ensureDefaultAdmin.js");
 const { initEmailTransport } = require("./lib/emailTransport.js");
-const { printDevNetworkGuide, getLanAddresses } = require("../scripts/lan-urls.cjs");
-const { readBackendPort } = require("../scripts/dev-backend-url.cjs");
 
-const PORT = Number(process.env.PORT) || readBackendPort();
+/**
+ * Production-safe startup — depends ONLY on:
+ * - process.env
+ * - backend source under this package
+ * - installed npm packages
+ *
+ * Never import monorepo-root scripts (../scripts/*). Those files are outside the
+ * Docker build context (backend/) and crash the process after every CI/CD deploy.
+ */
+const PORT = Number(process.env.PORT) || 8096;
 const HOST = process.env.HOST || "0.0.0.0";
 
 const server = http.createServer(app);
@@ -17,7 +24,7 @@ const server = http.createServer(app);
 server.on("error", (error) => {
   if (error.code === "EADDRINUSE") {
     console.error(
-      `Port ${PORT} is already in use. Stop the existing backend process or set a different PORT in backend/.env.`,
+      `Port ${PORT} is already in use. Stop the existing backend process or set a different PORT.`,
     );
     process.exit(1);
   }
@@ -30,7 +37,7 @@ const initializeServices = async () => {
   console.log("Initializing services...");
   if (!process.env.MONGO_URI?.trim()) {
     throw new Error(
-      "MONGO_URI is not set in backend/.env — refusing to start without persistent database.",
+      "MONGO_URI is not set — refusing to start without persistent database.",
     );
   }
 
@@ -66,12 +73,8 @@ const startServer = async () => {
   try {
     await initializeServices();
     server.listen(PORT, HOST, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-      const ips = getLanAddresses();
-      if (ips.length) {
-        ips.forEach((ip) => console.log(`  LAN API:  http://${ip}:${PORT}/api/health`));
-      }
-      printDevNetworkGuide({ frontend: 3000, admin: 8080, backend: PORT });
+      console.log(`GDP Backend listening on ${HOST}:${PORT}`);
+      console.log(`Health: http://${HOST === "0.0.0.0" ? "127.0.0.1" : HOST}:${PORT}/health`);
     });
   } catch (error) {
     console.error("Critical Failure during service initialization ❌:");

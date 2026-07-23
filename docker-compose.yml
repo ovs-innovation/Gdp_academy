@@ -18,6 +18,10 @@ services:
       - "3041:8096" # Maps VPS port 3041 to backend port 8096
     env_file:
       - ./backend/.env
+    environment:
+      NODE_ENV: production
+      PORT: "8096"
+      HOST: "0.0.0.0"
     healthcheck:
       test:
         [

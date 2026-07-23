@@ -50,9 +50,43 @@ dotenv.config();
 
 // DB connection is handled in server.js (do not connect here — avoids double-connect race)
 
-// Middleware
-app.use(cors({ origin: true, credentials: true }));
-app.options("*", cors());
+/**
+ * CORS
+ * - Development: reflect request origin (localhost / LAN Vite ports).
+ * - Production: explicit allowlist from env + known GDP domains (no open localhost).
+ */
+const parseOriginList = (value) =>
+  String(value || "")
+    .split(",")
+    .map((s) => s.trim().replace(/\/$/, ""))
+    .filter(Boolean);
+
+const isProd = process.env.NODE_ENV === "production";
+
+const productionOrigins = [
+  ...parseOriginList(process.env.CORS_ORIGINS),
+  ...parseOriginList(process.env.FRONTEND_URL),
+  ...parseOriginList(process.env.ADMIN_URL),
+  ...parseOriginList(process.env.ADMIN_PANEL_URL),
+  "https://garimadanceproductions.com",
+  "https://www.garimadanceproductions.com",
+  "https://admin.garimadanceproductions.com",
+].filter(Boolean);
+
+const corsOptions = {
+  credentials: true,
+  origin: isProd
+    ? (origin, callback) => {
+        // Non-browser clients (curl, healthchecks) send no Origin.
+        if (!origin) return callback(null, true);
+        const normalized = origin.replace(/\/$/, "");
+        callback(null, productionOrigins.includes(normalized));
+      }
+    : true,
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 // IMPORTANT FIX
 app.use(express.json());
