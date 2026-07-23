@@ -188,9 +188,15 @@ export const uploadProfilePhotoToServer = async (file: File) => {
 }
 
 // ================= VALIDATE TOKEN =================
-export const validateToken = async () => {
+/** Distinguishes real auth failure from transient network/server errors. */
+export type TokenValidationResult =
+  | { status: "ok"; user: AuthResponse["user"] }
+  | { status: "unauthorized" }
+  | { status: "transient" };
+
+export const validateToken = async (): Promise<TokenValidationResult> => {
   const token = getStoredToken();
-  if (!token) return null;
+  if (!token) return { status: "unauthorized" };
 
   try {
     const response = await fetch(`${API_BASE_URL}/auth/me`, {
@@ -199,16 +205,22 @@ export const validateToken = async () => {
       },
     });
 
-    if (!response.ok) {
+    // Only definitive auth failures should wipe the session.
+    if (response.status === 401 || response.status === 403) {
       removeStoredToken();
       removeStoredUser();
-      return null;
+      return { status: "unauthorized" };
+    }
+
+    if (!response.ok) {
+      return { status: "transient" };
     }
 
     const data = await response.json();
-    return data.user || data;
+    return { status: "ok", user: data.user || data };
   } catch {
-    return null;
+    // Network / CORS / offline — keep stored session for refresh survival.
+    return { status: "transient" };
   }
 };
 

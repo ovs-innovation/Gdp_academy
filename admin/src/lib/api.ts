@@ -34,17 +34,30 @@ const getHeaders = () => {
   return headers;
 };
 
+/** Typed API failure so callers can distinguish 401 from network/5xx. */
+export class ApiError extends Error {
+  status: number;
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
 const apiFetch = async <T>(path: string, options: RequestInit = {}): Promise<T> => {
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     headers: { ...getHeaders(), ...(options.headers || {}) },
   });
   const data = await response.json().catch(() => ({}));
+
+  // Wipe token only on definitive unauthorized responses.
   if (response.status === 401) {
     clearToken();
   }
+
   if (!response.ok) {
-    throw new Error(data.message || "Request failed");
+    throw new ApiError(data.message || "Request failed", response.status);
   }
   return data as T;
 };

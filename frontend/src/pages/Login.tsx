@@ -2,11 +2,12 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { motion } from 'framer-motion';
-import { login } from '../services/authService';
+import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-toastify';
 import '../styles/auth.css';
 
 const Login: React.FC = () => {
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -15,25 +16,14 @@ const Login: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await login({ email, password });
-      if ('token' in response) {
-        localStorage.setItem('auth_token', response.token);
-        localStorage.setItem('auth_user', JSON.stringify(response.user));
-        toast.success(`Welcome back, ${response.user.name}!`);
-        
-        if (response.user.role === 'admin' || response.user.role === 'superadmin' || response.user.role === 'super_admin') {
-          const adminBase =
-            import.meta.env.VITE_ADMIN_URL ||
-            `${window.location.protocol}//${window.location.hostname}:8080`;
-          window.location.href = `${adminBase.replace(/\/$/, '')}/login?token=${response.token}`;
-        } else {
-          window.location.href = '/dashboard';
-        }
-      } else {
-        toast.info('OTP required for login.');
-      }
+      await login({ email, password });
+      toast.success('Welcome back!');
     } catch (error: any) {
-      toast.error(error.message || 'Login failed');
+      if (error?.message === 'OTP_REQUIRED') {
+        toast.info('OTP required for login.');
+      } else {
+        toast.error(error?.message || 'Login failed');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -43,35 +33,37 @@ const Login: React.FC = () => {
     <Layout>
       <section className="auth-section">
         <div className="container">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="auth-card glass-card"
           >
             <div className="auth-header">
-              <h2>WELCOME <span className="gradient-text">BACK</span></h2>
+              <h2>
+                WELCOME <span className="gradient-text">BACK</span>
+              </h2>
               <p>Login to your GDP portal to continue your practice.</p>
             </div>
 
             <form onSubmit={handleSubmit} className="auth-form">
               <div className="form-group">
                 <label>EMAIL ADDRESS</label>
-                <input 
-                  type="email" 
-                  placeholder="name@example.com" 
+                <input
+                  type="email"
+                  placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  required 
+                  required
                 />
               </div>
               <div className="form-group">
                 <label>PASSWORD</label>
-                <input 
-                  type="password" 
-                  placeholder="••••••••" 
+                <input
+                  type="password"
+                  placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  required 
+                  required
                 />
               </div>
               <div className="form-actions">
@@ -86,7 +78,12 @@ const Login: React.FC = () => {
             </form>
 
             <div className="auth-footer">
-              <p>New to the platform? <Link to="/signup" className="gradient-text">JOIN GDP STUDIO</Link></p>
+              <p>
+                New to the platform?{' '}
+                <Link to="/signup" className="gradient-text">
+                  JOIN GDP STUDIO
+                </Link>
+              </p>
             </div>
           </motion.div>
         </div>
@@ -96,4 +93,3 @@ const Login: React.FC = () => {
 };
 
 export default Login;
-

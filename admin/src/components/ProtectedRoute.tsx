@@ -1,6 +1,6 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AuthAPI, clearToken, TOKEN_KEY } from "@/lib/api";
+import { ApiError, AuthAPI, clearToken, TOKEN_KEY } from "@/lib/api";
 import { useRole } from "@/contexts/RoleContext";
 import type { Permission } from "@/lib/rbac";
 
@@ -16,6 +16,10 @@ const ProtectedRoute = ({ children, permission, anyOf }: Props) => {
   const { setCurrentRole, setPermissions } = useRole();
   const [ready, setReady] = useState(false);
   const [allowed, setAllowed] = useState(true);
+  const verifiedPath = useRef<string | null>(null);
+
+  // Stabilize permission list so effect does not re-run every render.
+  const anyOfKey = useMemo(() => (anyOf?.length ? anyOf.join("|") : ""), [anyOf]);
 
   useEffect(() => {
     const verify = async () => {
@@ -24,6 +28,12 @@ const ProtectedRoute = ({ children, permission, anyOf }: Props) => {
         navigate("/login", { replace: true, state: { from: location.pathname } });
         return;
       }
+
+      // Avoid re-verifying the same path after a successful bootstrap.
+      if (verifiedPath.current === location.pathname && ready) {
+        return;
+      }
+
       try {
         const data = await AuthAPI.me();
         if (data.user?.role) {
@@ -68,23 +78,36 @@ const ProtectedRoute = ({ children, permission, anyOf }: Props) => {
 
         setAllowed(ok);
         setReady(true);
+        verifiedPath.current = location.pathname;
 
         if (!ok) {
           navigate("/", { replace: true });
         }
-      } catch {
-        clearToken();
-        navigate("/login", { replace: true, state: { from: location.pathname } });
+      } catch (err) {
+        const status = err instanceof ApiError ? err.status : 0;
+
+        // Only clear session on definitive auth failure.
+        if (status === 401 || status === 403) {
+          clearToken();
+          navigate("/login", { replace: true, state: { from: location.pathname } });
+          return;
+        }
+
+        // Network / 5xx / transient: keep token so hard refresh does not log the user out.
+        setAllowed(true);
+        setReady(true);
+        verifiedPath.current = location.pathname;
       }
     };
     verify();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- anyOfKey stabilizes anyOf
   }, [
     navigate,
     location.pathname,
     setCurrentRole,
     setPermissions,
     permission,
-    anyOf,
+    anyOfKey,
   ]);
 
   if (!ready || !allowed) return null;

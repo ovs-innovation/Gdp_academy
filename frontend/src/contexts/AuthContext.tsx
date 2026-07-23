@@ -61,8 +61,9 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null)
-  const [token, setToken] = useState<string | null>(null)
+  // Rehydrate synchronously so a hard refresh never flashes logged-out.
+  const [user, setUser] = useState<User | null>(() => getStoredUser() as User | null)
+  const [token, setToken] = useState<string | null>(() => getStoredToken())
   const [isLoading, setIsLoading] = useState(true)
   const navigate = useNavigate()
   const didInitAuth = useRef(false)
@@ -73,44 +74,48 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       didInitAuth.current = true
 
       const storedToken = getStoredToken()
+      const userFromStorage = getStoredUser()
 
-      if (storedToken) {
-        try {
-            // Optimistically set user from storage while validating
-            const userFromStorage = getStoredUser();
-            if(userFromStorage) {
-              setToken(storedToken);
-              setUser(userFromStorage);
-            }
-
-            const shouldValidateOnStartup =
-              !import.meta.env.DEV || import.meta.env.VITE_VALIDATE_AUTH_ON_STARTUP === 'true';
-
-            if (!shouldValidateOnStartup) {
-              setIsLoading(false);
-              return;
-            }
-            
-            const validatedUser = await validateToken()
-            
-            if (validatedUser) {
-                setToken(storedToken)
-                setUser(validatedUser)
-                setStoredUser(validatedUser)
-            } else {
-                // Token invalid
-                setToken(null)
-                setUser(null)
-                removeStoredToken()
-                removeStoredUser()
-            }
-        } catch (error) {
-            setToken(null)
-            setUser(null)
-            removeStoredToken()
-            removeStoredUser()
-        }
+      if (!storedToken) {
+        setToken(null)
+        setUser(null)
+        setIsLoading(false)
+        return
       }
+
+      // Keep cached session visible while we revalidate.
+      setToken(storedToken)
+      if (userFromStorage) {
+        setUser(userFromStorage as User)
+      }
+
+      const shouldValidateOnStartup =
+        !import.meta.env.DEV || import.meta.env.VITE_VALIDATE_AUTH_ON_STARTUP === 'true'
+
+      if (!shouldValidateOnStartup) {
+        setIsLoading(false)
+        return
+      }
+
+      try {
+        const result = await validateToken()
+
+        if (result.status === 'ok') {
+          setToken(storedToken)
+          setUser(result.user as User)
+          setStoredUser(result.user)
+        } else if (result.status === 'unauthorized') {
+          // Real auth failure — clear only here.
+          setToken(null)
+          setUser(null)
+          removeStoredToken()
+          removeStoredUser()
+        }
+        // 'transient': keep stored token/user (network/5xx must not log the user out)
+      } catch {
+        // Keep cached session on unexpected errors during startup validation.
+      }
+
       setIsLoading(false)
     }
 
@@ -130,8 +135,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setStoredUser(authResponse.user)
       setToken(authResponse.token)
       setUser(authResponse.user)
-      
-      if (authResponse.user.role === 'teacher' || authResponse.user.role === 'student') {
+
+      const role = authResponse.user.role
+      if (role === 'admin' || role === 'superadmin' || role === 'super_admin') {
+        const adminBase =
+          import.meta.env.VITE_ADMIN_URL ||
+          `${window.location.protocol}//${window.location.hostname}:8080`
+        window.location.href = `${adminBase.replace(/\/$/, '')}/login?token=${authResponse.token}`
+        return
+      }
+
+      if (role === 'teacher' || role === 'student') {
         navigate('/dashboard', { replace: true })
       } else {
         navigate('/', { replace: true })

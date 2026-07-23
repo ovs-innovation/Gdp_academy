@@ -3,6 +3,7 @@ import React, {
   useContext,
   useEffect,
   useState,
+  useCallback,
   ReactNode,
 } from "react";
 import { useThemeColor } from "@/contexts/ThemeColorContext";
@@ -27,6 +28,30 @@ interface RoleContextType {
 
 const RoleContext = createContext<RoleContextType | undefined>(undefined);
 
+const FALLBACK_ADMIN_PERMS: Permission[] = [
+  "dashboard.view",
+  "users.view",
+  "members.view",
+  "enquiries.view",
+  "enquiries.edit",
+  "enquiries.assign",
+  "enquiries.delete",
+  "roles.view",
+  "payments.view",
+  "analytics.view",
+  "reports.view",
+  "blogs.view",
+  "gallery.view",
+  "cms.view",
+  "faqs.view",
+  "membershipPlans.view",
+  "announcements.view",
+  "notifications.view",
+  "settings.view",
+  "programs.view",
+  "categories.view",
+];
+
 export function RoleProvider({ children }: { children: ReactNode }) {
   const { setThemeColor } = useThemeColor();
 
@@ -36,14 +61,14 @@ export function RoleProvider({ children }: { children: ReactNode }) {
 
   const [permissions, setPermissionsState] = useState<Permission[]>([]);
 
-  const setCurrentRole = (role: Role) => {
+  const setCurrentRole = useCallback((role: Role) => {
     setCurrentRoleState(role);
     localStorage.setItem(ROLE_KEY, role);
-  };
+  }, []);
 
-  const setPermissions = (perms: Permission[]) => {
+  const setPermissions = useCallback((perms: Permission[]) => {
     setPermissionsState(perms || []);
-  };
+  }, []);
 
   useEffect(() => {
     const syncRole = async () => {
@@ -64,30 +89,7 @@ export function RoleProvider({ children }: { children: ReactNode }) {
         if (data.user?.permissions && data.user.permissions.length > 0) {
           setPermissions(data.user.permissions as Permission[]);
         } else {
-          // fallback admin permissions
-          setPermissions([
-            "dashboard.view",
-            "users.view",
-            "members.view",
-            "enquiries.view",
-            "enquiries.edit",
-            "enquiries.assign",
-            "enquiries.delete",
-            "roles.view",
-            "payments.view",
-            "analytics.view",
-            "reports.view",
-            "blogs.view",
-            "gallery.view",
-            "cms.view",
-            "faqs.view",
-            "membershipPlans.view",
-            "announcements.view",
-            "notifications.view",
-            "settings.view",
-            "programs.view",
-            "categories.view",
-          ] as Permission[]);
+          setPermissions(FALLBACK_ADMIN_PERMS);
         }
 
         try {
@@ -95,7 +97,7 @@ export function RoleProvider({ children }: { children: ReactNode }) {
             m.SettingsAPI.get(),
           );
 
-          const colorMap = {
+          const colorMap: Record<string, string> = {
             sky: "sky",
             violet: "violet",
             emerald: "emerald",
@@ -113,41 +115,19 @@ export function RoleProvider({ children }: { children: ReactNode }) {
           const mappedColor =
             colorMap[settingsData.settings.themeColor] || "sky";
 
-          setThemeColor(mappedColor);
-        } catch (e) {
+          setThemeColor(mappedColor as any);
+        } catch {
           setThemeColor("sky");
         }
       } catch {
-        setCurrentRoleState("admin");
-
-        setPermissionsState([
-          "dashboard.view",
-          "users.view",
-          "members.view",
-          "enquiries.view",
-          "enquiries.edit",
-          "enquiries.assign",
-          "enquiries.delete",
-          "roles.view",
-          "payments.view",
-          "analytics.view",
-          "reports.view",
-          "blogs.view",
-          "gallery.view",
-          "cms.view",
-          "faqs.view",
-          "membershipPlans.view",
-          "announcements.view",
-          "notifications.view",
-          "settings.view",
-          "programs.view",
-          "categories.view",
-        ] as Permission[]);
+        // Keep cached role/permissions — never clear auth token here.
+        setCurrentRoleState((prev) => prev || "admin");
+        setPermissionsState((prev) => (prev.length ? prev : FALLBACK_ADMIN_PERMS));
       }
     };
 
     syncRole();
-  }, []);
+  }, [setCurrentRole, setPermissions, setThemeColor]);
 
   const can = (permission: Permission) => {
     if (currentRole === "admin" || currentRole === "super_admin") return true;
