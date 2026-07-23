@@ -178,6 +178,7 @@ const Header: React.FC = () => {
   const primaryNavLinks = [
     { name: "Home", path: "/" },
     { name: "About", path: "/about" },
+    { name: "Services", path: "/services" },
     { name: "Review", path: "/#reviews" },
     { name: "Contact", path: "/contact" },
   ];
@@ -192,7 +193,13 @@ const Header: React.FC = () => {
     );
   };
 
-  const isReviewsNav = (path: string) => path === "/#reviews";
+  const isReviewsNav = (path: string) =>
+    path === "/#reviews" || path.toLowerCase().includes("#reviews");
+
+  const isServicesNav = (path: string, name: string) => {
+    const normalizedPath = path.toLowerCase().replace(/\/+$/, "") || "/";
+    return normalizedPath === "/services" || name.toLowerCase().trim() === "services";
+  };
 
   const isServicesActive = () => location.pathname === "/services";
 
@@ -203,9 +210,20 @@ const Header: React.FC = () => {
     return location.pathname === path;
   };
 
-  const navLinks = primaryNavLinks.filter(
+  const cmsNavLinks =
+    settings?.navLinks && settings.navLinks.length > 0
+      ? settings.navLinks.map((link) => ({ name: link.label, path: link.href }))
+      : primaryNavLinks;
+
+  const navLinks = cmsNavLinks.filter(
     (link) => !isLibraryNavItem(link.path, link.name),
   );
+
+  const brandLine1 = settings?.brandLine1 || "Garima";
+  const brandLine2 = settings?.brandLine2 || "Dance";
+  const brandLine3 = settings?.brandLine3 || "Productions";
+  const headerCtaLabel = settings?.headerCtaLabel || "Join Studio";
+  const headerCtaUrl = settings?.headerCtaUrl || "/login";
 
   const handleNavClick = (path: string) => {
     if (isReviewsNav(path) && location.pathname === "/") {
@@ -243,79 +261,74 @@ const Header: React.FC = () => {
             alt="GDP"
           />
           <div className="site-text">
-            <span>Garima</span>
-            <span>Dance</span>
-            <span>Productions</span>
+            <span>{brandLine1}</span>
+            <span>{brandLine2}</span>
+            <span>{brandLine3}</span>
           </div>
         </Link>
 
         <nav className="desktop-nav">
           <ul className="nav-list">
-            {navLinks.slice(0, 2).map((link) => (
-              <li key={link.name}>
-                <Link
-                  to={link.path}
-                  onClick={() => handleNavClick(link.path)}
-                  className={`nav-link ${isNavActive(link.path) ? "active" : ""}`}
-                >
-                  {link.name}
-                </Link>
-              </li>
-            ))}
-
-            <li
-              ref={servicesRef}
-              className={`nav-item-services ${isServicesOpen ? "open" : ""} ${isServicesActive() ? "active" : ""}`}
-              onMouseEnter={() => setIsServicesOpen(true)}
-              onMouseLeave={() => setIsServicesOpen(false)}
-            >
-              <button
-                type="button"
-                className={`nav-link nav-link-services ${isServicesActive() ? "active" : ""}`}
-                onClick={() => setIsServicesOpen((v) => !v)}
-                aria-expanded={isServicesOpen}
-                aria-haspopup="true"
-              >
-                Services
-                <span className="nav-chevron" aria-hidden="true">
-                  ▾
-                </span>
-              </button>
-              <AnimatePresence>
-                {isServicesOpen && (
-                  <motion.div
-                    className="services-mega-wrap"
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 4 }}
-                    transition={{ duration: 0.2 }}
+            {navLinks.map((link) => {
+              if (isServicesNav(link.path, link.name)) {
+                return (
+                  <li
+                    key={link.name}
+                    ref={servicesRef}
+                    className={`nav-item-services ${isServicesOpen ? "open" : ""} ${isServicesActive() ? "active" : ""}`}
+                    onMouseEnter={() => setIsServicesOpen(true)}
+                    onMouseLeave={() => setIsServicesOpen(false)}
                   >
-                    <ServicesMegaMenu
-                      services={services}
-                      onNavigate={() => setIsServicesOpen(false)}
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </li>
+                    <button
+                      type="button"
+                      className={`nav-link nav-link-services ${isServicesActive() ? "active" : ""}`}
+                      onClick={() => setIsServicesOpen((v) => !v)}
+                      aria-expanded={isServicesOpen}
+                      aria-haspopup="true"
+                    >
+                      {link.name}
+                      <span className="nav-chevron" aria-hidden="true">
+                        ▾
+                      </span>
+                    </button>
+                    <AnimatePresence>
+                      {isServicesOpen && (
+                        <motion.div
+                          className="services-mega-wrap"
+                          initial={{ opacity: 0, y: 4 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 4 }}
+                          transition={{ duration: 0.2 }}
+                        >
+                          <ServicesMegaMenu
+                            services={services}
+                            onNavigate={() => setIsServicesOpen(false)}
+                          />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </li>
+                );
+              }
 
-            {navLinks.slice(2).map((link) => (
-              <li key={link.name}>
-                <Link
-                  to={link.path}
-                  onClick={() => handleNavClick(link.path)}
-                  className={`nav-link ${isNavActive(link.path) ? "active" : ""}`}
-                >
-                  {link.name}
-                </Link>
-              </li>
-            ))}
+              return (
+                <li key={link.name}>
+                  <Link
+                    to={link.path}
+                    onClick={() => handleNavClick(link.path)}
+                    className={`nav-link ${isNavActive(link.path) ? "active" : ""}`}
+                  >
+                    {link.name}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
         <div className="header-actions">
-          <Link to="/login" className="contact-btn">
-            Join Studio
+          <Link to={headerCtaUrl} className="contact-btn">
+            {headerCtaLabel}
           </Link>
         </div>
       </div>
@@ -328,90 +341,89 @@ const Header: React.FC = () => {
             exit={{ opacity: 0, y: -20 }}
             className="mobile-menu"
           >
-            <Link to="/" onClick={closeMobile} className="nav-link">
-              Home
-            </Link>
-            <Link to="/about" onClick={closeMobile} className="nav-link">
-              About
-            </Link>
-
-            <div className="mobile-services-block">
-              <button
-                type="button"
-                className={`nav-link mobile-services-toggle ${isMobileServicesOpen ? "open" : ""}`}
-                onClick={() => setIsMobileServicesOpen((v) => !v)}
-              >
-                Services{" "}
-                <span className="nav-chevron">
-                  {isMobileServicesOpen ? "▴" : "▾"}
-                </span>
-              </button>
-              {isMobileServicesOpen && (
-                <div className="mobile-services-panel">
-                  {services.map((item) => (
-                    <Link
-                      key={item._id || item.key}
-                      to={item.isFitness ? item.href : `/services`}
-                      onClick={closeMobile}
-                      className="mobile-services-link"
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "12px",
-                      }}
+            {navLinks.map((link) => {
+              if (isServicesNav(link.path, link.name)) {
+                return (
+                  <div key={link.name} className="mobile-services-block">
+                    <button
+                      type="button"
+                      className={`nav-link mobile-services-toggle ${isMobileServicesOpen ? "open" : ""}`}
+                      onClick={() => setIsMobileServicesOpen((v) => !v)}
                     >
-                      <LazyImage
-                        src={item.image}
-                        alt={item.title}
-                        rootMargin="80px"
-                        style={{
-                          width: "40px",
-                          height: "40px",
-                          borderRadius: "6px",
-                          objectFit: "cover",
-                        }}
-                      />
-                      <div>
-                        <strong style={{ fontSize: "14px" }}>
-                          {item.title}
-                        </strong>
-                        <span
-                          style={{
-                            fontSize: "11px",
-                            color: "rgba(255, 255, 255, 0.45)",
-                          }}
-                        >
-                          {item.tagline}
-                        </span>
+                      {link.name}{" "}
+                      <span className="nav-chevron">
+                        {isMobileServicesOpen ? "▴" : "▾"}
+                      </span>
+                    </button>
+                    {isMobileServicesOpen && (
+                      <div className="mobile-services-panel">
+                        {services.map((item) => (
+                          <Link
+                            key={item._id || item.key}
+                            to={item.isFitness ? item.href : `/services`}
+                            onClick={closeMobile}
+                            className="mobile-services-link"
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "12px",
+                            }}
+                          >
+                            <LazyImage
+                              src={item.image}
+                              alt={item.title}
+                              rootMargin="80px"
+                              style={{
+                                width: "40px",
+                                height: "40px",
+                                borderRadius: "6px",
+                                objectFit: "cover",
+                              }}
+                            />
+                            <div>
+                              <strong style={{ fontSize: "14px" }}>
+                                {item.title}
+                              </strong>
+                              <span
+                                style={{
+                                  fontSize: "11px",
+                                  color: "rgba(255, 255, 255, 0.45)",
+                                }}
+                              >
+                                {item.tagline}
+                              </span>
+                            </div>
+                          </Link>
+                        ))}
                       </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
+                    )}
+                  </div>
+                );
+              }
 
-            {navLinks.slice(2).map((link) => (
-              <Link
-                key={link.name}
-                to={link.path}
-                onClick={() => {
-                  handleNavClick(link.path);
-                  closeMobile();
-                }}
-                className={`nav-link ${isNavActive(link.path) ? "active" : ""}`}
-              >
-                {link.name}
-              </Link>
-            ))}
-            <Link to="/login" onClick={closeMobile} className="nav-link">
-              Login
+              return (
+                <Link
+                  key={link.name}
+                  to={link.path}
+                  onClick={() => {
+                    handleNavClick(link.path);
+                    closeMobile();
+                  }}
+                  className={`nav-link ${isNavActive(link.path) ? "active" : ""}`}
+                >
+                  {link.name}
+                </Link>
+              );
+            })}
+            <Link to={headerCtaUrl} onClick={closeMobile} className="nav-link">
+              {headerCtaLabel}
             </Link>
             <Link
-              to="/login"
+              to={headerCtaUrl}
               onClick={closeMobile}
               className="contact-btn mobile-join-cta"
             >
-              Join Studio
+              {headerCtaLabel}
             </Link>
           </motion.div>
         )}

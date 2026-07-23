@@ -12,14 +12,18 @@ interface ContactContent {
   address: string;
   phone: string;
   email: string;
+  hoursWeekday: string;
+  hoursWeekend: string;
 }
 
 const DEFAULT_CONTENT: ContactContent = {
-  headerTitle: "Get in Touch",
+  headerTitle: "LET'S CONNECT.",
   headerSubtitle: "We love hearing from fellow dancers, prospective students, and collaborators! Reach out for general inquiries, booking details, or customized workshop sessions.",
   address: "123 Creative Rhythm Way, Dance Arts District, New Delhi, India",
   phone: "+91 78384 16907",
-  email: "Gdp.info2019@gmail.com"
+  email: "Gdp.info2019@gmail.com",
+  hoursWeekday: "Mon-Fri: 9AM - 10PM",
+  hoursWeekend: "Sat-Sun: 10AM - 8PM",
 };
 
 const Contact: React.FC = () => {
@@ -42,8 +46,10 @@ const Contact: React.FC = () => {
             headerTitle: page.content.headerTitle || DEFAULT_CONTENT.headerTitle,
             headerSubtitle: page.content.headerSubtitle || DEFAULT_CONTENT.headerSubtitle,
             address: page.content.address || DEFAULT_CONTENT.address,
-            phone: loadedPhone === "+91 98765 43210" || loadedPhone === "9711384768" ? DEFAULT_CONTENT.phone : loadedPhone,
-            email: loadedEmail === "hello@gdpstudio.com" || loadedEmail === "hello@gdpacademy.com" ? DEFAULT_CONTENT.email : loadedEmail
+            phone: loadedPhone || DEFAULT_CONTENT.phone,
+            email: loadedEmail || DEFAULT_CONTENT.email,
+            hoursWeekday: page.content.hoursWeekday || DEFAULT_CONTENT.hoursWeekday,
+            hoursWeekend: page.content.hoursWeekend || DEFAULT_CONTENT.hoursWeekend,
           });
         }
       })
@@ -108,7 +114,19 @@ const Contact: React.FC = () => {
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           >
             <h1 className="contact-hero-title">
-              LET'S <span>CONNECT.</span>
+              {(() => {
+                const title = content.headerTitle || "LET'S CONNECT.";
+                const parts = title.split(/\s+/);
+                if (parts.length >= 2) {
+                  const last = parts.pop() as string;
+                  return (
+                    <>
+                      {parts.join(" ")} <span>{last}</span>
+                    </>
+                  );
+                }
+                return title;
+              })()}
             </h1>
             <p className="contact-hero-subtitle">
               {content.headerSubtitle}
@@ -134,9 +152,9 @@ const Contact: React.FC = () => {
               <div className="contact-detail-block">
                 <h4>HOURS</h4>
                 <p>
-                  Mon-Fri: 9AM - 10PM
+                  {content.hoursWeekday}
                   <br />
-                  Sat-Sun: 10AM - 8PM
+                  {content.hoursWeekend}
                 </p>
               </div>
 

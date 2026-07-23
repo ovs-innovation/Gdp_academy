@@ -30,7 +30,24 @@ const assertPersistentUri = (uri) => {
   }
 };
 
-const connectDB = async (uri) => {
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+let disconnectListenerAttached = false;
+
+const attachDisconnectListener = () => {
+  if (disconnectListenerAttached) return;
+  disconnectListenerAttached = true;
+  mongoose.connection.on("disconnected", () => {
+    console.error(
+      "❌ MongoDB disconnected. Fix Atlas/network — backend will keep retrying on next request cycle / restart.",
+    );
+  });
+};
+
+/**
+ * Connect with retries so transient Atlas / network blips don't kill the process on boot.
+ */
+const connectDB = async (uri, options = {}) => {
   const mongoUri = resolveMongoUri(uri);
   assertPersistentUri(mongoUri);
 
@@ -38,39 +55,55 @@ const connectDB = async (uri) => {
     return mongoose.connection;
   }
 
-  mongoose.connection.on("disconnected", () => {
-    console.error(
-      "❌ MongoDB disconnected. Fix Atlas/network and restart the backend.",
-    );
-  });
+  attachDisconnectListener();
 
-  try {
-    await mongoose.connect(mongoUri, {
-      serverSelectionTimeoutMS: 15000,
-      maxPoolSize: 10,
-    });
+  const maxAttempts = Number(options.maxAttempts ?? process.env.MONGO_CONNECT_RETRIES ?? 8);
+  const baseDelayMs = Number(options.baseDelayMs ?? 2000);
 
-    const { host, name } = mongoose.connection;
-    console.log("MongoDB Connected Successfully ✅");
-    console.log(`   Database: ${name} | Host: ${host}`);
-    console.log("   Storage: PERSISTENT — data survives restarts until you delete manually");
-    console.log("   Auto-delete: only OTP codes expire (login security); all other data is kept");
-    return mongoose.connection;
-  } catch (err) {
-    console.error("❌ FATAL: Cannot connect to MongoDB. Server will NOT start.");
-    console.error(
-      "   In-memory fallback is disabled — no data will be saved to RAM.",
-    );
-    console.error("   Reason:", err.message);
-    console.error("");
-    console.error("   Fix:");
-    console.error("   1. Set MONGO_URI in backend/.env");
-    console.error(
-      "   2. Atlas → Network Access → whitelist your IP (or 0.0.0.0/0 for dev)",
-    );
-    console.error("   3. Verify database user, password, and database name");
-    throw err;
+  let lastError;
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      await mongoose.connect(mongoUri, {
+        serverSelectionTimeoutMS: 15000,
+        maxPoolSize: 10,
+      });
+
+      const { host, name } = mongoose.connection;
+      console.log("MongoDB Connected Successfully ✅");
+      console.log(`   Database: ${name} | Host: ${host}`);
+      console.log(
+        "   Storage: PERSISTENT — data survives restarts until you delete manually",
+      );
+      console.log(
+        "   Auto-delete: only OTP codes expire (login security); all other data is kept",
+      );
+      return mongoose.connection;
+    } catch (err) {
+      lastError = err;
+      console.error(
+        `❌ MongoDB connect attempt ${attempt}/${maxAttempts} failed: ${err.message}`,
+      );
+      if (attempt < maxAttempts) {
+        const delay = baseDelayMs * attempt;
+        console.error(`   Retrying in ${delay}ms...`);
+        await sleep(delay);
+      }
+    }
   }
+
+  console.error("❌ FATAL: Cannot connect to MongoDB. Server will NOT start.");
+  console.error(
+    "   In-memory fallback is disabled — no data will be saved to RAM.",
+  );
+  console.error("   Reason:", lastError?.message);
+  console.error("");
+  console.error("   Fix:");
+  console.error("   1. Set MONGO_URI in backend/.env");
+  console.error(
+    "   2. Atlas → Network Access → whitelist your VPS IP (or 0.0.0.0/0 for open access)",
+  );
+  console.error("   3. Verify database user, password, and database name");
+  throw lastError;
 };
 
 const getDbHealth = () => {

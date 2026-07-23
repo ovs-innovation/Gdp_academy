@@ -16,6 +16,7 @@ interface AboutContent {
   missionTitle: string;
   missionText: string;
   heroText: string;
+  heroHighlights: Array<{ text: string }>;
   stats: StatItem[];
   pillars: PillarItem[];
   ecosystem: EcosystemItem[];
@@ -80,6 +81,7 @@ const DEFAULT_CONTENT: AboutContent = {
   missionTitle: "Our Mission",
   missionText: "To empower individuals to express themselves freely through dance, while honoring deep cultural roots and embracing contemporary innovation.",
   heroText: "GDP Dance Studio is a creative space where passion, performance, and personality come together. We train dancers with confidence, discipline, and real stage experience.",
+  heroHighlights: [...HERO_HIGHLIGHTS],
   stats: DEFAULT_STATS,
   pillars: DEFAULT_PILLARS,
   ecosystem: DEFAULT_ECOSYSTEM,
@@ -104,6 +106,10 @@ const About: React.FC = () => {
             missionTitle: c.missionTitle || DEFAULT_CONTENT.missionTitle,
             missionText: c.missionText || DEFAULT_CONTENT.missionText,
             heroText: c.heroText || c.storyText || DEFAULT_CONTENT.heroText,
+            heroHighlights:
+              Array.isArray(c.heroHighlights) && c.heroHighlights.length > 0
+                ? c.heroHighlights
+                : DEFAULT_CONTENT.heroHighlights,
             stats: c.stats?.length > 0 ? c.stats : DEFAULT_STATS,
             pillars: c.pillars?.length > 0 ? c.pillars : DEFAULT_PILLARS,
             ecosystem: c.ecosystem?.length > 0 ? c.ecosystem : DEFAULT_ECOSYSTEM,
@@ -214,7 +220,7 @@ const About: React.FC = () => {
               {/* Right Side: Hero Dancer Cutout */}
               <div className="hero-visual-centerpiece">
                 <div className="hero-highlights" aria-hidden>
-                  {HERO_HIGHLIGHTS.map((item, i) => (
+                  {content.heroHighlights.map((item, i) => (
                     <motion.div
                       key={item.text}
                       className={`hero-highlight ${i === 0 ? 'hero-highlight--tl' : 'hero-highlight--br'}`}

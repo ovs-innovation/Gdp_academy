@@ -27,6 +27,25 @@ const siteSettingsSchema = new mongoose.Schema(
 
     footerText: { type: String, trim: true },
 
+    footerTagline: { type: String, trim: true },
+
+    brandLine1: { type: String, trim: true, default: "Garima" },
+    brandLine2: { type: String, trim: true, default: "Dance" },
+    brandLine3: { type: String, trim: true, default: "Productions" },
+
+    headerCtaLabel: { type: String, trim: true, default: "Join Studio" },
+    headerCtaUrl: { type: String, trim: true, default: "/login" },
+
+    footerServiceLinks: {
+      type: [
+        {
+          label: { type: String, required: true, trim: true },
+          href: { type: String, required: true, trim: true },
+        },
+      ],
+      default: [],
+    },
+
     socialLinks: {
       type: [
         {

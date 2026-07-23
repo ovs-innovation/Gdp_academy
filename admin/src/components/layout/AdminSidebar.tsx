@@ -1,6 +1,7 @@
 import { NavLink } from "@/components/NavLink";
 import { useRole } from "@/contexts/RoleContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import type { Permission } from "@/lib/rbac";
 import {
   LayoutDashboard,
   Users,
@@ -25,7 +26,7 @@ import {
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 
@@ -35,119 +36,152 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
-const adminNavItems = [
+type NavItem = {
+  to: string;
+  icon: typeof LayoutDashboard;
+  label: string;
+  permission?: Permission;
+  anyOf?: Permission[];
+};
+
+const adminNavItems: NavItem[] = [
   {
     to: "/",
     icon: LayoutDashboard,
     label: "Dashboard",
+    permission: "dashboard.view",
   },
   {
     to: "/users",
     icon: Users,
     label: "Users",
+    permission: "users.view",
   },
   {
     to: "/members",
     icon: UserCircle,
     label: "Students",
+    permission: "students.view",
   },
   {
     to: "/enquiries",
     icon: MessageSquare,
     label: "Enquiries",
+    permission: "enquiries.view",
   },
   {
     to: "/roles",
     icon: Shield,
     label: "Permissions",
+    permission: "roles.view",
   },
   {
     to: "/payments",
     icon: DollarSign,
     label: "Payments",
+    permission: "payments.view",
   },
   {
     to: "/analytics",
     icon: BarChart3,
     label: "Analytics",
+    permission: "analytics.view",
   },
   {
     to: "/reports",
     icon: FileText,
     label: "Reports",
+    permission: "reports.view",
   },
   {
     to: "/support-tickets",
     icon: MessageSquare,
     label: "Support",
-  },
-  {
-    to: "/blogs",
-    icon: Bell,
-    label: "Blog",
-  },
-  {
-    to: "/cms",
-    icon: FileText,
-    label: "Website Control",
-  },
-  {
-    to: "/services-cms",
-    icon: BookOpen,
-    label: "Homepage Services",
-  },
-  {
-    to: "/testimonials",
-    icon: MessageSquare,
-    label: "Student Reviews",
-  },
-  {
-    to: "/gallery",
-    icon: Image,
-    label: "Photos & Videos",
-  },
-  {
-    to: "/faqs",
-    icon: HelpCircle,
-    label: "FAQ Questions",
-  },
-  {
-    to: "/membership-plans",
-    icon: DollarSign,
-    label: "Membership Plans",
+    permission: "reports.view",
   },
   {
     to: "/contact-messages",
     icon: MessageSquare,
     label: "Contact Messages",
+    permission: "contactMessages.view",
   },
   {
     to: "/notifications",
     icon: Bell,
     label: "Notifications",
+    permission: "notifications.view",
   },
   {
     to: "/settings",
     icon: Settings,
     label: "Settings",
+    permission: "settings.view",
   },
 ];
 
-const ProgramManagementItems = [
+const WebsiteManagementItems: NavItem[] = [
+  {
+    to: "/cms",
+    icon: FileText,
+    label: "Website Control",
+    anyOf: ["cms.view", "pages.view", "settings.view"],
+  },
+  {
+    to: "/services-cms",
+    icon: BookOpen,
+    label: "Service Cards",
+    anyOf: ["cms.view", "pages.edit", "settings.edit"],
+  },
+  {
+    to: "/blogs",
+    icon: Bell,
+    label: "Blog Posts",
+    permission: "blogs.view",
+  },
+  {
+    to: "/testimonials",
+    icon: MessageSquare,
+    label: "Student Reviews",
+    permission: "testimonials.view",
+  },
+  {
+    to: "/gallery",
+    icon: Image,
+    label: "Photos & Videos",
+    permission: "gallery.view",
+  },
+  {
+    to: "/faqs",
+    icon: HelpCircle,
+    label: "FAQ Questions",
+    permission: "faqs.view",
+  },
+  {
+    to: "/membership-plans",
+    icon: DollarSign,
+    label: "Membership Plans",
+    permission: "membershipPlans.view",
+  },
+];
+
+const ProgramManagementItems: NavItem[] = [
   {
     to: "/programs",
     icon: BookOpen,
     label: "Programs",
+    permission: "programs.view",
   },
   {
     to: "/workshops",
     icon: Calendar,
     label: "Workshops",
+    permission: "workshops.view",
   },
   {
     to: "/dance-styles",
     icon: FolderTree,
     label: "Dance Styles",
+    permission: "categories.view",
   },
 ];
 
@@ -159,10 +193,33 @@ type AdminSidebarProps = {
 export function AdminSidebar({ mobileOpen = false, onMobileClose }: AdminSidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const [ProgramManagementOpen, setProgramManagementOpen] = useState(true);
-  const { currentRole } = useRole();
+  const [WebsiteOpen, setWebsiteOpen] = useState(true);
+  const { currentRole, can, canAny } = useRole();
   const isMobile = useIsMobile();
 
-  const navItems = adminNavItems;
+  const canSeeItem = (item: NavItem) => {
+    if (item.anyOf?.length) return canAny(item.anyOf);
+    if (item.permission) return can(item.permission);
+    return true;
+  };
+
+  const navItems = useMemo(
+    () => adminNavItems.filter(canSeeItem),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentRole, can, canAny],
+  );
+
+  const programItems = useMemo(
+    () => ProgramManagementItems.filter(canSeeItem),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentRole, can, canAny],
+  );
+
+  const websiteItems = useMemo(
+    () => WebsiteManagementItems.filter(canSeeItem),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentRole, can, canAny],
+  );
 
   const name = localStorage.getItem('user-name') || sessionStorage.getItem('user-name') || '';
   const email = localStorage.getItem('user-email') || sessionStorage.getItem('user-email') || '';
@@ -186,6 +243,24 @@ export function AdminSidebar({ mobileOpen = false, onMobileClose }: AdminSidebar
   const handleNavClick = () => {
     if (isMobile) onMobileClose?.();
   };
+
+  const renderNavLink = (item: NavItem, compact = false) => (
+    <NavLink
+      key={item.to}
+      to={item.to}
+      end={item.to === "/"}
+      onClick={handleNavClick}
+      className={cn(
+        "flex items-center gap-3 rounded-lg px-3 text-sm font-medium text-sidebar-foreground transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+        compact ? "py-2" : "py-2.5",
+        collapsed && !isMobile && "justify-center px-2",
+      )}
+      activeClassName="bg-sidebar-accent text-sidebar-primary shadow-glow"
+    >
+      <item.icon className={cn("flex-shrink-0", compact ? "h-4 w-4" : "h-5 w-5")} />
+      {(!collapsed || isMobile) && <span>{item.label}</span>}
+    </NavLink>
+  );
 
   const sidebarContent = (
     <>
@@ -230,24 +305,11 @@ export function AdminSidebar({ mobileOpen = false, onMobileClose }: AdminSidebar
       </div>
 
       <nav className="flex-1 space-y-1 overflow-y-auto p-3 admin-mobile-sidebar">
-        {navItems.slice(0, 1).map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.to === "/"}
-            onClick={handleNavClick}
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              collapsed && !isMobile && "justify-center px-2",
-            )}
-            activeClassName="bg-sidebar-accent text-sidebar-primary shadow-glow"
-          >
-            <item.icon className="h-5 w-5 flex-shrink-0" />
-            {(!collapsed || isMobile) && <span>{item.label}</span>}
-          </NavLink>
-        ))}
+        {navItems
+          .filter((item) => item.to === "/")
+          .map((item) => renderNavLink(item))}
 
-        {(currentRole === "admin" || currentRole === "super_admin") && (
+        {programItems.length > 0 && (
           <Collapsible
             open={ProgramManagementOpen}
             onOpenChange={setProgramManagementOpen}
@@ -275,39 +337,49 @@ export function AdminSidebar({ mobileOpen = false, onMobileClose }: AdminSidebar
 
             {(!collapsed || isMobile) && (
               <CollapsibleContent className="space-y-1 pl-4">
-                {ProgramManagementItems.map((item) => (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    onClick={handleNavClick}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-sidebar-foreground/80 transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                    activeClassName="bg-sidebar-accent text-sidebar-primary shadow-glow"
-                  >
-                    <item.icon className="h-4 w-4 flex-shrink-0" />
-                    <span>{item.label}</span>
-                  </NavLink>
-                ))}
+                {programItems.map((item) => renderNavLink(item, true))}
               </CollapsibleContent>
             )}
           </Collapsible>
         )}
 
-        {navItems.slice(1).map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.to === "/"}
-            onClick={handleNavClick}
-            className={cn(
-              "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-              collapsed && !isMobile && "justify-center px-2",
-            )}
-            activeClassName="bg-sidebar-accent text-sidebar-primary shadow-glow"
+        {websiteItems.length > 0 && (
+          <Collapsible
+            open={WebsiteOpen}
+            onOpenChange={setWebsiteOpen}
+            className="space-y-1"
           >
-            <item.icon className="h-5 w-5 flex-shrink-0" />
-            {(!collapsed || isMobile) && <span>{item.label}</span>}
-          </NavLink>
-        ))}
+            <CollapsibleTrigger
+              className={cn(
+                "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                collapsed && !isMobile && "justify-center px-2",
+                WebsiteOpen && "bg-sidebar-accent/50",
+              )}
+            >
+              <FileText className="h-5 w-5 flex-shrink-0" />
+              {(!collapsed || isMobile) && (
+                <>
+                  <span className="flex-1 text-left">Website</span>
+                  {WebsiteOpen ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </>
+              )}
+            </CollapsibleTrigger>
+
+            {(!collapsed || isMobile) && (
+              <CollapsibleContent className="space-y-1 pl-4">
+                {websiteItems.map((item) => renderNavLink(item, true))}
+              </CollapsibleContent>
+            )}
+          </Collapsible>
+        )}
+
+        {navItems
+          .filter((item) => item.to !== "/")
+          .map((item) => renderNavLink(item))}
       </nav>
 
       <div className="border-t border-sidebar-border p-4">

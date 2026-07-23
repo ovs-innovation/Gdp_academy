@@ -70,6 +70,9 @@ export function RoleProvider({ children }: { children: ReactNode }) {
             "users.view",
             "members.view",
             "enquiries.view",
+            "enquiries.edit",
+            "enquiries.assign",
+            "enquiries.delete",
             "roles.view",
             "payments.view",
             "analytics.view",
@@ -122,6 +125,9 @@ export function RoleProvider({ children }: { children: ReactNode }) {
           "users.view",
           "members.view",
           "enquiries.view",
+          "enquiries.edit",
+          "enquiries.assign",
+          "enquiries.delete",
           "roles.view",
           "payments.view",
           "analytics.view",
@@ -143,12 +149,20 @@ export function RoleProvider({ children }: { children: ReactNode }) {
     syncRole();
   }, []);
 
-  const can = (permission: Permission) =>
-    hasPermission(permissions, permission);
+  const can = (permission: Permission) => {
+    if (currentRole === "admin" || currentRole === "super_admin") return true;
+    return hasPermission(permissions, permission);
+  };
 
-  const canAny = (perms: Permission[]) => hasAnyPermission(permissions, perms);
+  const canAny = (perms: Permission[]) => {
+    if (currentRole === "admin" || currentRole === "super_admin") return true;
+    return hasAnyPermission(permissions, perms);
+  };
 
-  const canAll = (perms: Permission[]) => hasAllPermissions(permissions, perms);
+  const canAll = (perms: Permission[]) => {
+    if (currentRole === "admin" || currentRole === "super_admin") return true;
+    return hasAllPermissions(permissions, perms);
+  };
 
   return (
     <RoleContext.Provider

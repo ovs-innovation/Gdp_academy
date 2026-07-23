@@ -66,6 +66,24 @@ const enquirySchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
+    assignedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    assignedAt: {
+      type: Date,
+      default: null,
+    },
+    closedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    closedAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true },
 );
@@ -73,5 +91,6 @@ const enquirySchema = new mongoose.Schema(
 enquirySchema.index({ email: 1, createdAt: -1 });
 enquirySchema.index({ status: 1, createdAt: -1 });
 enquirySchema.index({ source: 1, createdAt: -1 });
+enquirySchema.index({ assignedTo: 1, status: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Enquiry", enquirySchema);

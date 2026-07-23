@@ -8,9 +8,17 @@ import { usePageContent, renderMultiLineHeroTitle } from "../hooks/usePageConten
 import {
   EXPLORE_PROGRAMS,
   SERVICES_MEGA_MENU,
+  getServiceIcon,
 } from "../lib/servicesMenu";
 
 import "../styles/services.css";
+
+const DEFAULT_STATS = [
+  { value: "5000+", label: "Students" },
+  { value: "100+", label: "Performances" },
+  { value: "20+", label: "Trainers" },
+  { value: "ALL", label: "Age Groups" },
+];
 
 const Services: React.FC = () => {
   const location = useLocation();
@@ -19,6 +27,44 @@ const Services: React.FC = () => {
   const heroSubtitle =
     (pageContent.heroSubtitle as string) ||
     "Professional dance training designed for every performer.";
+  const heroCtaText = (pageContent.heroCtaText as string) || "BOOK A TRIAL";
+  const heroCtaUrl = (pageContent.heroCtaUrl as string) || "/contact";
+
+  const stats =
+    Array.isArray(pageContent.stats) && pageContent.stats.length > 0
+      ? pageContent.stats
+      : DEFAULT_STATS;
+
+  const exploreBadge = (pageContent.exploreBadge as string) || "Discover GDP";
+  const exploreTitle =
+    (pageContent.exploreTitle as string) || "What would you like to";
+  const exploreHighlight = (pageContent.exploreHighlight as string) || "Explore";
+
+  const explorePrograms =
+    Array.isArray(pageContent.explorePrograms) && pageContent.explorePrograms.length > 0
+      ? pageContent.explorePrograms
+      : EXPLORE_PROGRAMS.map(({ key, title, subtitle, href }) => ({
+          key,
+          title,
+          subtitle,
+          href,
+        }));
+
+  const wellnessGroups =
+    Array.isArray(pageContent.wellnessGroups) && pageContent.wellnessGroups.length > 0
+      ? pageContent.wellnessGroups
+      : SERVICES_MEGA_MENU.map((group, groupIndex) => ({
+          label: group.label,
+          sectionId: group.sectionId,
+          title: groupIndex === 0 ? "Heal your body." : "Get fit.",
+          highlight: groupIndex === 0 ? "Learn to dance." : "Dance it out.",
+          items: group.items,
+        }));
+
+  const finalCtaTitle = (pageContent.finalCtaTitle as string) || "START YOUR JOURNEY";
+  const finalCtaButtonText =
+    (pageContent.finalCtaButtonText as string) || "CONTACT US";
+  const finalCtaUrl = (pageContent.finalCtaUrl as string) || "/contact";
 
   useEffect(() => {
     if (!location.hash) return;
@@ -90,8 +136,8 @@ const Services: React.FC = () => {
               </motion.p>
 
               <motion.div variants={fadeInUp}>
-                <Link to="/contact" className="svc-btn-glow">
-                  BOOK A TRIAL
+                <Link to={heroCtaUrl} className="svc-btn-glow">
+                  {heroCtaText}
                 </Link>
               </motion.div>
             </motion.div>
@@ -107,22 +153,16 @@ const Services: React.FC = () => {
               viewport={{ once: true, margin: "-100px" }}
               variants={staggerContainer}
             >
-              <motion.div className="svc-stat-item" variants={fadeInUp}>
-                <div className="svc-stat-num">5000+</div>
-                <div className="svc-stat-text">Students</div>
-              </motion.div>
-              <motion.div className="svc-stat-item" variants={fadeInUp}>
-                <div className="svc-stat-num">100+</div>
-                <div className="svc-stat-text">Performances</div>
-              </motion.div>
-              <motion.div className="svc-stat-item" variants={fadeInUp}>
-                <div className="svc-stat-num">20+</div>
-                <div className="svc-stat-text">Trainers</div>
-              </motion.div>
-              <motion.div className="svc-stat-item" variants={fadeInUp}>
-                <div className="svc-stat-num">ALL</div>
-                <div className="svc-stat-text">Age Groups</div>
-              </motion.div>
+              {stats.map((stat: { value?: string; label?: string }) => (
+                <motion.div
+                  key={`${stat.value}-${stat.label}`}
+                  className="svc-stat-item"
+                  variants={fadeInUp}
+                >
+                  <div className="svc-stat-num">{stat.value}</div>
+                  <div className="svc-stat-text">{stat.label}</div>
+                </motion.div>
+              ))}
             </motion.div>
           </div>
         </section>
@@ -136,27 +176,31 @@ const Services: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.7 }}
             >
-              <span className="svc-explore-badge">Discover GDP</span>
+              <span className="svc-explore-badge">{exploreBadge}</span>
               <h2 className="svc-explore-title">
-                What would you like to{" "}
-                <span className="svc-explore-highlight">Explore</span> today?
+                {exploreTitle}{" "}
+                <span className="svc-explore-highlight">{exploreHighlight}</span> today?
               </h2>
             </motion.div>
 
             <div className="svc-explore-list">
-              {EXPLORE_PROGRAMS.map((item, index) => (
+              {explorePrograms.map((item: any, index: number) => (
                 <motion.div
-                  key={item.key}
+                  key={item.key || item.title || index}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.5, delay: index * 0.06 }}
                 >
-                  <Link to={item.href} className="svc-explore-row">
+                  <Link to={item.href || "/contact"} className="svc-explore-row">
                     <span className="svc-explore-num">
                       {String(index + 1).padStart(2, "0")}
                     </span>
-                    <span className="svc-explore-icon">{item.icon}</span>
+                    <span className="svc-explore-icon">
+                      {getServiceIcon({ key: item.key, title: item.title }) ||
+                        EXPLORE_PROGRAMS.find((p) => p.key === item.key)?.icon ||
+                        null}
+                    </span>
                     <div className="svc-explore-copy">
                       <h3>{item.title}</h3>
                       <p>{item.subtitle}</p>
@@ -173,9 +217,9 @@ const Services: React.FC = () => {
           </div>
         </section>
 
-        {SERVICES_MEGA_MENU.map((group, groupIndex) => (
+        {wellnessGroups.map((group: any) => (
           <section
-            key={group.label}
+            key={group.sectionId || group.label}
             id={group.sectionId}
             className="svc-wellness-section section-padding"
           >
@@ -189,30 +233,23 @@ const Services: React.FC = () => {
               >
                 <span className="svc-explore-badge">{group.label}</span>
                 <h2 className="svc-explore-title">
-                  {groupIndex === 0 ? (
-                    <>
-                      Heal your body.{" "}
-                      <span className="svc-explore-highlight">Learn to dance.</span>
-                    </>
-                  ) : (
-                    <>
-                      Get fit.{" "}
-                      <span className="svc-explore-highlight">Dance it out.</span>
-                    </>
-                  )}
+                  {group.title}{" "}
+                  {group.highlight ? (
+                    <span className="svc-explore-highlight">{group.highlight}</span>
+                  ) : null}
                 </h2>
               </motion.div>
 
               <div className="svc-wellness-grid">
-                {group.items.map((item, index) => (
+                {(group.items || []).map((item: any, index: number) => (
                   <motion.div
-                    key={item.title}
+                    key={item.title || index}
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ duration: 0.5, delay: index * 0.06 }}
                   >
-                    <Link to="/contact" className="svc-wellness-card">
+                    <Link to={item.href || "/contact"} className="svc-wellness-card">
                       {item.image ? (
                         <img src={item.image} alt="" className="svc-wellness-card-img" />
                       ) : null}
@@ -242,9 +279,9 @@ const Services: React.FC = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <h2 className="svc-final-cta-title">START YOUR JOURNEY</h2>
-              <Link to="/contact" className="svc-btn-glow">
-                CONTACT US
+              <h2 className="svc-final-cta-title">{finalCtaTitle}</h2>
+              <Link to={finalCtaUrl} className="svc-btn-glow">
+                {finalCtaButtonText}
               </Link>
             </motion.div>
           </div>

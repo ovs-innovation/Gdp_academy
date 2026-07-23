@@ -12,6 +12,12 @@ RUN npm install
 # Copy the rest of the application
 COPY . .
 
+# Build-time API URL (override via --build-arg in CI / docker compose)
+ARG VITE_API_BASE_URL=https://api.garimadanceproductions.com/api
+ARG VITE_API_URL=https://api.garimadanceproductions.com/api
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ENV VITE_API_URL=$VITE_API_URL
+
 # Build the Vite application
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN npm run build

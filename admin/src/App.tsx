@@ -6,7 +6,6 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { RoleProvider } from "@/contexts/RoleContext";
 import { ThemeColorProvider } from "@/contexts/ThemeColorContext";
-import ControlDashboardPage from "./pages/ControlDashboardPage";
 import UsersPage from "./pages/UsersPage";
 import MembersPage from "./pages/MembersPage";
 import RolesPage from "./pages/RolesPage";
@@ -51,7 +50,7 @@ const App = () => (
                 <Route
                   path="/"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="dashboard.view">
                       <DashboardRouter />
                     </ProtectedRoute>
                   }
@@ -59,7 +58,7 @@ const App = () => (
                 <Route
                   path="/users"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="users.view">
                       <UsersPage />
                     </ProtectedRoute>
                   }
@@ -67,7 +66,7 @@ const App = () => (
                 <Route
                   path="/members"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="students.view">
                       <MembersPage />
                     </ProtectedRoute>
                   }
@@ -75,7 +74,7 @@ const App = () => (
                 <Route
                   path="/roles"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="roles.view">
                       <RolesPage />
                     </ProtectedRoute>
                   }
@@ -83,7 +82,7 @@ const App = () => (
                 <Route
                   path="/analytics"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="analytics.view">
                       <AnalyticsPage />
                     </ProtectedRoute>
                   }
@@ -91,7 +90,7 @@ const App = () => (
                 <Route
                   path="/reports"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="reports.view">
                       <ReportsPage />
                     </ProtectedRoute>
                   }
@@ -99,7 +98,7 @@ const App = () => (
                 <Route
                   path="/support-tickets"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="reports.view">
                       <SupportTicketsPage />
                     </ProtectedRoute>
                   }
@@ -107,7 +106,7 @@ const App = () => (
                 <Route
                   path="/blogs"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="blogs.view">
                       <BlogsPage />
                     </ProtectedRoute>
                   }
@@ -115,7 +114,7 @@ const App = () => (
                 <Route
                   path="/reviews"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="testimonials.view">
                       <ReviewModerationPage />
                     </ProtectedRoute>
                   }
@@ -123,7 +122,7 @@ const App = () => (
                 <Route
                   path="/enquiries"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="enquiries.view">
                       <EnquiriesPage />
                     </ProtectedRoute>
                   }
@@ -131,7 +130,7 @@ const App = () => (
                 <Route
                   path="/payments"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="payments.view">
                       <PaymentsPage />
                     </ProtectedRoute>
                   }
@@ -139,7 +138,7 @@ const App = () => (
                 <Route
                   path="/settings"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="settings.view">
                       <SettingsPage />
                     </ProtectedRoute>
                   }
@@ -147,7 +146,7 @@ const App = () => (
                 <Route
                   path="/cms"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute anyOf={["cms.view", "pages.view", "settings.view"]}>
                       <CMSPage />
                     </ProtectedRoute>
                   }
@@ -155,7 +154,7 @@ const App = () => (
                 <Route
                   path="/faqs"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="faqs.view">
                       <FAQManagementPage />
                     </ProtectedRoute>
                   }
@@ -163,7 +162,7 @@ const App = () => (
                 <Route
                   path="/membership-plans"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="membershipPlans.view">
                       <MembershipPlansPage />
                     </ProtectedRoute>
                   }
@@ -171,7 +170,7 @@ const App = () => (
                 <Route
                   path="/contact-messages"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="contactMessages.view">
                       <ContactMessagesPage />
                     </ProtectedRoute>
                   }
@@ -179,7 +178,7 @@ const App = () => (
                 <Route
                   path="/gallery"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="gallery.view">
                       <GalleryPage />
                     </ProtectedRoute>
                   }
@@ -187,7 +186,7 @@ const App = () => (
                 <Route
                   path="/testimonials"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="testimonials.view">
                       <TestimonialsManagementPage />
                     </ProtectedRoute>
                   }
@@ -195,7 +194,7 @@ const App = () => (
                 <Route
                   path="/services-cms"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute anyOf={["cms.view", "pages.edit", "settings.edit"]}>
                       <ServicesCMSPage />
                     </ProtectedRoute>
                   }
@@ -203,7 +202,7 @@ const App = () => (
                 <Route
                   path="/notifications"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="notifications.view">
                       <NotificationsPage />
                     </ProtectedRoute>
                   }
@@ -211,7 +210,7 @@ const App = () => (
                 <Route
                   path="/workshops"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="workshops.view">
                       <WorkshopsManagementPage />
                     </ProtectedRoute>
                   }
@@ -227,7 +226,7 @@ const App = () => (
                 <Route
                   path="/programs"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="programs.view">
                       <ProgramManagementPage />
                     </ProtectedRoute>
                   }
@@ -235,7 +234,7 @@ const App = () => (
                 <Route
                   path="/dance-styles"
                   element={
-                    <ProtectedRoute>
+                    <ProtectedRoute permission="categories.view">
                       <DanceStyleManagementPage />
                     </ProtectedRoute>
                   }

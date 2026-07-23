@@ -449,21 +449,61 @@ export interface ApiEnquiry {
   programId?: ApiProgram | string | null;
   workshopId?: ApiProgram | string | null;
   notes?: string;
+  assignedTo?: { _id: string; name: string; email: string; role?: string } | string | null;
+  assignedBy?: { _id: string; name: string; email: string } | string | null;
+  assignedAt?: string | null;
+  closedBy?: { _id: string; name: string; email: string } | string | null;
+  closedAt?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
 
+export interface ApiEnquiryStats {
+  total: number;
+  newEnquiries: number;
+  inProgress: number;
+  closed: number;
+  unassigned: number;
+  mine: number;
+  bySource: Array<{ _id: string; count: number }>;
+  byAssignee: Array<{ _id: string; count: number; name?: string; email?: string }>;
+  scoped: boolean;
+}
+
 export const EnquiriesAPI = {
-  list: (params?: { status?: string; source?: string; search?: string; limit?: number }) => {
+  list: (params?: {
+    status?: string;
+    source?: string;
+    search?: string;
+    assignedTo?: string;
+    unassigned?: boolean;
+    mine?: boolean;
+    page?: number;
+    limit?: number;
+  }) => {
     const query = new URLSearchParams();
     if (params?.status) query.append("status", params.status);
     if (params?.source) query.append("source", params.source);
     if (params?.search) query.append("search", params.search);
+    if (params?.assignedTo) query.append("assignedTo", params.assignedTo);
+    if (params?.unassigned) query.append("unassigned", "true");
+    if (params?.mine) query.append("mine", "true");
+    if (params?.page) query.append("page", String(params.page));
     query.append("limit", String(params?.limit ?? 200));
     const suffix = `?${query.toString()}`;
-    return apiFetch<{ enquiries: ApiEnquiry[]; total: number }>(`/enquiries${suffix}`);
+    return apiFetch<{ enquiries: ApiEnquiry[]; total: number; pages: number; currentPage: number }>(
+      `/enquiries${suffix}`,
+    );
   },
-  update: (id: string, payload: { status?: ApiEnquiry["status"]; notes?: string }) =>
+  stats: () => apiFetch<ApiEnquiryStats>("/enquiries/stats"),
+  update: (
+    id: string,
+    payload: {
+      status?: ApiEnquiry["status"];
+      notes?: string;
+      assignedTo?: string | null;
+    },
+  ) =>
     apiFetch<{ enquiry: ApiEnquiry; message: string }>(`/enquiries/${id}`, {
       method: "PUT",
       body: JSON.stringify(payload),
@@ -1077,7 +1117,14 @@ export interface ApiSiteSettings {
   logoUrl?: string;
   navLinks: Array<{ label: string; href: string }>;
   footerLinks?: Array<{ label: string; href: string }>;
+  footerServiceLinks?: Array<{ label: string; href: string }>;
   footerText?: string;
+  footerTagline?: string;
+  brandLine1?: string;
+  brandLine2?: string;
+  brandLine3?: string;
+  headerCtaLabel?: string;
+  headerCtaUrl?: string;
   socialLinks: Array<{ platform: string; url: string }>;
   metaTitle?: string;
   metaDescription?: string;

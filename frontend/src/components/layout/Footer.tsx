@@ -33,11 +33,18 @@ const Footer: React.FC = () => {
     { label: 'Upcoming Workshops', href: '/workshops' },
     { label: 'Gallery', href: '/gallery' },
   ];
+  const defaultServiceLinks = [
+    { label: 'Regular Dance Sessions', href: '/services' },
+    { label: 'Fitness Sessions', href: '/services' },
+    { label: 'Wedding Choreography', href: '/services' },
+    { label: 'Custom Choreography', href: '/services' },
+  ];
 
   const socialLinks =
-    settings && settings.socialLinks && settings.socialLinks.length > 0
+    settings?.socialLinks && settings.socialLinks.length > 0
       ? settings.socialLinks
       : defaultSocialLinks;
+
   const isLibraryNavItem = (href: string, label: string) => {
     const normalizedPath = href.toLowerCase().replace(/\/+$/, '') || '/';
     const normalizedName = label.toLowerCase().trim();
@@ -48,25 +55,34 @@ const Footer: React.FC = () => {
     );
   };
 
-  const footerLinks = defaultFooterLinks.filter((link) => !isLibraryNavItem(link.href, link.label));
+  const rawFooterLinks =
+    settings?.footerLinks && settings.footerLinks.length > 0
+      ? settings.footerLinks
+      : defaultFooterLinks;
+  const footerLinks = rawFooterLinks.filter(
+    (link) => !isLibraryNavItem(link.href, link.label),
+  );
+
+  const serviceLinks =
+    settings?.footerServiceLinks && settings.footerServiceLinks.length > 0
+      ? settings.footerServiceLinks
+      : defaultServiceLinks;
 
   const footerText =
     settings?.footerText || 'copyright@2026 Garima dance productions, All rights reserved';
   const footerTagline =
+    settings?.footerTagline ||
     'Where grace meets rhythm — Garima Dance Productions empowers dancers of every level through expert-led training, live sessions, and unforgettable performances.';
+
+  const brandLine1 = settings?.brandLine1 || 'Garima';
+  const brandLine2 = settings?.brandLine2 || 'Dance';
+  const brandLine3 = settings?.brandLine3 || 'Productions';
 
   const address =
     contactPage?.content?.address ||
     'K-6, near SANDISH MEDICAL, Sector-12, Block-K, Pratap Vihar, Ghaziabad, Uttar Pradesh 201009';
-  const rawPhone = contactPage?.content?.phone || '';
-  const phone = rawPhone === '9711384768' || rawPhone === '+91 98765 43210' || !rawPhone
-    ? '+91 78384 16907'
-    : rawPhone;
-
-  const rawEmail = contactPage?.content?.email || '';
-  const email = rawEmail === 'Garima@productions.com' || rawEmail === 'hello@gdpstudio.com' || !rawEmail
-    ? 'Gdp.info2019@gmail.com'
-    : rawEmail;
+  const phone = contactPage?.content?.phone || '+91 78384 16907';
+  const email = contactPage?.content?.email || 'Gdp.info2019@gmail.com';
 
   return (
     <footer className="footer">
@@ -76,9 +92,9 @@ const Footer: React.FC = () => {
             <Link to="/" className="footer-logo-container">
               <SiteLogo logoUrl={settings?.logoUrl} className="footer-site-logo" alt="GDP" />
               <div className="footer-site-text">
-                <span>Garima</span>
-                <span>Dance</span>
-                <span>Productions</span>
+                <span>{brandLine1}</span>
+                <span>{brandLine2}</span>
+                <span>{brandLine3}</span>
               </div>
             </Link>
             <p className="footer-brand-desc">{footerTagline}</p>
@@ -88,7 +104,7 @@ const Footer: React.FC = () => {
             <h4>Quick links</h4>
             <ul>
               {footerLinks.map((link) => (
-                <li key={link.href}>
+                <li key={`${link.href}-${link.label}`}>
                   <Link to={link.href}>{link.label}</Link>
                 </li>
               ))}
@@ -98,10 +114,11 @@ const Footer: React.FC = () => {
           <div className="footer-links footer-col">
             <h4>Services</h4>
             <ul>
-              <li><Link to="/services">Regular Dance Sessions</Link></li>
-              <li><Link to="/services">Fitness Sessions</Link></li>
-              <li><Link to="/services">Wedding Choreography</Link></li>
-              <li><Link to="/services">Custom Choreography</Link></li>
+              {serviceLinks.map((link) => (
+                <li key={`${link.href}-${link.label}`}>
+                  <Link to={link.href}>{link.label}</Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -118,20 +135,15 @@ const Footer: React.FC = () => {
             </ul>
           </div>
 
-          <div className="footer-contact footer-col">
-            <h4>Contact us</h4>
-            <ul className="footer-contact-list">
+          <div className="footer-links footer-col">
+            <h4>Visit us</h4>
+            <ul>
+              <li>{address}</li>
               <li>
-                <span className="footer-contact-label">Address</span>
-                <p>{address}</p>
+                <a href={`tel:${phone.replace(/\s/g, '')}`}>{phone}</a>
               </li>
               <li>
-                <span className="footer-contact-label">Phone</span>
-                <p><a href={`tel:${phone}`}>{phone}</a></p>
-              </li>
-              <li>
-                <span className="footer-contact-label">Email</span>
-                <p><a href={`mailto:${email}`}>{email}</a></p>
+                <a href={`mailto:${email}`}>{email}</a>
               </li>
             </ul>
           </div>
@@ -139,11 +151,6 @@ const Footer: React.FC = () => {
 
         <div className="footer-bottom">
           <p>{footerText}</p>
-          <div className="footer-bottom-links">
-            <Link to="/faq">FAQ</Link>
-            <Link to="/terms">Terms and conditions</Link>
-            <Link to="/privacy">Privacy policy</Link>
-          </div>
         </div>
       </div>
     </footer>

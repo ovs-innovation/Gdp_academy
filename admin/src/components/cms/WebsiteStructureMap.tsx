@@ -7,32 +7,32 @@ const WEBSITE_MAP = [
     page: "Homepage (/)",
     slug: "home",
     sections: [
-      { name: "Hero text + 9 media grid", edit: "Website Content → Homepage", path: "/cms" },
-      { name: "Service circles", edit: "Homepage Services", path: "/services-cms" },
-      { name: "YouTube Shorts, Instagram, Reviews", edit: "Website Content → Homepage", path: "/cms" },
+      { name: "Hero text + 9 media grid", edit: "Website Control → Homepage", path: "/cms" },
+      { name: "Service circles", edit: "Website → Service Cards", path: "/services-cms" },
+      { name: "YouTube Shorts, Instagram, Reviews", edit: "Website Control → Homepage", path: "/cms" },
       { name: "Workshop cards", edit: "Programs & Workshops admin", path: "/programs" },
-      { name: "FAQ questions", edit: "FAQ Questions", path: "/faqs" },
-      { name: "Student text reviews", edit: "Student Reviews", path: "/testimonials" },
+      { name: "FAQ questions", edit: "Website → FAQ Questions", path: "/faqs" },
+      { name: "Student text reviews", edit: "Website → Student Reviews", path: "/testimonials" },
     ],
   },
   {
     page: "About (/about)",
     slug: "about",
-    sections: [{ name: "Story, mission, stats, video", edit: "Website Content → About", path: "/cms" }],
+    sections: [{ name: "Story, mission, stats, video", edit: "Website Control → About", path: "/cms" }],
   },
   {
     page: "Services (/services)",
     slug: "services",
     sections: [
-      { name: "Page hero text", edit: "Website Content → Services Page", path: "/cms" },
-      { name: "Service cards list", edit: "Homepage Services", path: "/services-cms" },
+      { name: "Page hero text", edit: "Website Control → Services", path: "/cms" },
+      { name: "Service cards list", edit: "Website → Service Cards", path: "/services-cms" },
     ],
   },
   {
     page: "Programs (/programs)",
     slug: "programs",
     sections: [
-      { name: "Page hero", edit: "Website Content → Programs", path: "/cms" },
+      { name: "Page hero", edit: "Website Control → Programs", path: "/cms" },
       { name: "Program cards", edit: "Programs admin", path: "/programs" },
     ],
   },
@@ -40,8 +40,8 @@ const WEBSITE_MAP = [
     page: "Workshops (/workshops)",
     slug: "workshops",
     sections: [
-      { name: "Step 1–5: Offer, featured, benefits, reviews, about", edit: "Website Content → Workshops Page", path: "/cms" },
-      { name: "Step 6: Upcoming list heading", edit: "Website Content → Workshops Page", path: "/cms" },
+      { name: "Step 1–5: Offer, featured, benefits, reviews, about", edit: "Website Control → Workshops", path: "/cms" },
+      { name: "Step 6: Upcoming list heading", edit: "Website Control → Workshops", path: "/cms" },
       { name: "Workshop cards (date, price, image)", edit: "Workshops admin", path: "/workshops" },
     ],
   },
@@ -49,52 +49,52 @@ const WEBSITE_MAP = [
     page: "Gallery (/gallery)",
     slug: "gallery",
     sections: [
-      { name: "Page header", edit: "Website Content → Gallery", path: "/cms" },
-      { name: "Photos & videos grid", edit: "Photos & Videos", path: "/gallery" },
+      { name: "Page header", edit: "Website Control → Gallery", path: "/cms" },
+      { name: "Photos & videos grid", edit: "Website → Photos & Videos", path: "/gallery" },
     ],
   },
   {
     page: "Blog (/blog)",
     slug: "blog",
     sections: [
-      { name: "Page hero", edit: "Website Content → Blog", path: "/cms" },
-      { name: "Blog posts", edit: "Blog admin", path: "/blogs" },
+      { name: "Page hero", edit: "Website Control → Blog", path: "/cms" },
+      { name: "Blog posts", edit: "Website → Blog Posts", path: "/blogs" },
     ],
   },
   {
     page: "FAQ (/faq)",
     slug: "faq",
     sections: [
-      { name: "Page hero", edit: "Website Content → FAQ Page", path: "/cms" },
-      { name: "Questions & answers", edit: "FAQ Questions", path: "/faqs" },
+      { name: "Page hero", edit: "Website Control → FAQ", path: "/cms" },
+      { name: "Questions & answers", edit: "Website → FAQ Questions", path: "/faqs" },
     ],
   },
   {
     page: "Testimonials (/testimonials)",
     slug: "testimonials",
     sections: [
-      { name: "Page hero", edit: "Website Content → Testimonials", path: "/cms" },
-      { name: "Review cards", edit: "Student Reviews", path: "/testimonials" },
+      { name: "Page hero", edit: "Website Control → Reviews", path: "/cms" },
+      { name: "Review cards", edit: "Website → Student Reviews", path: "/testimonials" },
     ],
   },
   {
     page: "Membership (/membership)",
     slug: "membership",
     sections: [
-      { name: "Page hero", edit: "Website Content → Membership", path: "/cms" },
-      { name: "Pricing plans", edit: "Membership Plans", path: "/membership-plans" },
+      { name: "Page hero", edit: "Website Control → Membership", path: "/cms" },
+      { name: "Pricing plans", edit: "Website → Membership Plans", path: "/membership-plans" },
     ],
   },
   {
     page: "Contact (/contact)",
     slug: "contact",
-    sections: [{ name: "Header, phone, email, address", edit: "Website Content → Contact", path: "/cms" }],
+    sections: [{ name: "Header, phone, email, address", edit: "Website Control → Contact", path: "/cms" }],
   },
   {
     page: "Header & Footer (all pages)",
     slug: "settings",
     sections: [
-      { name: "Logo, nav links, WhatsApp, announcement", edit: "Site Settings tab", path: "/cms" },
+      { name: "Logo, nav links, WhatsApp, announcement", edit: "Website Control → Header & Footer", path: "/cms" },
     ],
   },
 ];

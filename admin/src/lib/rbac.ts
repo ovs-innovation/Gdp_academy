@@ -45,6 +45,7 @@ export type Permission =
   | "teacher_courses.delete"
   | "enquiries.view"
   | "enquiries.edit"
+  | "enquiries.assign"
   | "enquiries.delete"
   | "payments.view"
   | "cms.view"
@@ -57,6 +58,24 @@ export type Permission =
   | "gallery.create"
   | "gallery.edit"
   | "gallery.delete"
+  | "faqs.view"
+  | "faqs.create"
+  | "faqs.edit"
+  | "faqs.delete"
+  | "testimonials.view"
+  | "testimonials.create"
+  | "testimonials.edit"
+  | "testimonials.delete"
+  | "membershipPlans.view"
+  | "membershipPlans.create"
+  | "membershipPlans.edit"
+  | "membershipPlans.delete"
+  | "pages.view"
+  | "pages.create"
+  | "pages.edit"
+  | "pages.delete"
+  | "contactMessages.view"
+  | "contactMessages.create"
   | "announcements.view"
   | "announcements.manage"
   | "notifications.view"
@@ -85,6 +104,12 @@ const defaultRoleMetadata: Record<
     color: "bg-blue-500 text-white",
   },
 
+  staff: {
+    label: "Staff",
+    description: "Enquiry handling access",
+    color: "bg-cyan-500 text-white",
+  },
+
   teacher: {
     label: "Teacher",
     description: "Teacher access",
@@ -109,9 +134,7 @@ export function hasPermission(
   permissions: Permission[],
   permission: Permission,
 ): boolean {
-  // temporary recovery mode
-  // allow all permissions until RBAC fully restored
-  return true;
+  return permissions.includes(permission);
 }
 
 export function hasAnyPermission(

@@ -71,7 +71,14 @@ export interface SiteSettings {
   logoUrl: string;
   navLinks: Array<{ label: string; href: string }>;
   footerLinks?: Array<{ label: string; href: string }>;
+  footerServiceLinks?: Array<{ label: string; href: string }>;
   footerText: string;
+  footerTagline?: string;
+  brandLine1?: string;
+  brandLine2?: string;
+  brandLine3?: string;
+  headerCtaLabel?: string;
+  headerCtaUrl?: string;
   socialLinks: Array<{ platform: string; url: string }>;
   metaTitle?: string;
   metaDescription?: string;

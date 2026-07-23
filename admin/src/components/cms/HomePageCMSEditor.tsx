@@ -101,6 +101,55 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
+        title="1b. Stats bar (below hero)"
+        description="Four big numbers shown between the hero and services section."
+        websiteLocation="Homepage → stats strip above services"
+      >
+        {(content.homeStats?.length
+          ? content.homeStats
+          : [
+              { value: "250K+", label: "Social Community" },
+              { value: "15+", label: "Years of Experience" },
+              { value: "700+", label: "Weddings Choreographed" },
+              { value: "50K+", label: "Students Trained" },
+            ]
+        ).map((stat: { value?: string; label?: string }, idx: number) => (
+          <div key={idx} className="grid gap-2 md:grid-cols-2">
+            <Input
+              value={stat.value || ""}
+              onChange={(e) => {
+                const next = [...(content.homeStats || [
+                  { value: "250K+", label: "Social Community" },
+                  { value: "15+", label: "Years of Experience" },
+                  { value: "700+", label: "Weddings Choreographed" },
+                  { value: "50K+", label: "Students Trained" },
+                ])];
+                next[idx] = { ...next[idx], value: e.target.value };
+                onChange("homeStats", next);
+              }}
+              placeholder="250K+"
+              className="bg-muted/50"
+            />
+            <Input
+              value={stat.label || ""}
+              onChange={(e) => {
+                const next = [...(content.homeStats || [
+                  { value: "250K+", label: "Social Community" },
+                  { value: "15+", label: "Years of Experience" },
+                  { value: "700+", label: "Weddings Choreographed" },
+                  { value: "50K+", label: "Students Trained" },
+                ])];
+                next[idx] = { ...next[idx], label: e.target.value };
+                onChange("homeStats", next);
+              }}
+              placeholder="Social Community"
+              className="bg-muted/50"
+            />
+          </div>
+        ))}
+      </CMSSection>
+
+      <CMSSection
         title="2. Hero — Left side media grid (9 photos/videos)"
         description="The 3×3 grid of rotating videos and images on the left side of the homepage. Set a type and link for each slot."
         websiteLocation="Homepage top → left video/image collage"
@@ -338,7 +387,11 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
       >
         <div className="space-y-2 mb-4">
           <Label>Section title (text after the heart icon)</Label>
-          <Input value={content.reviewsSectionTitle || "from Clients"} onChange={(e) => onChange("reviewsSectionTitle", e.target.value)} className="bg-muted/50" />
+          <Input value={content.reviewsSectionTitle || "Clients"} onChange={(e) => onChange("reviewsSectionTitle", e.target.value)} className="bg-muted/50" />
+          <Label>Title prefix</Label>
+          <Input value={content.reviewsTitlePrefix || "From Our"} onChange={(e) => onChange("reviewsTitlePrefix", e.target.value)} className="bg-muted/50" />
+          <Label>Badge text</Label>
+          <Input value={content.reviewsBadge || "Our Community"} onChange={(e) => onChange("reviewsBadge", e.target.value)} className="bg-muted/50" />
         </div>
         <div className="grid gap-4 md:grid-cols-3 mb-4">
           <Input placeholder="Rating e.g. 5.0" value={content.googleRating || "5.0"} onChange={(e) => onChange("googleRating", e.target.value)} className="bg-muted/50" />

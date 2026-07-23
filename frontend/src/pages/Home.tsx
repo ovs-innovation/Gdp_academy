@@ -1081,6 +1081,9 @@ const Home: React.FC = () => {
         </section>
       ) : (
       <ReviewsSection
+        badgeText={homeContent.reviewsBadge || 'Our Community'}
+        titlePrefix={homeContent.reviewsTitlePrefix || 'From Our'}
+        titleHighlight={homeContent.reviewsSectionTitle || 'Clients'}
         subtitle={testimonialsSubtitle}
         googleRating={googleRating}
         googleReviewCount={googleReviewCount}
@@ -1096,7 +1099,7 @@ const Home: React.FC = () => {
         <div className="container">
           <div className="services-section-header faq-v3-header">
             <h2 className="section-title">
-              <span className="gradient-text">FAQ</span>
+              <span className="gradient-text">{homeContent.faqTitle || 'FAQ'}</span>
             </h2>
             <p className="section-desc">
               {!homeCopyReady ? (

@@ -20,6 +20,9 @@ type VideoReview = {
 };
 
 interface ReviewsSectionProps {
+  titlePrefix?: string;
+  titleHighlight?: string;
+  badgeText?: string;
   subtitle?: string;
   googleRating?: string;
   googleReviewCount?: string;
@@ -34,6 +37,9 @@ const truncate = (text: string, max = 140) =>
   text.length <= max ? text : `${text.slice(0, max).trim()}…`;
 
 const ReviewsSection: React.FC<ReviewsSectionProps> = ({
+  titlePrefix = 'From Our',
+  titleHighlight = 'Clients',
+  badgeText = 'Our Community',
   subtitle = 'Real stories from students, couples & performers who learned, celebrated & grew with GDP.',
   googleRating = '5.0',
   googleReviewCount = '(236)',
@@ -143,10 +149,10 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
         <header className="reviews-v3-header">
           <span className="reviews-v3-badge">
             <span className="reviews-v3-badge-icon" aria-hidden="true">♥</span>
-            Our Community
+            {badgeText}
           </span>
           <h2 className="reviews-v3-title">
-            From Our <span className="gradient-text">Clients</span>
+            {titlePrefix} <span className="gradient-text">{titleHighlight}</span>
           </h2>
           <p className="reviews-v3-subtitle">{subtitle}</p>
           <div className="reviews-v3-divider" aria-hidden="true">
