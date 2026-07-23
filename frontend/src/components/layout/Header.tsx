@@ -189,7 +189,9 @@ const Header: React.FC = () => {
 
   const isServicesNav = (path: string, name: string) => {
     const normalizedPath = path.toLowerCase().replace(/\/+$/, "") || "/";
-    return normalizedPath === "/services" || name.toLowerCase().trim() === "services";
+    return (
+      normalizedPath === "/services" || name.toLowerCase().trim() === "services"
+    );
   };
 
   const isServicesActive = () => location.pathname === "/services";
@@ -206,6 +208,8 @@ const Header: React.FC = () => {
   const brandLine1 = settings?.brandLine1 || "Garima";
   const brandLine2 = settings?.brandLine2 || "Dance";
   const brandLine3 = settings?.brandLine3 || "Productions";
+  const headerCtaLabel = settings?.headerCtaLabel || "Join Studio";
+  const headerCtaUrl = settings?.headerCtaUrl || "/login";
 
   const scrollToReviews = () => {
     const el = document.getElementById("reviews");
@@ -327,6 +331,12 @@ const Header: React.FC = () => {
             })}
           </ul>
         </nav>
+
+        <div className="header-actions">
+          <Link to={headerCtaUrl} className="contact-btn">
+            {headerCtaLabel}
+          </Link>
+        </div>
       </div>
 
       <AnimatePresence>
@@ -421,6 +431,16 @@ const Header: React.FC = () => {
                 </Link>
               );
             })}
+            <Link to={headerCtaUrl} onClick={closeMobile} className="nav-link">
+              {headerCtaLabel}
+            </Link>
+            <Link
+              to={headerCtaUrl}
+              onClick={closeMobile}
+              className="contact-btn mobile-join-cta"
+            >
+              {headerCtaLabel}
+            </Link>
           </motion.div>
         )}
       </AnimatePresence>
