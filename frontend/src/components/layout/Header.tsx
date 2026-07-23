@@ -183,16 +183,6 @@ const Header: React.FC = () => {
     { name: "Contact", path: "/contact" },
   ];
 
-  const isLibraryNavItem = (path: string, name: string) => {
-    const normalizedPath = path.toLowerCase().replace(/\/+$/, "") || "/";
-    const normalizedName = name.toLowerCase().trim();
-    return (
-      normalizedPath === "/library" ||
-      normalizedName === "video library" ||
-      normalizedName === "library"
-    );
-  };
-
   const isReviewsNav = (path: string) =>
     path === "/#reviews" || path.toLowerCase().includes("#reviews");
 
@@ -210,14 +200,7 @@ const Header: React.FC = () => {
     return location.pathname === path;
   };
 
-  const cmsNavLinks =
-    settings?.navLinks && settings.navLinks.length > 0
-      ? settings.navLinks.map((link) => ({ name: link.label, path: link.href }))
-      : primaryNavLinks;
-
-  const navLinks = cmsNavLinks.filter(
-    (link) => !isLibraryNavItem(link.path, link.name),
-  );
+  const navLinks = primaryNavLinks;
 
   const brandLine1 = settings?.brandLine1 || "Garima";
   const brandLine2 = settings?.brandLine2 || "Dance";
