@@ -13,11 +13,13 @@ const getIntegrationStatus = () => {
     "PHONEPE_CLIENT_VERSION",
   );
   const zoom = has("ZOOM_ACCOUNT_ID", "ZOOM_CLIENT_ID", "ZOOM_CLIENT_SECRET");
+  const s3Bucket =
+    process.env.AWS_S3_BUCKET_NAME?.trim() ||
+    process.env.AWS_S3_BUCKET?.trim();
   const recording = has(
     "AWS_ACCESS_KEY_ID",
     "AWS_SECRET_ACCESS_KEY",
-    "AWS_S3_BUCKET",
-  );
+  ) && Boolean(s3Bucket);
 
   const forceDemo = (process.env.INTEGRATION_MODE || "demo").toLowerCase() === "demo";
   const paymentLive = !forceDemo && (razorpay || phonepe);

@@ -1,6 +1,7 @@
 import axios from "axios";
+import { API_BASE_URL } from "../lib/apiConfig";
 
-const API_URL = "/api/student-profiles/wishlist"; 
+const API_URL = `${API_BASE_URL}/student-profiles/wishlist`;
 
 export const getWishlist = async (token: string) => {
    const response = await axios.get(API_URL, {

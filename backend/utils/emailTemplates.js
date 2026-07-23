@@ -27,11 +27,8 @@ const formatDateTime = (date = new Date()) =>
   });
 
 const getLogoAttachment = () => {
-  const candidates = [
-    path.join(__dirname, "..", "assets", "logo.png"),
-    path.join(__dirname, "..", "..", "frontend", "public", "logo.png"),
-    path.join(__dirname, "..", "..", "admin", "public", "logo.png"),
-  ];
+  // Backend-only path — monorepo frontend/admin paths are absent in Docker (build context = backend/).
+  const candidates = [path.join(__dirname, "..", "assets", "logo.png")];
   const logoPath = candidates.find((p) => fs.existsSync(p));
   if (!logoPath) return null;
   return {

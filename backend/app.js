@@ -63,7 +63,13 @@ const parseOriginList = (value) =>
 
 const isProd = process.env.NODE_ENV === "production";
 
-const productionOrigins = [
+/** Strip localhost / LAN origins from production allowlist (dev URLs in .env must not leak). */
+const stripDevOrigins = (origins) =>
+  origins.filter(
+    (o) => !/^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/i.test(o),
+  );
+
+const productionOrigins = stripDevOrigins([
   ...parseOriginList(process.env.CORS_ORIGINS),
   ...parseOriginList(process.env.FRONTEND_URL),
   ...parseOriginList(process.env.ADMIN_URL),
@@ -71,7 +77,7 @@ const productionOrigins = [
   "https://garimadanceproductions.com",
   "https://www.garimadanceproductions.com",
   "https://admin.garimadanceproductions.com",
-].filter(Boolean);
+]).filter(Boolean);
 
 const corsOptions = {
   credentials: true,

@@ -18,6 +18,7 @@
   "type": "commonjs",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.750.0",
     "axios": "^1.13.2",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^1.41.3",

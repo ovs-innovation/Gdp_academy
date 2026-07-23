@@ -22,7 +22,12 @@ export const uploadRecording = async (localFilePath, bookingId, meetingId) => {
 };
 
 const uploadToS3 = async (localFilePath, bookingId, meetingId) => {
-  const bucketName = process.env.AWS_S3_BUCKET_NAME;
+  const bucketName =
+    process.env.AWS_S3_BUCKET_NAME?.trim() ||
+    process.env.AWS_S3_BUCKET?.trim();
+  if (!bucketName) {
+    throw new Error("AWS_S3_BUCKET_NAME (or AWS_S3_BUCKET) is not set");
+  }
   const key = `recordings/${bookingId}/${meetingId}.mp4`;
 
   const fileStream = fs.createReadStream(localFilePath);

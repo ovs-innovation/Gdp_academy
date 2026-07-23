@@ -2,7 +2,8 @@ const User = require("../models/userModel.js");
 
 const ADMIN_EMAIL = "admin@gdpstudio.com";
 const LEGACY_ADMIN_EMAIL = "admin@gdpacademy.com";
-const ADMIN_PASSWORD = "adminpassword";
+const ADMIN_PASSWORD =
+  process.env.DEFAULT_ADMIN_PASSWORD?.trim() || "adminpassword";
 const ADMIN_NAME = "GDP Admin";
 
 /**
@@ -34,7 +35,11 @@ async function ensureDefaultAdmin() {
       role: "admin",
       status: "active",
     });
-    console.log(`Default admin created: ${ADMIN_EMAIL} / ${ADMIN_PASSWORD}`);
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`Default admin created: ${ADMIN_EMAIL}`);
+    } else {
+      console.log(`Default admin created: ${ADMIN_EMAIL} (set DEFAULT_ADMIN_PASSWORD in production)`);
+    }
     return;
   }
 
