@@ -3,8 +3,6 @@ import { motion } from 'framer-motion';
 import LazyVideo from '../common/LazyVideo';
 import HomeMediaMarquee from './HomeMediaMarquee';
 import { HomeMediaSkeleton } from './HomeSkeletons';
-import MediaProfileAvatar from './MediaProfileAvatar';
-import YouTubeSubscribeButton from './YouTubeSubscribeButton';
 
 export type YouTubeShortItem = {
   vid: string;
@@ -31,17 +29,9 @@ const cleanChannelName = (channel: string): string =>
 const YouTubeShortsSection: React.FC<Props> = ({
   shorts,
   channel,
-  channelUrl,
-  channelId,
-  logoUrl,
   loading = false,
 }) => {
   const displayName = cleanChannelName(channel);
-
-  const openShort = (item: YouTubeShortItem) => {
-    const url = item.shortUrl || channelUrl;
-    window.open(url, '_blank', 'noopener,noreferrer');
-  };
 
   return (
     <section className="youtube-shorts-section section-padding">

@@ -11,7 +11,6 @@ import {
   isExcludedService,
 } from "../../lib/defaultServices";
 import { getLocalizedValue } from "../../utils/contentHelper";
-import { EXPLORE_PROGRAMS, SERVICES_MEGA_MENU } from "../../lib/servicesMenu";
 import "../../styles/header.css";
 
 const HOME_SERVICE_IMAGES = {

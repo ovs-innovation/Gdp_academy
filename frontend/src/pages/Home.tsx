@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '../components/layout/Layout';
@@ -18,7 +18,6 @@ import ReviewsSection from '../components/home/ReviewsSection';
 import { useScrollToHash } from '../hooks/useScrollToHash';
 import { buildWhatsAppUrl } from '../utils/whatsapp';
 import HomeMediaMarquee from '../components/home/HomeMediaMarquee';
-import MediaProfileAvatar from '../components/home/MediaProfileAvatar';
 import {
   HomeFaqSkeleton,
   HomeMediaSkeleton,
@@ -27,9 +26,7 @@ import {
 } from '../components/home/HomeSkeletons';
 import { normalizeShortsList, normalizeVideoSource } from '../utils/mediaUrl';
 import {
-  DEFAULT_INSTAGRAM_PROFILE_URL,
   DEFAULT_YOUTUBE_CHANNEL_URL,
-  resolveInstagramProfileUrl,
   resolveYoutubeChannelUrl,
 } from '../utils/socialLinks';
 import SEO from '../components/SEO';
@@ -505,11 +502,6 @@ const Home: React.FC = () => {
     : [];
 
   const instagramHandle = homeContent.instagramHandle || '@GarimadanceProductions';
-  const instagramChannelUrl = resolveInstagramProfileUrl(
-    homeContent.instagramChannelUrl as string | undefined,
-    instagramHandle,
-    DEFAULT_INSTAGRAM_PROFILE_URL,
-  );
 
   const aboutYoutubeId = homeContent.aboutYoutubeId || DEFAULT_ABOUT_YOUTUBE_ID;
   const heroYoutubeId = homeContent.heroYoutubeId || DEFAULT_HERO_YOUTUBE_ID;
@@ -555,19 +547,6 @@ const Home: React.FC = () => {
   const [showWhatsApp, setShowWhatsApp] = useState(false);
   const servicesSectionRef = useRef<HTMLElement>(null);
   const catchUpSectionRef = useRef<HTMLElement>(null);
-
-  // Instagram follow state (persisted like YouTube subscribe)
-  const INSTA_STORAGE_KEY = 'gdp_insta_following';
-  const [isFollowing, setIsFollowing] = useState<boolean>(() => {
-    try { return localStorage.getItem(INSTA_STORAGE_KEY) === '1'; } catch { return false; }
-  });
-  const handleFollowToggle = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const next = !isFollowing;
-    setIsFollowing(next);
-    try { localStorage.setItem(INSTA_STORAGE_KEY, next ? '1' : '0'); } catch {}
-  }, [isFollowing]);
 
   useEffect(() => {
     const handleScroll = () => {

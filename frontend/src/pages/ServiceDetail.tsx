@@ -3,7 +3,6 @@ import { useParams, Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Layout from '../components/layout/Layout';
 import SEO from '../components/SEO';
-import { getServiceIcon } from '../components/home/ServiceIcons';
 import { useSiteData } from '../contexts/SiteDataContext';
 import { buildWhatsAppUrl } from '../utils/whatsapp';
 import { submitEnquiry } from '../services/enquiryService';

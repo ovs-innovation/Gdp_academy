@@ -138,9 +138,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       const role = authResponse.user.role
       if (role === 'admin' || role === 'superadmin' || role === 'super_admin') {
+        const isProdDomain = window.location.hostname.includes('garimadanceproductions.com');
         const adminBase =
           import.meta.env.VITE_ADMIN_URL ||
-          `${window.location.protocol}//${window.location.hostname}:8080`
+          (isProdDomain
+            ? `${window.location.protocol}//admin.garimadanceproductions.com`
+            : `${window.location.protocol}//${window.location.hostname}:8080`);
         window.location.href = `${adminBase.replace(/\/$/, '')}/login?token=${authResponse.token}`
         return
       }
