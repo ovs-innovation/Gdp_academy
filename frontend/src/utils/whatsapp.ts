@@ -1,5 +1,5 @@
 export const DEFAULT_WHATSAPP_MESSAGE =
-  "Hello! I found Garima Dance Productions through your website. I'm interested in your dance classes. Please share the available batches, fees, timings, and other details.";
+  "Hello! I found Garima Dance Productions through your website\nI'm interested in your dance classes. Please share the available batches, fees, timings, and other details";
 
 export function buildWhatsAppUrl(
   phone: string,
