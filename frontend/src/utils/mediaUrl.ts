@@ -89,6 +89,7 @@ export type ShortLikeItem = {
   views?: string;
   likes?: string;
   delay?: number;
+  ytId?: string;
 };
 
 export function normalizeShortsList(raw: unknown): Array<{
@@ -97,6 +98,7 @@ export function normalizeShortsList(raw: unknown): Array<{
   views: string;
   likes: string;
   delay: number;
+  ytId?: string;
 }> {
   const list = Array.isArray(raw) ? raw : raw && typeof raw === "object" ? [raw] : [];
 
@@ -107,6 +109,7 @@ export function normalizeShortsList(raw: unknown): Array<{
       views: item?.views || "",
       likes: item?.likes || "",
       delay: typeof item?.delay === "number" ? item.delay : index * 0.1,
+      ytId: item?.ytId || undefined,
     }))
-    .filter((item) => Boolean(item.vid));
+    .filter((item) => Boolean(item.vid) || Boolean(item.ytId));
 }

@@ -1,5 +1,5 @@
 const PageContent = require("../models/pageContentModel.js");
-const { withPublicCache } = require("../utils/publicCache.js");
+const { withPublicCache, invalidatePublicCache } = require("../utils/publicCache.js");
 
 // Create page content (admin only)
 const createPageContent = async (req, res, next) => {
@@ -77,6 +77,8 @@ const updatePageContent = async (req, res, next) => {
       { new: true, runValidators: true },
     );
     if (!updated) return res.status(404).json({ message: "Page not found" });
+    // Bust the public cache so visitors immediately get the new content
+    invalidatePublicCache(`page:${updated.slug}`);
     res.json({ message: "Page content updated", page: updated });
   } catch (err) {
     next(err);

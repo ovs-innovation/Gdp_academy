@@ -1278,6 +1278,41 @@
   letter-spacing: 0.5px;
 }
 
+/* Header row — badge + mute button side by side */
+.youtube-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Mute / Unmute toggle button */
+.media-mute-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 8px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  letter-spacing: 0.3px;
+}
+
+.media-mute-btn:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.38);
+  color: #fff;
+}
+
+.media-mute-btn svg {
+  flex-shrink: 0;
+}
+
 /* Shorts / reels — swipe/scroll carousel, no arrow controls */
 .home-media-carousel {
   position: relative;
@@ -1415,6 +1450,23 @@
   transform: scale(1.05);
 }
 
+/* Iframe link wrapper for real YouTube Shorts */
+.yt-short-iframe-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  text-decoration: none;
+}
+
+.yt-short-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+  pointer-events: none;
+}
+
 .yt-short-overlay {
   position: absolute;
   top: 0;
@@ -1423,6 +1475,25 @@
   height: 100%;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.15) 0%, transparent 35%, rgba(0, 0, 0, 0.55) 100%);
   pointer-events: none;
+}
+
+/* Instagram Reel embed link wrapper */
+.insta-reel-embed-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  text-decoration: none;
+  overflow: hidden;
+}
+
+.insta-reel-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+  pointer-events: none;
+  transform: scale(1.02);
 }
 
 .yt-shorts-ui {

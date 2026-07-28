@@ -7,12 +7,13 @@ import { useSiteData } from '../contexts/SiteDataContext';
 import { submitEnquiry } from '../services/enquiryService';
 import { getFeaturedTestimonials, type Testimonial } from '../services/testimonialService';
 import { getLocalizedValue } from '../utils/contentHelper';
-import LazyVideo from '../components/common/LazyVideo';
+
 import LazyImage from '../components/common/LazyImage';
 import LazySection from '../components/common/LazySection';
 import FormResultModal, { type FormResultType } from '../components/common/FormResultModal';
 import Hero from '../components/homes/home-one/Hero';
 import YouTubeShortsSection from '../components/home/YouTubeShortsSection';
+import InstagramReelsSection from '../components/home/InstagramReelsSection';
 import HomeStatsBar from '../components/home/HomeStatsBar';
 import ReviewsSection from '../components/home/ReviewsSection';
 import { useScrollToHash } from '../hooks/useScrollToHash';
@@ -20,11 +21,11 @@ import { buildWhatsAppUrl } from '../utils/whatsapp';
 import HomeMediaMarquee from '../components/home/HomeMediaMarquee';
 import {
   HomeFaqSkeleton,
-  HomeMediaSkeleton,
   HomeReviewsSkeleton,
   HomeServicesSkeleton,
 } from '../components/home/HomeSkeletons';
-import { normalizeShortsList, normalizeVideoSource } from '../utils/mediaUrl';
+
+import { invalidateCache } from '../lib/apiCache';
 import {
   DEFAULT_YOUTUBE_CHANNEL_URL,
   resolveYoutubeChannelUrl,
@@ -81,53 +82,34 @@ const HOME_SERVICE_IMAGE_LIST = [
 ] as const;
 
 const DEFAULT_YOUTUBE_CHANNEL = '@garimadanceproductions1146';
-
-const HOME_MEDIA_ROW_COUNT = 10;
-
-const DEFAULT_YOUTUBE_SHORTS = [
-  { vid: '/services.mp4', title: 'Dance Reel — Studio Session', views: '1.2k', likes: '890', delay: 0 },
-  { vid: '/service3.mp4', title: 'Group Flow Choreography', views: '2.5k', likes: '1.1k', delay: 0.1 },
-  { vid: '/services4.mp4', title: 'Solo Edge Performance', views: '3.1k', likes: '1.4k', delay: 0.2 },
-  { vid: '/hero.mp4', title: 'Urban Move — Hip Hop', views: '1.8k', likes: '720', delay: 0.3 },
-  { vid: '/service2.mp4', title: 'Classical Fusion Flow', views: '2.1k', likes: '960', delay: 0.4 },
-  { vid: '/services.mp4', title: 'Wedding Choreo Reel', views: '3.4k', likes: '1.2k', delay: 0.5 },
-  { vid: '/service3.mp4', title: 'Stage Performance Clip', views: '1.6k', likes: '640', delay: 0.6 },
-  { vid: '/services4.mp4', title: 'Masterclass Highlight', views: '2.8k', likes: '1.0k', delay: 0.7 },
-  { vid: '/hero.mp4', title: 'Behind the Scenes', views: '1.9k', likes: '810', delay: 0.8 },
-  { vid: '/service2.mp4', title: 'Student Spotlight', views: '2.3k', likes: '940', delay: 0.9 },
+// ─── Static YouTube Shorts (real IDs hardcoded) ───────────────────────────
+const STATIC_YOUTUBE_SHORTS = [
+  { vid: '', ytId: 't_U6KbVqRDg', title: 'GDP Reel 1', views: '', likes: '', delay: 0 },
+  { vid: '', ytId: 'xnvhC3obxHg', title: 'GDP Reel 2', views: '', likes: '', delay: 0.1 },
+  { vid: '', ytId: 'OMr8rMSe_GQ', title: 'GDP Reel 3', views: '', likes: '', delay: 0.2 },
+  { vid: '', ytId: 'wiDo4xWDrdY', title: 'GDP Reel 4', views: '', likes: '', delay: 0.3 },
+  { vid: '', ytId: 'N_M1J_wgKcI', title: 'GDP Reel 5', views: '', likes: '', delay: 0.4 },
+  { vid: '', ytId: 'IyyCJjf8iqM', title: 'GDP Reel 6', views: '', likes: '', delay: 0.5 },
+  { vid: '', ytId: 't_7IgCxN3kc', title: 'GDP Reel 7', views: '', likes: '', delay: 0.6 },
+  { vid: '', ytId: 'ziBaK1q7L2Q', title: 'GDP Reel 8', views: '', likes: '', delay: 0.7 },
+  { vid: '', ytId: 't_U6KbVqRDg', title: 'GDP Reel 1', views: '', likes: '', delay: 0.8 },
+  { vid: '', ytId: 'xnvhC3obxHg', title: 'GDP Reel 2', views: '', likes: '', delay: 0.9 },
 ];
 
-const DEFAULT_INSTAGRAM_POSTS = [
-  { vid: '/services.mp4', delay: 0, offset: '0', likes: '1.2k', comments: '45' },
-  { vid: '/service2.mp4', delay: 0.1, offset: '-50px', likes: '2.5k', comments: '82' },
-  { vid: '/service3.mp4', delay: 0.2, offset: '50px', likes: '890', comments: '12' },
-  { vid: '/services4.mp4', delay: 0.3, offset: '-20px', likes: '3.1k', comments: '104' },
-  { vid: '/hero.mp4', delay: 0.4, offset: '30px', likes: '1.7k', comments: '56' },
-  { vid: '/services.mp4', delay: 0.5, offset: '-35px', likes: '2.2k', comments: '71' },
-  { vid: '/service3.mp4', delay: 0.6, offset: '15px', likes: '1.4k', comments: '38' },
-  { vid: '/services4.mp4', delay: 0.7, offset: '-45px', likes: '2.9k', comments: '92' },
-  { vid: '/hero.mp4', delay: 0.8, offset: '40px', likes: '1.1k', comments: '29' },
-  { vid: '/service2.mp4', delay: 0.9, offset: '-10px', likes: '2.0k', comments: '63' },
+// ─── Static Instagram Reels (real IDs hardcoded) ──────────────────────────
+const STATIC_INSTAGRAM_REELS = [
+  { vid: '', reelId: 'DadAKWthgEB', url: 'https://www.instagram.com/reel/DadAKWthgEB/', delay: 0, offset: '0', likes: '', comments: '' },
+  { vid: '', reelId: 'DX4zIElTyh9', url: 'https://www.instagram.com/reel/DX4zIElTyh9/', delay: 0.1, offset: '-20px', likes: '', comments: '' },
+  { vid: '', reelId: 'DXB8VV3CbLc', url: 'https://www.instagram.com/reel/DXB8VV3CbLc/', delay: 0.2, offset: '20px', likes: '', comments: '' },
+  { vid: '', reelId: 'DVBQlWyCeqY', url: 'https://www.instagram.com/reel/DVBQlWyCeqY/', delay: 0.3, offset: '-10px', likes: '', comments: '' },
+  { vid: '', reelId: 'CqPTAdduo6m', url: 'https://www.instagram.com/reel/CqPTAdduo6m/', delay: 0.4, offset: '10px', likes: '', comments: '' },
+  { vid: '', reelId: 'CpfgqWbNvUo', url: 'https://www.instagram.com/reel/CpfgqWbNvUo/', delay: 0.5, offset: '-30px', likes: '', comments: '' },
+  { vid: '', reelId: 'CtayfVrJ174', url: 'https://www.instagram.com/reel/CtayfVrJ174/', delay: 0.6, offset: '30px', likes: '', comments: '' },
+  { vid: '', reelId: 'DadAKWthgEB', url: 'https://www.instagram.com/reel/DadAKWthgEB/', delay: 0.7, offset: '-15px', likes: '', comments: '' },
+  { vid: '', reelId: 'DX4zIElTyh9', url: 'https://www.instagram.com/reel/DX4zIElTyh9/', delay: 0.8, offset: '15px', likes: '', comments: '' },
+  { vid: '', reelId: 'DXB8VV3CbLc', url: 'https://www.instagram.com/reel/DXB8VV3CbLc/', delay: 0.9, offset: '-5px', likes: '', comments: '' },
 ];
 
-function padHomeMediaRow<T extends { vid: string; delay?: number }>(
-  items: T[],
-  defaults: T[],
-  count: number,
-): T[] {
-  if (items.length >= count) return items.slice(0, count);
-  const out = [...items];
-  let i = 0;
-  while (out.length < count) {
-    const fallback = defaults[i % defaults.length];
-    out.push({
-      ...fallback,
-      delay: out.length * 0.1,
-    });
-    i += 1;
-  }
-  return out;
-}
 
 const DEFAULT_VIDEO_TESTIMONIALS = [
   { id: 1, img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80', vid: 'https://www.youtube.com/embed/2iM5RoR0khg' },
@@ -269,9 +251,8 @@ const Home: React.FC = () => {
   const [enquiryForm, setEnquiryForm] = useState({ name: '', phone: '', email: '', message: '', whatsappConsent: false });
   const [enquiryErrors, setEnquiryErrors] = useState<EnquiryFieldErrors>({});
   const [isEnquirySubmitting, setIsEnquirySubmitting] = useState(false);
-  /** Per-section ready flags — show skeletons until each fetch settles (no static→dynamic flash). */
   const [sectionReady, setSectionReady] = useState({
-    home: true,
+    home: false,
     settings: true,
     services: true,
     faqs: true,
@@ -306,6 +287,9 @@ const Home: React.FC = () => {
   }, [servicesCms, siteDataReady]);
 
   useEffect(() => {
+    // Bust in-memory API cache on every mount so DB changes always load fresh
+    invalidateCache();
+
     getFeaturedTestimonials(6)
       .then((data) => {
         if (data && data.length > 0) {
@@ -468,14 +452,8 @@ const Home: React.FC = () => {
     features: service.features,
   }));
 
-  const normalizedYoutubeShorts = normalizeShortsList(homeContent.youtubeShorts);
-  const youtubeShorts = homeCopyReady
-    ? padHomeMediaRow(
-        normalizedYoutubeShorts.length > 0 ? normalizedYoutubeShorts : DEFAULT_YOUTUBE_SHORTS,
-        DEFAULT_YOUTUBE_SHORTS,
-        HOME_MEDIA_ROW_COUNT,
-      )
-    : [];
+  // Static YouTube Shorts — directly use real IDs, no DB needed
+  const youtubeShorts = STATIC_YOUTUBE_SHORTS;
 
   const youtubeChannel = homeContent.youtubeChannel || DEFAULT_YOUTUBE_CHANNEL;
   const youtubeChannelUrl = resolveYoutubeChannelUrl(
@@ -483,23 +461,8 @@ const Home: React.FC = () => {
     DEFAULT_YOUTUBE_CHANNEL_URL,
   );
 
-  const rawInstagram = Array.isArray(homeContent.instagramPosts) ? homeContent.instagramPosts : [];
-  const normalizedInstagram = rawInstagram
-    .map((item: { vid?: string; delay?: number; offset?: string; likes?: string; comments?: string }, i: number) => ({
-      vid: normalizeVideoSource(item?.vid || ''),
-      delay: item?.delay ?? i * 0.1,
-      offset: item?.offset || DEFAULT_INSTAGRAM_POSTS[i % DEFAULT_INSTAGRAM_POSTS.length]?.offset || '0',
-      likes: item?.likes || '',
-      comments: item?.comments || '',
-    }))
-    .filter((item) => Boolean(item.vid));
-  const instagramPosts = homeCopyReady
-    ? padHomeMediaRow(
-        normalizedInstagram.length > 0 ? normalizedInstagram : DEFAULT_INSTAGRAM_POSTS,
-        DEFAULT_INSTAGRAM_POSTS,
-        HOME_MEDIA_ROW_COUNT,
-      )
-    : [];
+  // Static Instagram Reels — directly use real IDs, no DB needed
+  const instagramPosts = STATIC_INSTAGRAM_REELS;
 
   const instagramHandle = homeContent.instagramHandle || '@GarimadanceProductions';
 
@@ -957,61 +920,11 @@ const Home: React.FC = () => {
       </LazySection>
 
       <LazySection minHeight={520} rootMargin="400px">
-      <section className="instagram-section section-padding">
-        <div className="container">
-          <div className="instagram-content">
-            <div className="instagram-header">
-              <motion.h2 
-                className="insta-title"
-                initial={{ opacity: 0, x: -50 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-              >
-                {homeCopyReady ? (
-                  <>
-                    {homeContent.instagramSectionTitle || 'Join us'} <br />{' '}
-                    <span className="gradient-text">{homeContent.instagramSectionHighlight || 'on Instagram'}</span>
-                  </>
-                ) : (
-                  <span className="home-skel" style={{ display: 'inline-block', height: 48, width: 220 }} />
-                )}
-              </motion.h2>
-              <div className="insta-header-actions">
-                <motion.div
-                  className="insta-badge"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                >
-                  <span className="insta-handle" style={{ padding: '4px 8px' }}>{instagramHandle}</span>
-                </motion.div>
-              </div>
-            </div>
-            
-            {!homeCopyReady ? (
-              <HomeMediaSkeleton count={4} ariaLabel="Loading Instagram reels" />
-            ) : (
-            <HomeMediaMarquee
-              items={instagramPosts}
-              ariaLabel="Instagram reels"
-              renderItem={(item: typeof DEFAULT_INSTAGRAM_POSTS[number]) => (
-                <div className="insta-video-card">
-                  <LazyVideo src={item.vid} scale={1.1} />
-
-                  <div className="insta-reels-ui">
-                    {/* Like/comment/share icons and user info removed */}
-                  </div>
-
-                  <div className="insta-overlay"></div>
-                </div>
-              )}
-            />
-            )}
-          </div>
-        </div>
-      </section>
+      <InstagramReelsSection
+        reels={instagramPosts}
+        handle={instagramHandle}
+      />
       </LazySection>
-
       <LazySection minHeight={560} rootMargin="400px">
       {!sectionReady.testimonials || !homeCopyReady ? (
         <section className="reviews-v3 section-padding" id="reviews">
