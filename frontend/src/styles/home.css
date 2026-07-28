@@ -1433,6 +1433,31 @@
   outline: none;
 }
 
+/* Individual card mute button */
+.card-mute-btn {
+  position: absolute;
+  bottom: 80px;
+  right: 16px;
+  z-index: 10;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.card-mute-btn:hover {
+  background: rgba(0, 0, 0, 0.85);
+  transform: scale(1.1);
+}
+
+
 .yt-short-card:focus-visible {
   box-shadow: 0 0 0 2px var(--accent-color), 0 10px 30px rgba(0, 0, 0, 0.5);
 }
