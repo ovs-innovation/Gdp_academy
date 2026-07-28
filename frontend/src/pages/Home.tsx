@@ -519,10 +519,13 @@ const Home: React.FC = () => {
       const srv = servicesSectionRef.current;
       const ctc = catchUpSectionRef.current;
       if (!srv || !ctc) return;
-      const scrollY = window.scrollY + window.innerHeight / 2;
-      const srvBottom = srv.getBoundingClientRect().bottom + window.scrollY;
+      
+      const srvTop = srv.getBoundingClientRect().top + window.scrollY;
       const ctcTop = ctc.getBoundingClientRect().top + window.scrollY;
-      setShowWhatsApp(scrollY >= srvBottom && scrollY <= ctcTop + 200);
+      const scrollPosition = window.scrollY;
+
+      // Show WhatsApp button starting from Services section top to Contact section top
+      setShowWhatsApp(scrollPosition >= srvTop - 100 && scrollPosition <= ctcTop - 100);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
