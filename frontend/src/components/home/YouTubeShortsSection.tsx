@@ -21,16 +21,19 @@ type Props = {
   channelId?: string | null;
   logoUrl?: string | null;
   loading?: boolean;
+  activeVideoId: string | null;
+  setActiveVideoId: (id: string | null) => void;
 };
 
 const cleanChannelName = (channel: string): string =>
   channel.startsWith('@') ? channel.slice(1) : channel;
 
-
 const YouTubeShortsSection: React.FC<Props> = ({
   shorts,
   channel,
   loading = false,
+  activeVideoId,
+  setActiveVideoId,
 }) => {
   const displayName = cleanChannelName(channel);
 
@@ -71,8 +74,15 @@ const YouTubeShortsSection: React.FC<Props> = ({
               ariaLabel="YouTube shorts"
               renderItem={(item) => {
                 const s = item as YouTubeShortItem;
+                const isPlaying = activeVideoId === s.ytId;
                 return s.ytId ? (
-                  <YTShortCard ytId={s.ytId} title={s.title} views={s.views} />
+                  <YTShortCard 
+                    ytId={s.ytId} 
+                    title={s.title} 
+                    views={s.views} 
+                    isPlaying={isPlaying}
+                    onPlay={() => setActiveVideoId(s.ytId || null)}
+                  />
                 ) : null;
               }}
             />

@@ -16,9 +16,16 @@ export type InstagramReelItem = {
 type Props = {
   reels: InstagramReelItem[];
   handle: string;
+  activeVideoId: string | null;
+  setActiveVideoId: (id: string | null) => void;
 };
 
-const InstagramReelsSection: React.FC<Props> = ({ reels, handle }) => {
+const InstagramReelsSection: React.FC<Props> = ({ 
+  reels, 
+  handle,
+  activeVideoId,
+  setActiveVideoId,
+}) => {
   return (
     <section className="youtube-shorts-section section-padding">
       <div className="container">
@@ -52,8 +59,13 @@ const InstagramReelsSection: React.FC<Props> = ({ reels, handle }) => {
             ariaLabel="Instagram reels"
             renderItem={(item) => {
               const r = item as InstagramReelItem;
+              const isPlaying = activeVideoId === r.reelId;
               return r.reelId ? (
-                <InstaReelCard reelId={r.reelId} url={r.url || ''} />
+                <InstaReelCard 
+                  reelId={r.reelId} 
+                  isPlaying={isPlaying}
+                  onPlay={() => setActiveVideoId(r.reelId || null)}
+                />
               ) : null;
             }}
           />

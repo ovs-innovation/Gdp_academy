@@ -265,6 +265,9 @@ const Home: React.FC = () => {
     message: string;
   }>({ open: false, type: 'success', title: '', message: '' });
 
+  // Track the currently active playing video (YouTube short or Instagram reel)
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
+
   const showFormModal = (type: FormResultType, title: string, message: string) => {
     setFormModal({ open: true, type, title, message });
   };
@@ -855,6 +858,8 @@ const Home: React.FC = () => {
         channelId={homeContent.youtubeChannelId as string | undefined}
         logoUrl={settings?.logoUrl}
         loading={!homeCopyReady}
+        activeVideoId={activeVideoId}
+        setActiveVideoId={setActiveVideoId}
       />
       </LazySection>
 
@@ -923,6 +928,8 @@ const Home: React.FC = () => {
       <InstagramReelsSection
         reels={instagramPosts}
         handle={instagramHandle}
+        activeVideoId={activeVideoId}
+        setActiveVideoId={setActiveVideoId}
       />
       </LazySection>
       <LazySection minHeight={560} rootMargin="400px">
