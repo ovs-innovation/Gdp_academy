@@ -23,13 +23,7 @@ function buildEmbedUrl(ytId: string): string {
 const YTShortCard: React.FC<Props> = ({ ytId, title, views }) => {
   return (
     <div className="yt-short-card">
-      <a
-        href={`https://youtube.com/shorts/${ytId}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="yt-short-iframe-link"
-        aria-label={`Watch: ${title}`}
-      >
+      <div className="yt-short-iframe-wrapper" style={{ width: '100%', height: '100%', position: 'relative' }}>
         <iframe
           src={buildEmbedUrl(ytId)}
           className="yt-short-iframe"
@@ -39,7 +33,7 @@ const YTShortCard: React.FC<Props> = ({ ytId, title, views }) => {
           title={title}
         />
         <div className="yt-short-overlay" style={{ pointerEvents: 'none' }} />
-      </a>
+      </div>
 
 
       {/* YouTube badge + info */}

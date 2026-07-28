@@ -5,16 +5,10 @@ type Props = {
   url: string;
 };
 
-const InstaReelCard: React.FC<Props> = ({ reelId, url }) => {
+const InstaReelCard: React.FC<Props> = ({ reelId }) => {
   return (
     <div className="yt-short-card">
-      <a
-        href={url || `https://www.instagram.com/reel/${reelId}/`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="yt-short-iframe-link"
-        aria-label="Watch Instagram reel"
-      >
+      <div className="yt-short-iframe-wrapper" style={{ width: '100%', height: '100%', position: 'relative' }}>
         <iframe
           src={`https://www.instagram.com/p/${reelId}/embed/`}
           className="yt-short-iframe"
@@ -25,7 +19,7 @@ const InstaReelCard: React.FC<Props> = ({ reelId, url }) => {
           title={`Instagram reel ${reelId}`}
         />
         <div className="yt-short-overlay" style={{ pointerEvents: 'none' }} />
-      </a>
+      </div>
 
 
       {/* Instagram badge */}

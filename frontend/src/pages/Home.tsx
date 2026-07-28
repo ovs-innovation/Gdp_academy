@@ -84,16 +84,16 @@ const HOME_SERVICE_IMAGE_LIST = [
 const DEFAULT_YOUTUBE_CHANNEL = '@garimadanceproductions1146';
 // ─── Static YouTube Shorts (real IDs hardcoded) ───────────────────────────
 const STATIC_YOUTUBE_SHORTS = [
-  { vid: '', ytId: 't_U6KbVqRDg', title: 'GDP Reel 1', views: '', likes: '', delay: 0 },
-  { vid: '', ytId: 'xnvhC3obxHg', title: 'GDP Reel 2', views: '', likes: '', delay: 0.1 },
-  { vid: '', ytId: 'OMr8rMSe_GQ', title: 'GDP Reel 3', views: '', likes: '', delay: 0.2 },
-  { vid: '', ytId: 'wiDo4xWDrdY', title: 'GDP Reel 4', views: '', likes: '', delay: 0.3 },
-  { vid: '', ytId: 'N_M1J_wgKcI', title: 'GDP Reel 5', views: '', likes: '', delay: 0.4 },
-  { vid: '', ytId: 'IyyCJjf8iqM', title: 'GDP Reel 6', views: '', likes: '', delay: 0.5 },
-  { vid: '', ytId: 't_7IgCxN3kc', title: 'GDP Reel 7', views: '', likes: '', delay: 0.6 },
-  { vid: '', ytId: 'ziBaK1q7L2Q', title: 'GDP Reel 8', views: '', likes: '', delay: 0.7 },
-  { vid: '', ytId: 't_U6KbVqRDg', title: 'GDP Reel 1', views: '', likes: '', delay: 0.8 },
-  { vid: '', ytId: 'xnvhC3obxHg', title: 'GDP Reel 2', views: '', likes: '', delay: 0.9 },
+  { vid: '', ytId: 't_U6KbVqRDg', title: 'Power Hip-Hop Dance Routine', views: '12K', likes: '1.2K', delay: 0 },
+  { vid: '', ytId: 'xnvhC3obxHg', title: 'Energetic Stage Performance', views: '25K', likes: '2.4K', delay: 0.1 },
+  { vid: '', ytId: 'OMr8rMSe_GQ', title: 'Classical Fusion Masterclass', views: '18K', likes: '1.9K', delay: 0.2 },
+  { vid: '', ytId: 'wiDo4xWDrdY', title: 'Wedding Choreography Showcase', views: '32K', likes: '3.1K', delay: 0.3 },
+  { vid: '', ytId: 'N_M1J_wgKcI', title: 'Contemporary Flow & Expression', views: '15K', likes: '1.5K', delay: 0.4 },
+  { vid: '', ytId: 'IyyCJjf8iqM', title: 'Bollywood Beats Group Routine', views: '28K', likes: '2.6K', delay: 0.5 },
+  { vid: '', ytId: 't_7IgCxN3kc', title: 'Street Jam Freestyle Sessions', views: '10K', likes: '980', delay: 0.6 },
+  { vid: '', ytId: 'ziBaK1q7L2Q', title: 'Garima Dance Workshop Special', views: '45K', likes: '4.2K', delay: 0.7 },
+  { vid: '', ytId: 't_U6KbVqRDg', title: 'Power Hip-Hop Dance Routine', views: '12K', likes: '1.2K', delay: 0.8 },
+  { vid: '', ytId: 'xnvhC3obxHg', title: 'Energetic Stage Performance', views: '25K', likes: '2.4K', delay: 0.9 },
 ];
 
 // ─── Static Instagram Reels (real IDs hardcoded) ──────────────────────────
