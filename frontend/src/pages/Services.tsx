@@ -58,7 +58,11 @@ const Services: React.FC = () => {
           sectionId: group.sectionId,
           title: groupIndex === 0 ? "Heal your body." : "Get fit.",
           highlight: groupIndex === 0 ? "Learn to dance." : "Dance it out.",
-          items: group.items,
+          items: group.items.map((item) => ({
+            ...item,
+            // ensure each item goes to its own page
+            href: item.href.startsWith('/services/') ? item.href : item.href,
+          })),
         }));
 
   const finalCtaTitle = (pageContent.finalCtaTitle as string) || "START YOUR JOURNEY";
@@ -204,6 +208,25 @@ const Services: React.FC = () => {
                     <div className="svc-explore-copy">
                       <h3>{item.title}</h3>
                       <p>{item.subtitle}</p>
+                      {(item.key === 'wedding-choreography' || (item.title && item.title.toLowerCase().includes('wedding'))) && (
+                        <span style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: 4,
+                          background: 'rgba(99, 75, 250, 0.18)',
+                          border: '1px solid rgba(99, 75, 250, 0.4)',
+                          color: '#a78bfa',
+                          fontSize: 10,
+                          fontWeight: 700,
+                          letterSpacing: '0.8px',
+                          textTransform: 'uppercase',
+                          padding: '3px 10px',
+                          borderRadius: 50,
+                          marginTop: 6,
+                        }}>
+                          ✦ Virtual &amp; In-Person
+                        </span>
+                      )}
                     </div>
                     <span className="svc-explore-arrow" aria-hidden="true">
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">

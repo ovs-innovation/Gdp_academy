@@ -151,7 +151,7 @@ const Programs: React.FC = () => {
   const ctaSecondaryUrl = (pageContent.ctaSecondaryUrl as string) || '/contact';
   const [activeStyle, setActiveStyle] = useState('All');
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     let mounted = true;

@@ -29,7 +29,7 @@ const Schedule: React.FC = () => {
   const [scheduleData, setScheduleData] = useState<ScheduleRow[]>(DEFAULT_SCHEDULE);
   const [heroTitle, setHeroTitle] = useState(DEFAULT_HERO_TITLE);
   const [heroSubtitle, setHeroSubtitle] = useState(DEFAULT_HERO_SUBTITLE);
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(true);
 
   useEffect(() => {
     getPageContentBySlug('schedule')

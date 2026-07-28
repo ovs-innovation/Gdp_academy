@@ -432,6 +432,20 @@
   z-index: 2;
 }
 
+.premium-section-header {
+  text-align: left;
+  margin-bottom: 50px;
+}
+
+.premium-section-header .section-title {
+  font-family: var(--font-krona);
+  font-size: clamp(28px, 4vw, 48px);
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin-top: 10px;
+}
+
 /* ================= 3. CORE PILLARS SECTION ================= */
 .about-pillars-section {
   position: relative;
@@ -1387,6 +1401,39 @@
   .premium-stat-item {
     flex: 1 1 100%;
     border-right: none;
+  }
+
+  .hero-futuristic {
+    padding-top: 100px;
+    padding-bottom: 40px;
+    min-height: auto;
+  }
+
+  .laptop-experience-section {
+    padding: 60px 0;
+  }
+
+  .about-pillars-section {
+    padding: 60px 0;
+  }
+
+  .final-cta-section {
+    padding: 60px 0;
+  }
+
+  .premium-section-header .section-title {
+    font-size: clamp(20px, 6vw, 28px) !important;
+    letter-spacing: -0.5px;
+  }
+
+  .hero-text-details h1 {
+    font-size: clamp(26px, 6vw, 38px) !important;
+    letter-spacing: -1px;
+  }
+
+  .premium-cta-title {
+    font-size: clamp(24px, 6vw, 40px) !important;
+    letter-spacing: -1px;
   }
 }
 

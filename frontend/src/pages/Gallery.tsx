@@ -67,11 +67,11 @@ const DEFAULT_HERO_TITLE = 'THE ARCHIVE';
 const DEFAULT_HERO_SUBTITLE = 'Raw emotion and precision';
 
 const Gallery: React.FC = () => {
-  const [galleryItems, setGalleryItems] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [galleryItems, setGalleryItems] = useState<any[]>(DEFAULT_GALLERY);
+  const [loading, setLoading] = useState(false);
   const [heroTitle, setHeroTitle] = useState(DEFAULT_HERO_TITLE);
   const [heroSubtitle, setHeroSubtitle] = useState(DEFAULT_HERO_SUBTITLE);
-  const [heroReady, setHeroReady] = useState(false);
+  const [heroReady, setHeroReady] = useState(true);
 
   useEffect(() => {
     getPageContentBySlug('gallery')

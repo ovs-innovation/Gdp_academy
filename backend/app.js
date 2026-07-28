@@ -41,10 +41,13 @@ const recordingRoutes = require("./routes/recordingRoutes.js");
 const protectedMediaRoutes = require("./routes/protectedMediaRoutes.js");
 const integrationsRoutes = require("./routes/integrationsRoutes.js");
 const zoomRoutes = require("./routes/zoomRoutes.js");
+const compression = require("compression");
 const { getDbHealth } = require("./config/db.js");
 const { requirePersistentDb } = require("./middlewares/requireDbMiddleware.js");
 
 const app = express();
+
+app.use(compression());
 
 dotenv.config();
 

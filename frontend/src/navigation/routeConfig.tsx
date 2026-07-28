@@ -20,6 +20,7 @@ const pageLoaders = {
   Terms: () => import('../pages/Terms'),
   Privacy: () => import('../pages/Privacy'),
   Services: () => import('../pages/Services'),
+  ServiceDetail: () => import('../pages/ServiceDetail'),
   LiveZoomSessions: () => import('../pages/LiveZoomSessions'),
   ForgotPassword: () => import('../pages/ForgotPassword'),
 } as const;
@@ -46,6 +47,7 @@ const FAQ = React.lazy(pageLoaders.FAQ);
 const Terms = React.lazy(pageLoaders.Terms);
 const Privacy = React.lazy(pageLoaders.Privacy);
 const Services = React.lazy(pageLoaders.Services);
+const ServiceDetail = React.lazy(pageLoaders.ServiceDetail);
 const LiveZoomSessions = React.lazy(pageLoaders.LiveZoomSessions);
 const ForgotPassword = React.lazy(pageLoaders.ForgotPassword);
 
@@ -90,6 +92,7 @@ export const routeConfig: RouteItem[] = [
   { path: '/terms', element: <Terms /> },
   { path: '/privacy', element: <Privacy /> },
   { path: '/services', element: <Services /> },
+  { path: '/services/:slug', element: <ServiceDetail /> },
   { path: '/services/*', element: <Navigate to="/services" replace /> },
   { path: '/wellness', element: <Navigate to="/services" replace /> },
   { path: '/wellness/*', element: <Navigate to="/services" replace /> },

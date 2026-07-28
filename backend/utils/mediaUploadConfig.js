@@ -1,34 +1,52 @@
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("./cloudinary.js");
 
-const uploadsDir = path.join(__dirname, "../uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
+// ──────────────────────────────────────────────────────────────────────────────
+// Cloudinary storage – images → gdp-media, videos → gdp-videos
+// Falls back to memory storage only when Cloudinary env-vars are absent
+// (so local dev without credentials still works, but uploads won't persist).
+// ──────────────────────────────────────────────────────────────────────────────
+const cloudConfigured =
+  process.env.CLOUDINARY_CLOUD_NAME &&
+  process.env.CLOUDINARY_API_KEY &&
+  process.env.CLOUDINARY_API_SECRET;
 
-const storage = multer.diskStorage({
-  destination: uploadsDir,
-  filename: (_req, file, cb) => {
-    const safeBase = path
-      .basename(file.originalname, path.extname(file.originalname))
-      .replace(/[^a-zA-Z0-9-_]/g, "-")
-      .slice(0, 40);
-    cb(null, `${safeBase}-${Date.now()}${path.extname(file.originalname).toLowerCase()}`);
-  },
-});
+const storage = cloudConfigured
+  ? new CloudinaryStorage({
+      cloudinary,
+      params: async (_req, file) => {
+        const isVideo = /^video\//i.test(file.mimetype);
+        return {
+          folder: isVideo ? "gdp-videos" : "gdp-media",
+          resource_type: isVideo ? "video" : "image",
+          // Keep a clean filename (strip timestamp injected by multer)
+          public_id: `${Date.now()}-${file.originalname
+            .replace(/[^a-zA-Z0-9.\-_]/g, "-")
+            .replace(/\.[^/.]+$/, "")}`,
+          // For images: auto quality + format; for video: passthrough
+          ...(isVideo ? {} : { quality: "auto", fetch_format: "auto" }),
+        };
+      },
+    })
+  : multer.memoryStorage();
 
 const mediaUpload = multer({
   storage,
-  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB for videos
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB (videos)
   fileFilter: (_req, file, cb) => {
     const allowed = /jpeg|jpg|png|webp|gif|mp4|webm|mov|quicktime/;
-    const ext = path.extname(file.originalname).toLowerCase().replace(".", "");
-    const ok =
-      allowed.test(ext) ||
-      /^(image|video)\//i.test(file.mimetype);
+    const ext = file.originalname
+      .split(".")
+      .pop()
+      .toLowerCase();
+    const ok = allowed.test(ext) || /^(image|video)\//i.test(file.mimetype);
     if (ok) return cb(null, true);
-    cb(new Error("Only images (JPG, PNG, WebP, GIF) and videos (MP4, WebM, MOV) are allowed"));
+    cb(
+      new Error(
+        "Only images (JPG, PNG, WebP, GIF) and videos (MP4, WebM, MOV) are allowed"
+      )
+    );
   },
 });
 

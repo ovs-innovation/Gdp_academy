@@ -29,8 +29,8 @@ const FAQ: React.FC = () => {
   const hero = renderSplitHeroTitle(content, { before: 'COMMON ', highlight: 'QUESTIONS' });
   const heroSubtitle =
     (content.heroSubtitle as string) || 'Everything you need to know about joining GDP Studio.';
-  const [faqs, setFaqs] = useState<any[]>([]);
-  const [faqsReady, setFaqsReady] = useState(false);
+  const [faqs, setFaqs] = useState<any[]>(DEFAULT_FAQS);
+  const [faqsReady, setFaqsReady] = useState(true);
 
   useEffect(() => {
     getFAQs()

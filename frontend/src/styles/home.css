@@ -1106,25 +1106,26 @@
 
 @media (max-width: 600px) {
   .services-v2-grid {
-    gap: 20px;
+    gap: 16px;
+    padding: 4px 16px 12px;
   }
 
   .service-card-v2 {
-    width: 200px;
+    width: 240px;
   }
 
   .service-card-img {
-    width: 200px;
-    height: 200px;
+    width: 240px;
+    height: 240px;
   }
 
   .service-card-footer {
     width: fit-content;
-    max-width: 226px;
-    height: 52px;
+    max-width: 232px;
+    height: auto;
     min-height: 52px;
-    max-height: 52px;
-    padding: 0 12px;
+    max-height: none;
+    padding: 6px 14px;
     gap: 8px;
   }
 
@@ -1141,8 +1142,10 @@
   }
 
   .service-card-footer h3 {
-    font-size: 12px;
-    max-width: 168px;
+    font-size: 13px;
+    max-width: 172px;
+    white-space: normal;
+    word-break: break-word;
   }
 }
 
@@ -1188,20 +1191,10 @@
   display: grid;
   grid-template-columns: 1.35fr 0.65fr;
   gap: 80px;
-  align-items: center;
-  transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  align-items: start;
 }
 
-.about-content-wrapper.theater-mode {
-  grid-template-columns: 1fr;
-  gap: 40px;
-}
 
-.about-content-wrapper.theater-mode .about-text {
-  text-align: center;
-  max-width: 900px;
-  margin: 40px auto 0 auto;
-}
 
 @media (max-width: 992px) {
   .about-content-wrapper { grid-template-columns: 1fr !important; gap: 40px; }

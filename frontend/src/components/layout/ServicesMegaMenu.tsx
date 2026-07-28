@@ -20,7 +20,7 @@ const ServicesMegaMenu: React.FC<ServicesMegaMenuProps> = ({
         {services.map((item) => (
           <Link
             key={item._id || item.key}
-            to={item.isFitness ? item.href : `/services`}
+            to={item.href}
             className="services-mega-item"
             onClick={onNavigate}
             role="menuitem"

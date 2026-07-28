@@ -17,11 +17,24 @@ const HydrationMarker: React.FC = () => {
 };
 
 const ScrollToTopOnNavigate: React.FC = () => {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
 
   useEffect(() => {
+    const originalStyle = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+
     window.scrollTo(0, 0);
-  }, [pathname]);
+
+    const timer = setTimeout(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.style.scrollBehavior = originalStyle;
+    }, 50);
+
+    return () => {
+      clearTimeout(timer);
+      document.documentElement.style.scrollBehavior = originalStyle;
+    };
+  }, [pathname, search]);
 
   return null;
 };

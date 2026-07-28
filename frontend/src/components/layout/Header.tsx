@@ -11,6 +11,7 @@ import {
   isExcludedService,
 } from "../../lib/defaultServices";
 import { getLocalizedValue } from "../../utils/contentHelper";
+import { EXPLORE_PROGRAMS, SERVICES_MEGA_MENU } from "../../lib/servicesMenu";
 import "../../styles/header.css";
 
 const HOME_SERVICE_IMAGES = {
@@ -82,79 +83,37 @@ const Header: React.FC = () => {
   const [services, setServices] = useState<any[]>([]);
 
   useEffect(() => {
-    const cmsServices = servicesCms;
-    const defaultServices = DEFAULT_SERVICES.filter(
-      (service) =>
-        !isExcludedService({ key: service.key, title: service.title }),
-    ).map((service) => ({
-      _id: service._id,
-      key: service.key,
-      title: service.title,
-      image: service.imageUrl,
-      tagline: service.tagline,
-      mainTitle: service.description.split(".")[0] || service.title,
-    }));
+    const mapped = (servicesCms || [])
+      .filter((s) => !isExcludedService({ key: s.key, title: getLocalizedValue(s.title, "") }))
+      .map((svc, index) => ({
+        _id: svc._id,
+        key: svc.key,
+        title: getLocalizedValue(svc.title, ""),
+        image: resolveHomeServiceImage(
+          {
+            key: svc.key,
+            title: getLocalizedValue(svc.title, ""),
+            cmsImage: svc.images?.[0]?.url,
+          },
+          index,
+        ),
+        tagline: svc.content?.tagline || svc.content?.subtitle || "Learn from experts",
+        href: `/services/${svc.key}`,
+      }));
 
-    let mapped = [];
-    if (cmsServices && cmsServices.length > 0) {
-      mapped = cmsServices
-        .filter(
-          (svc: { key?: string; title?: unknown; description?: unknown }) =>
-            !isExcludedService({
-              key: svc.key,
-              title: getLocalizedValue(
-                svc.title as
-                  | string
-                  | { en: string; [key: string]: string }
-                  | null
-                  | undefined,
-                "",
-              ),
-            }),
-        )
-        .map((svc: any, index: number) => ({
-          _id: svc._id,
-          key: svc.key,
-          title: getLocalizedValue(svc.title, ""),
-          image: resolveHomeServiceImage(
-            {
-              key: svc.key,
-              title: getLocalizedValue(svc.title, ""),
-              cmsImage: svc.images?.[0]?.url,
-            },
-            index,
-          ),
-          tagline: svc.content?.tagline || "All Levels | Expert Guided",
-          mainTitle:
-            getLocalizedValue(svc.description, "").split(".")[0] ||
-            "Unleash your creative potential",
-        }));
+    if (mapped.length > 0) {
+      setServices(mapped);
     } else {
-      mapped = defaultServices;
+      const fallback = DEFAULT_SERVICES.map((p, idx) => ({
+        _id: p.key,
+        key: p.key,
+        title: p.title,
+        image: resolveHomeServiceImage({ key: p.key, title: p.title }, idx),
+        tagline: p.tagline || p.exploreSubtitle || "",
+        href: `/services/${p.key}`,
+      }));
+      setServices(fallback);
     }
-
-    if (mapped.length < 3) {
-      const usedTitles = new Set(mapped.map((s) => s.title.toLowerCase()));
-      const fillers = defaultServices.filter(
-        (d) => !usedTitles.has(d.title.toLowerCase()),
-      );
-      mapped = [...mapped, ...fillers].slice(0, 3);
-    } else {
-      mapped = mapped.slice(0, 3);
-    }
-
-    const fitnessItem = {
-      _id: "fitness-item-mega",
-      key: "fitness-classes",
-      title: "Fitness Classes",
-      image:
-        "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=900&h=700&q=80",
-      tagline: "Zumba, HIIT, Yoga & health programs",
-      href: "/services#fitness-classes",
-      isFitness: true,
-    };
-
-    setServices([...mapped, fitnessItem]);
   }, [servicesCms]);
 
   useEffect(() => {
@@ -241,7 +200,7 @@ const Header: React.FC = () => {
           type="button"
           className="mobile-toggle"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          aria-label="Menu"
+          aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={isMobileMenuOpen}
         >
           <span className="toggle-icon">{isMobileMenuOpen ? "✕" : "☰"}</span>
@@ -347,6 +306,15 @@ const Header: React.FC = () => {
             exit={{ opacity: 0, y: -20 }}
             className="mobile-menu"
           >
+            {/* Prominent close button at top-right */}
+            <button
+              type="button"
+              className="mobile-close-btn"
+              onClick={closeMobile}
+              aria-label="Close menu"
+            >
+              ✕
+            </button>
             {navLinks.map((link) => {
               if (isServicesNav(link.path, link.name)) {
                 return (
@@ -366,14 +334,10 @@ const Header: React.FC = () => {
                         {services.map((item) => (
                           <Link
                             key={item._id || item.key}
-                            to={item.isFitness ? item.href : `/services`}
+                            to={item.href}
                             onClick={closeMobile}
                             className="mobile-services-link"
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "12px",
-                            }}
+                            style={{ display: 'flex', alignItems: 'center', gap: '12px' }}
                           >
                             <LazyImage
                               src={item.image}
@@ -431,9 +395,6 @@ const Header: React.FC = () => {
                 </Link>
               );
             })}
-            <Link to={headerCtaUrl} onClick={closeMobile} className="nav-link">
-              {headerCtaLabel}
-            </Link>
             <Link
               to={headerCtaUrl}
               onClick={closeMobile}

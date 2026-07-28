@@ -46,7 +46,7 @@ const LiveZoomSessions: React.FC = () => {
   const [joinSteps, setJoinSteps] = useState<JoinStep[]>(DEFAULT_JOIN_STEPS);
   const [heroTitle, setHeroTitle] = useState(DEFAULT_HERO_TITLE);
   const [heroSubtitle, setHeroSubtitle] = useState(DEFAULT_HERO_SUBTITLE);
-  const [heroReady, setHeroReady] = useState(false);
+  const [heroReady, setHeroReady] = useState(true);
 
   useEffect(() => {
     fetchLiveZoomSessions()

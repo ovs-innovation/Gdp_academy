@@ -1,30 +1,38 @@
 const multer = require("multer");
-const path = require("path");
-const fs = require("fs");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+const cloudinary = require("./cloudinary.js");
 
-const uploadsDir = path.join(__dirname, "../uploads");
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
+// ──────────────────────────────────────────────────────────────────────────────
+// Profile-photo upload → Cloudinary "gdp-profiles" folder
+// Falls back to memoryStorage when Cloudinary env-vars are absent.
+// ──────────────────────────────────────────────────────────────────────────────
+const cloudConfigured =
+  process.env.CLOUDINARY_CLOUD_NAME &&
+  process.env.CLOUDINARY_API_KEY &&
+  process.env.CLOUDINARY_API_SECRET;
 
-const storage = multer.diskStorage({
-  destination: uploadsDir,
-  filename: (req, file, cb) => {
-    cb(
-      null,
-      file.fieldname + "-" + Date.now() + path.extname(file.originalname),
-    );
-  },
-});
+const storage = cloudConfigured
+  ? new CloudinaryStorage({
+      cloudinary,
+      params: {
+        folder: "gdp-profiles",
+        resource_type: "image",
+        quality: "auto",
+        fetch_format: "auto",
+        // Overwrite the same public_id on re-upload so old versions are cleaned up
+        overwrite: true,
+      },
+    })
+  : multer.memoryStorage();
 
 const upload = multer({
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (req, file, cb) => {
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
+  fileFilter: (_req, file, cb) => {
     const allowed = /jpeg|jpg|png|webp|gif/;
-    const extname = allowed.test(path.extname(file.originalname).toLowerCase());
+    const ext = file.originalname.split(".").pop().toLowerCase();
     const mimeOk = /image\/(jpeg|jpg|png|webp|gif)/i.test(file.mimetype);
-    if (mimeOk && extname) return cb(null, true);
+    if (mimeOk && allowed.test(ext)) return cb(null, true);
     cb(new Error("Only image files (JPG, PNG, WebP, GIF) are allowed"));
   },
 });

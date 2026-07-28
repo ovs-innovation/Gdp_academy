@@ -19,7 +19,7 @@ const Membership: React.FC = () => {
   const heroSubtitle =
     (content.heroSubtitle as string) ||
     'Elevate your craft with flexible plans designed for every stage of your dance journey.';
-  const [plans, setPlans] = useState<any[]>([]);
+  const [plans, setPlans] = useState<any[]>(DEFAULT_PLANS);
 
   useEffect(() => {
     getMembershipPlans()

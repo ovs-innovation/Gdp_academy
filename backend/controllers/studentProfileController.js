@@ -1,5 +1,4 @@
-const fs = require("fs");
-const path = require("path");
+// fs and path no longer needed — Cloudinary storage handles uploads directly
 const StudentProfile = require("../models/studentProfileModel.js");
 const User = require("../models/userModel.js");
 const Booking = require("../models/bookingModel.js");
@@ -30,29 +29,8 @@ const uploadMyProfilePhoto = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    let photoUrl = "";
-
-    const cloudConfigured =
-      process.env.CLOUDINARY_CLOUD_NAME &&
-      process.env.CLOUDINARY_API_KEY &&
-      process.env.CLOUDINARY_API_SECRET;
-
-    if (cloudConfigured) {
-      try {
-        const cloudinary = require("../utils/cloudinary.js");
-        const result = await cloudinary.uploader.upload(req.file.path, {
-          folder: "gdp-profiles",
-          resource_type: "image",
-        });
-        photoUrl = result.secure_url;
-        fs.unlink(req.file.path, () => {});
-      } catch (cloudErr) {
-        console.error("Cloudinary upload failed, using local storage:", cloudErr.message);
-        photoUrl = `/uploads/${req.file.filename}`;
-      }
-    } else {
-      photoUrl = `/uploads/${req.file.filename}`;
-    }
+    // multer-storage-cloudinary stores the Cloudinary URL in req.file.path
+    const photoUrl = req.file.path || `/uploads/${req.file.filename}`;
 
     let profile = await StudentProfile.findOne({ userId });
     if (!profile) {
@@ -69,9 +47,6 @@ const uploadMyProfilePhoto = async (req, res, next) => {
       profile,
     });
   } catch (err) {
-    if (req.file?.path) {
-      fs.unlink(req.file.path, () => {});
-    }
     next(err);
   }
 };
