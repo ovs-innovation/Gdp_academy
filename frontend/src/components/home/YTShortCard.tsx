@@ -1,4 +1,5 @@
 import React from 'react';
+import MediaPlayButton from './MediaPlayButton';
 
 type Props = {
   ytId: string;
@@ -38,18 +39,10 @@ const YTShortCard: React.FC<Props> = ({ ytId, title, views, isPlaying, onPlay })
         />
         {/* Overlay is only present when not playing to intercept the first click and trigger onPlay */}
         {!isPlaying && (
-          <div 
-            className="yt-short-overlay" 
-            style={{ 
-              position: 'absolute', 
-              top: 0, 
-              left: 0, 
-              width: 100 + '%', 
-              height: 100 + '%', 
-              cursor: 'pointer',
-              background: 'rgba(0,0,0,0.1)'
-            }} 
-          />
+          <>
+            <div className="yt-short-overlay gdp-video-card-overlay" aria-hidden="true" />
+            <MediaPlayButton size="md" />
+          </>
         )}
       </div>
 

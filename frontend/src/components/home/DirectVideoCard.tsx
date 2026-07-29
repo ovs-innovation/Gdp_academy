@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import MediaPlayButton from './MediaPlayButton';
 
 type Props = {
   src: string;
@@ -51,18 +52,10 @@ const DirectVideoCard: React.FC<Props> = ({
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
         {!isPlaying && (
-          <div
-            className="yt-short-overlay"
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              cursor: 'pointer',
-              background: 'rgba(0,0,0,0.15)',
-            }}
-          />
+          <>
+            <div className="yt-short-overlay gdp-video-card-overlay" aria-hidden="true" />
+            <MediaPlayButton />
+          </>
         )}
       </div>
 

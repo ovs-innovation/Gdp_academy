@@ -1,4 +1,5 @@
 import React from 'react';
+import MediaPlayButton from './MediaPlayButton';
 
 type Props = {
   reelId: string;
@@ -22,18 +23,10 @@ const InstaReelCard: React.FC<Props> = ({ reelId, isPlaying, onPlay }) => {
           title={`Instagram reel ${reelId}`}
         />
         {!isPlaying && (
-          <div 
-            className="yt-short-overlay" 
-            style={{ 
-              position: 'absolute', 
-              top: 0, 
-              left: 0, 
-              width: '100%', 
-              height: '100%', 
-              cursor: 'pointer',
-              background: 'rgba(0,0,0,0.1)'
-            }} 
-          />
+          <>
+            <div className="yt-short-overlay gdp-video-card-overlay" aria-hidden="true" />
+            <MediaPlayButton size="md" />
+          </>
         )}
       </div>
     </div>
