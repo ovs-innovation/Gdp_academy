@@ -10,6 +10,7 @@ import {
   SERVICES_MEGA_MENU,
   getServiceIcon,
 } from "../lib/servicesMenu";
+import { servicePageHref } from "../lib/serviceDetail";
 
 import "../styles/services.css";
 
@@ -198,7 +199,7 @@ const Services: React.FC = () => {
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.5, delay: index * 0.06 }}
                 >
-                  <Link to={item.href || "/contact"} className="svc-explore-row">
+                  <Link to={servicePageHref(item)} className="svc-explore-row">
                     <span className="svc-explore-num">
                       {String(index + 1).padStart(2, "0")}
                     </span>
@@ -274,7 +275,7 @@ const Services: React.FC = () => {
                     viewport={{ once: true, margin: "-40px" }}
                     transition={{ duration: 0.5, delay: index * 0.06 }}
                   >
-                    <Link to={item.href || "/contact"} className="svc-wellness-card">
+                    <Link to={servicePageHref(item)} className="svc-wellness-card">
                       {item.image ? (
                         <img src={item.image} alt="" className="svc-wellness-card-img" />
                       ) : null}

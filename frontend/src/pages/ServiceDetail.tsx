@@ -6,7 +6,13 @@ import SEO from '../components/SEO';
 import { useSiteData } from '../contexts/SiteDataContext';
 import { buildWhatsAppUrl } from '../utils/whatsapp';
 import { submitEnquiry } from '../services/enquiryService';
+import { getCMSByKey } from '../services/cmsService';
 import FormResultModal, { type FormResultType } from '../components/common/FormResultModal';
+import {
+  cmsContentToServiceDetail,
+  findCmsServiceBySlug,
+  type ServiceDetailData,
+} from '../lib/serviceDetail';
 import {
   sanitizeEnquiryField,
   validateEnquiryField,
@@ -19,20 +25,7 @@ import '../styles/services.css';
 // ──────────────────────────────────────────────────────────────
 // Service content data
 // ──────────────────────────────────────────────────────────────
-const SERVICE_DATA: Record<string, {
-  title: string;
-  tagline: string;
-  description: string;
-  features: string[];
-  image: string;
-  youtubeId?: string;
-  stats?: { value: string; label: string }[];
-  whyUs?: { title: string; description: string; iconKey: string }[];
-  processTitle?: string;
-  processSubtitle?: string;
-  processSteps?: { num: string; title: string; description: string; image: string }[];
-  faq?: { q: string; a: string }[];
-}> = {
+const SERVICE_DATA: Record<string, ServiceDetailData> = {
   'wedding-choreography': {
     title: 'Wedding Choreography',
     tagline: 'Virtual & In-Person | Worldwide',
@@ -413,9 +406,47 @@ const SERVICE_DATA: Record<string, {
 // ──────────────────────────────────────────────────────────────
 const ServiceDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const { appSettings: settings } = useSiteData();
+  const { appSettings: settings, servicesCms, ready: siteDataReady } = useSiteData();
+  const [remoteCms, setRemoteCms] = useState<ReturnType<typeof cmsContentToServiceDetail> | null>(null);
+  const [lookupDone, setLookupDone] = useState(false);
 
-  const service = slug ? SERVICE_DATA[slug] : null;
+  const hardcodedService = slug ? SERVICE_DATA[slug] : null;
+  const cmsFromList = slug ? findCmsServiceBySlug(servicesCms, slug) : undefined;
+  const cmsService =
+    hardcodedService ||
+    (cmsFromList ? cmsContentToServiceDetail(cmsFromList) : null) ||
+    remoteCms;
+
+  useEffect(() => {
+    setRemoteCms(null);
+    setLookupDone(false);
+  }, [slug]);
+
+  useEffect(() => {
+    if (!slug || hardcodedService || cmsFromList) {
+      setLookupDone(true);
+      return;
+    }
+    if (!siteDataReady) return;
+
+    let cancelled = false;
+    getCMSByKey(slug)
+      .then((cms) => {
+        if (!cancelled) setRemoteCms(cmsContentToServiceDetail(cms));
+      })
+      .catch(() => {
+        if (!cancelled) setRemoteCms(null);
+      })
+      .finally(() => {
+        if (!cancelled) setLookupDone(true);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [slug, hardcodedService, cmsFromList, siteDataReady]);
+
+  const service = cmsService;
 
   const [form, setForm] = useState({ name: '', phone: '', email: '', message: '' });
   const [fieldErrors, setFieldErrors] = useState<EnquiryFieldErrors>({});
@@ -429,6 +460,17 @@ const ServiceDetail: React.FC = () => {
   useEffect(() => {
     setIsPlayingVideo(false);
   }, [slug]);
+
+  // Wait for CMS lookup before redirecting
+  if (!service && (!siteDataReady || !lookupDone)) {
+    return (
+      <Layout>
+        <div className="services-page-wrapper svcd-container" style={{ minHeight: '50vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <p style={{ color: 'rgba(255,255,255,0.5)' }}>Loading…</p>
+        </div>
+      </Layout>
+    );
+  }
 
   // If slug not found → redirect to /services
   if (!service) {

@@ -627,17 +627,39 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                         min-height: 150px;
                     }
                     .hero-bottom-stats {
-                        grid-template-columns: 1fr;
-                        gap: 16px;
-                        padding: 16px;
+                        grid-template-columns: repeat(2, 1fr);
+                        gap: 12px 8px;
+                        padding: 16px 12px;
                     }
                     .stat-box {
                         border-right: none !important;
-                        padding: 12px 0;
+                        border-bottom: none !important;
+                        padding: 10px 8px;
                         justify-content: flex-start;
+                        gap: 10px;
                     }
-                    .stat-box:not(:last-child) {
+                    .stat-box:nth-child(odd) {
+                        border-right: 1px solid rgba(255, 255, 255, 0.08);
+                    }
+                    .stat-box:nth-child(1),
+                    .stat-box:nth-child(2) {
                         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                        padding-bottom: 14px;
+                        margin-bottom: 4px;
+                    }
+                    .stat-purple-icon {
+                        width: 36px;
+                        height: 36px;
+                    }
+                    .stat-purple-icon svg {
+                        width: 18px;
+                        height: 18px;
+                    }
+                    .stat-main-val {
+                        font-size: 15px;
+                    }
+                    .stat-sub-label {
+                        font-size: 10px;
                     }
                     .hero-btns-row {
                         flex-direction: column;
