@@ -410,14 +410,14 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
 
                 .hero-bottom-stats {
                     display: grid;
-                    grid-template-columns: repeat(4, 1fr);
-                    gap: 16px;
+                    grid-template-columns: repeat(4, minmax(0, 1fr));
+                    gap: 12px;
                     width: 100%;
                     max-width: 1064px;
                     background: rgba(255, 255, 255, 0.02);
                     border: 1px solid rgba(255, 255, 255, 0.05);
                     border-radius: 20px;
-                    padding: 24px;
+                    padding: 20px 16px;
                     margin-bottom: 32px;
                     backdrop-filter: blur(10px);
                 }
@@ -425,8 +425,9 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                 .stat-box {
                     display: flex;
                     align-items: center;
-                    gap: 16px;
-                    padding: 0 16px;
+                    gap: 12px;
+                    padding: 8px 10px;
+                    min-width: 0;
                 }
 
                 .stat-box:not(:last-child) {
@@ -434,8 +435,8 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                 }
 
                 .stat-purple-icon {
-                    width: 44px;
-                    height: 44px;
+                    width: 40px;
+                    height: 40px;
                     border-radius: 12px;
                     background: rgba(99, 75, 250, 0.1);
                     color: #634BFA;
@@ -446,34 +447,40 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                 }
 
                 .stat-purple-icon svg {
-                    width: 22px;
-                    height: 22px;
+                    width: 20px;
+                    height: 20px;
                 }
 
                 .stat-info {
                     display: flex;
                     flex-direction: column;
+                    min-width: 0;
+                    flex: 1;
                 }
 
                 .stat-main-val {
                     font-family: 'Krona One', sans-serif;
-                    font-size: 18px;
+                    font-size: 16px;
                     color: #FFFFFF;
                     line-height: 1.2;
+                    white-space: nowrap;
                 }
 
                 .stat-stars {
                     color: #FFB800;
-                    font-size: 11px;
+                    font-size: 10px;
                     margin-left: 4px;
-                    letter-spacing: 1px;
+                    letter-spacing: 0.5px;
                 }
 
                 .stat-sub-label {
                     font-family: 'Montserrat', sans-serif;
                     font-size: 11px;
                     color: rgba(255, 255, 255, 0.45);
-                    margin-top: 4px;
+                    margin-top: 3px;
+                    line-height: 1.3;
+                    white-space: normal;
+                    word-break: break-word;
                 }
 
                 .hero-trusted-by {
@@ -604,11 +611,22 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                         max-height: none;
                     }
                     .hero-bottom-stats {
-                        grid-template-columns: repeat(2, 1fr);
-                        gap: 24px;
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                        gap: 10px;
+                        padding: 16px 12px;
                     }
+                    .stat-box {
+                        border-right: none !important;
+                        border-bottom: none !important;
+                        padding: 10px 8px;
+                    }
+                    .stat-box:nth-child(1),
                     .stat-box:nth-child(2) {
-                        border-right: none;
+                        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                        padding-bottom: 12px;
+                    }
+                    .stat-box:nth-child(odd) {
+                        border-right: 1px solid rgba(255, 255, 255, 0.08);
                     }
                 }
 
@@ -627,39 +645,41 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                         min-height: 150px;
                     }
                     .hero-bottom-stats {
-                        grid-template-columns: repeat(2, 1fr);
-                        gap: 12px 8px;
-                        padding: 16px 12px;
+                        grid-template-columns: repeat(2, minmax(0, 1fr));
+                        gap: 8px;
+                        padding: 14px 10px;
                     }
                     .stat-box {
+                        flex-direction: column;
+                        align-items: center;
+                        text-align: center;
+                        gap: 8px;
+                        padding: 10px 6px;
                         border-right: none !important;
-                        border-bottom: none !important;
-                        padding: 10px 8px;
-                        justify-content: flex-start;
-                        gap: 10px;
                     }
                     .stat-box:nth-child(odd) {
-                        border-right: 1px solid rgba(255, 255, 255, 0.08);
+                        border-right: none !important;
                     }
                     .stat-box:nth-child(1),
                     .stat-box:nth-child(2) {
                         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-                        padding-bottom: 14px;
-                        margin-bottom: 4px;
+                        padding-bottom: 12px;
+                        margin-bottom: 0;
                     }
                     .stat-purple-icon {
-                        width: 36px;
-                        height: 36px;
+                        width: 34px;
+                        height: 34px;
                     }
                     .stat-purple-icon svg {
-                        width: 18px;
-                        height: 18px;
+                        width: 17px;
+                        height: 17px;
                     }
                     .stat-main-val {
-                        font-size: 15px;
+                        font-size: 14px;
                     }
                     .stat-sub-label {
-                        font-size: 10px;
+                        font-size: 9px;
+                        line-height: 1.25;
                     }
                     .hero-btns-row {
                         flex-direction: column;
@@ -815,10 +835,10 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
 
                 <div className="hero-bottom-stats">
                     {(homeContent?.homeStats || [
-                        { value: "4.9", label: "320+ Google Reviews" },
-                        { value: "15+", label: "Countries Worldwide" },
+                        { value: "4.9", label: "320+ Reviews" },
+                        { value: "15+", label: "Countries" },
                         { value: "10K+", label: "Happy Students" },
-                        { value: "300+", label: "Weddings Choreographed" }
+                        { value: "250+", label: "Weddings" }
                     ]).slice(0, 4).map((stat: any, idx: number) => (
                         <div key={idx} className="stat-box">
                             <div className="stat-purple-icon">

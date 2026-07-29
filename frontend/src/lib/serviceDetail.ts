@@ -87,8 +87,14 @@ function buildDefaultProcessSteps(
   slug: string,
   features: string[],
   heroImage: string,
+  gallery: string[] = [],
 ) {
   const theme = getServiceTheme(slug);
+  const imagePool = [...new Set([heroImage, ...gallery, ...theme.processImages])].filter(
+    Boolean,
+  );
+  const pickImage = (index: number) => imagePool[index % imagePool.length] || heroImage;
+
   const steps = features.slice(0, 4);
   const titles =
     steps.length >= 4
@@ -111,7 +117,22 @@ function buildDefaultProcessSteps(
           : i === 2
             ? "Live or guided practice with corrections, feedback, and structured milestones."
             : "Celebrate progress with confidence — ready for stage, events, or daily practice.",
-    image: theme.processImages[i] || heroImage,
+    image: pickImage(i),
+  }));
+}
+
+function applyServiceProcessImages(
+  steps: ServiceDetailData["processSteps"],
+  heroImage: string,
+  gallery: string[] = [],
+) {
+  if (!steps?.length) return steps;
+  const pool = [...new Set([heroImage, ...gallery])].filter(Boolean);
+  if (!pool.length) return steps;
+
+  return steps.map((step, i) => ({
+    ...step,
+    image: pool[i % pool.length],
   }));
 }
 
@@ -215,7 +236,18 @@ export function buildServiceDetail(
   }
 
   if (!base.processSteps?.length) {
-    base.processSteps = buildDefaultProcessSteps(slug, base.features, base.image);
+    base.processSteps = buildDefaultProcessSteps(
+      slug,
+      base.features,
+      base.image,
+      base.gallery || [],
+    );
+  } else if (!isNonEmpty(cmsPartial?.processSteps)) {
+    base.processSteps = applyServiceProcessImages(
+      base.processSteps,
+      base.image,
+      base.gallery || [],
+    );
   }
 
   if (!base.gallery?.length) {

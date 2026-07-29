@@ -93,7 +93,7 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
 
       <CMSSection
         title="2. Hero Section - Bottom Stats Grid"
-        description="Four stats boxes shown directly below the video stage in the Hero section."
+        description="Four stats boxes below the hero video. Keep labels short (2–3 words) so they fit on mobile."
         websiteLocation="Homepage → Hero bottom stats grid"
       >
         {(content.homeStats?.length
