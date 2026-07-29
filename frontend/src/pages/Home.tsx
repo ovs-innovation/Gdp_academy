@@ -637,10 +637,8 @@ const Home: React.FC = () => {
       {/* 1. Hero Section */}
       <Hero settings={settings} homeContent={homeContent} contentReady={homeCopyReady} />
 
-      <HomeStatsBar stats={homeCopyReady ? homeContent.homeStats : undefined} />
-
       {/* 2. Services Section */}
-      <section className="services-section section-padding" ref={servicesSectionRef}>
+      <section className="services-section section-padding" id="services" ref={servicesSectionRef}>
         <div className="container">
           <div className="services-section-header">
             {!homeCopyReady ? (

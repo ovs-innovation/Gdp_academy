@@ -136,10 +136,10 @@ const DEFAULT_HOME_PAGE = {
     contactFormTitle: "Or let us reach you!",
 
     homeStats: [
-      { value: "250K+", label: "Social Community" },
-      { value: "15+", label: "Years of Experience" },
-      { value: "700+", label: "Weddings Choreographed" },
-      { value: "50K+", label: "Students Trained" },
+      { value: "4.9", label: "320+ Google Reviews" },
+      { value: "15+", label: "Countries Worldwide" },
+      { value: "10K+", label: "Happy Students" },
+      { value: "300+", label: "Weddings Choreographed" },
     ],
   },
 };

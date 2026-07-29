@@ -33,7 +33,7 @@ const storage = cloudConfigured
 
 const mediaUpload = multer({
   storage,
-  limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB (videos)
+  limits: { fileSize: 1024 * 1024 * 1024 }, // 1 GB (videos)
   fileFilter: (_req, file, cb) => {
     const allowed = /jpeg|jpg|png|webp|gif|mp4|webm|mov|quicktime/;
     const ext = file.originalname

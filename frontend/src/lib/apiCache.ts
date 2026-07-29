@@ -6,7 +6,7 @@ type CacheEntry<T> = {
 const cache = new Map<string, CacheEntry<unknown>>();
 const inflight = new Map<string, Promise<unknown>>();
 
-const DEFAULT_TTL_MS = 60_000;
+const DEFAULT_TTL_MS = import.meta.env.DEV ? 0 : 60_000;
 
 export async function cachedFetch<T>(
   key: string,

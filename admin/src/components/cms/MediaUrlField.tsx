@@ -63,7 +63,7 @@ export function MediaUrlField({
     onDrop,
     accept: mediaAcceptFor(mediaType),
     multiple: false,
-    maxSize: 100 * 1024 * 1024,
+    maxSize: 1024 * 1024 * 1024,
     disabled: uploading,
   });
 
