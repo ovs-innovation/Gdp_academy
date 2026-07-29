@@ -231,11 +231,9 @@ const buildHomeServices = (
     .map(mapCmsServiceToHomeCard)
     .filter((s) => !isExcludedService({ key: s.key, title: s.title }));
 
-  if (mapped.length >= 3) return mapped.slice(0, 3);
+  if (mapped.length > 0) return mapped;
 
-  const usedTitles = new Set(mapped.map((s) => s.title.toLowerCase()));
-  const fillers = filteredDefaults.filter((d) => !usedTitles.has(d.title.toLowerCase()));
-  return [...mapped, ...fillers].slice(0, 3);
+  return filteredDefaults;
 };
 
 const Home: React.FC = () => {
