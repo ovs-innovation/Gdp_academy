@@ -3,16 +3,9 @@ import { motion } from 'framer-motion';
 import HomeMediaMarquee from './HomeMediaMarquee';
 import { HomeMediaSkeleton } from './HomeSkeletons';
 import YTShortCard from './YTShortCard';
-
-export type YouTubeShortItem = {
-  vid: string;
-  title: string;
-  views: string;
-  likes: string;
-  delay: number;
-  ytId?: string; // Real YouTube Short ID
-  shortUrl?: string;
-};
+import DirectVideoCard from './DirectVideoCard';
+import { isDirectVideoUrl, resolvePublicMediaUrl } from '../../utils/mediaUrl';
+import type { YouTubeShortItem } from '../../lib/homeCms';
 
 type Props = {
   shorts: YouTubeShortItem[];
@@ -72,18 +65,40 @@ const YouTubeShortsSection: React.FC<Props> = ({
             <HomeMediaMarquee
               items={shorts}
               ariaLabel="YouTube shorts"
-              renderItem={(item) => {
+              renderItem={(item, index) => {
                 const s = item as YouTubeShortItem;
-                const isPlaying = activeVideoId === s.ytId;
-                return s.ytId ? (
-                  <YTShortCard 
-                    ytId={s.ytId} 
-                    title={s.title} 
-                    views={s.views} 
-                    isPlaying={isPlaying}
-                    onPlay={() => setActiveVideoId(s.ytId || null)}
-                  />
-                ) : null;
+                const videoSrc =
+                  s.vid && isDirectVideoUrl(s.vid) ? resolvePublicMediaUrl(s.vid) : '';
+                const ytId = s.ytId;
+                const itemId = videoSrc || ytId || `yt-${index}`;
+
+                if (videoSrc) {
+                  return (
+                    <DirectVideoCard
+                      src={videoSrc}
+                      isPlaying={activeVideoId === itemId}
+                      onPlay={() => setActiveVideoId(itemId)}
+                      title={s.title}
+                      views={s.views}
+                      likes={s.likes}
+                    />
+                  );
+                }
+
+                if (ytId) {
+                  const isPlaying = activeVideoId === ytId;
+                  return (
+                    <YTShortCard
+                      ytId={ytId}
+                      title={s.title}
+                      views={s.views}
+                      isPlaying={isPlaying}
+                      onPlay={() => setActiveVideoId(ytId)}
+                    />
+                  );
+                }
+
+                return null;
               }}
             />
           )}

@@ -34,6 +34,23 @@ export function isYoutubeUrl(url: string): boolean {
   return /youtube\.com|youtu\.be/i.test(url);
 }
 
+export function isInstagramUrl(url: string): boolean {
+  return /instagram\.com/i.test(url);
+}
+
+/** Extract Instagram reel/post id from a link or bare id. */
+export function extractInstagramReelId(url: string): string | null {
+  const raw = url?.trim();
+  if (!raw) return null;
+
+  if (/^[A-Za-z0-9_-]{5,}$/.test(raw) && !raw.includes('.') && !raw.includes('/')) {
+    return raw;
+  }
+
+  const match = raw.match(/instagram\.com\/(?:reel|p)\/([A-Za-z0-9_-]+)/i);
+  return match?.[1] || null;
+}
+
 /** Extract YouTube video id from watch, shorts, embed, or youtu.be links */
 export function extractYoutubeVideoId(url: string): string | null {
   const raw = url?.trim();

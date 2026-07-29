@@ -2,27 +2,24 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import HomeMediaMarquee from './HomeMediaMarquee';
 import InstaReelCard from './InstaReelCard';
-
-export type InstagramReelItem = {
-  vid: string;
-  reelId?: string;
-  url?: string;
-  delay: number;
-  offset: string;
-  likes: string;
-  comments: string;
-};
+import DirectVideoCard from './DirectVideoCard';
+import { isDirectVideoUrl, resolvePublicMediaUrl } from '../../utils/mediaUrl';
+import type { InstagramReelItem } from '../../lib/homeCms';
 
 type Props = {
   reels: InstagramReelItem[];
   handle: string;
+  sectionTitle?: string;
+  sectionHighlight?: string;
   activeVideoId: string | null;
   setActiveVideoId: (id: string | null) => void;
 };
 
-const InstagramReelsSection: React.FC<Props> = ({ 
-  reels, 
+const InstagramReelsSection: React.FC<Props> = ({
+  reels,
   handle,
+  sectionTitle = 'Join us',
+  sectionHighlight = 'on Instagram',
   activeVideoId,
   setActiveVideoId,
 }) => {
@@ -37,7 +34,7 @@ const InstagramReelsSection: React.FC<Props> = ({
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
             >
-              Join us <br /> <span className="gradient-text">on Instagram</span>
+              {sectionTitle} <br /> <span className="gradient-text">{sectionHighlight}</span>
             </motion.h2>
 
             <div className="youtube-header-actions">
@@ -57,16 +54,37 @@ const InstagramReelsSection: React.FC<Props> = ({
           <HomeMediaMarquee
             items={reels}
             ariaLabel="Instagram reels"
-            renderItem={(item) => {
+            renderItem={(item, index) => {
               const r = item as InstagramReelItem;
-              const isPlaying = activeVideoId === r.reelId;
-              return r.reelId ? (
-                <InstaReelCard 
-                  reelId={r.reelId} 
-                  isPlaying={isPlaying}
-                  onPlay={() => setActiveVideoId(r.reelId || null)}
-                />
-              ) : null;
+              const videoSrc =
+                r.vid && isDirectVideoUrl(r.vid) ? resolvePublicMediaUrl(r.vid) : '';
+              const reelId = r.reelId;
+              const itemId = videoSrc || reelId || `insta-${index}`;
+
+              if (videoSrc) {
+                return (
+                  <DirectVideoCard
+                    src={videoSrc}
+                    isPlaying={activeVideoId === itemId}
+                    onPlay={() => setActiveVideoId(itemId)}
+                    likes={r.likes}
+                    comments={r.comments}
+                  />
+                );
+              }
+
+              if (reelId) {
+                const isPlaying = activeVideoId === reelId;
+                return (
+                  <InstaReelCard
+                    reelId={reelId}
+                    isPlaying={isPlaying}
+                    onPlay={() => setActiveVideoId(reelId)}
+                  />
+                );
+              }
+
+              return null;
             }}
           />
         </div>

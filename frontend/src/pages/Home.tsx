@@ -31,7 +31,7 @@ import {
 } from '../utils/socialLinks';
 import SEO from '../components/SEO';
 import '../styles/home.css';
-import { normalizeHomeContent } from '../lib/homeCms';
+import { normalizeHomeContent, mergeMediaList } from '../lib/homeCms';
 import { DEFAULT_SERVICES, HOME_SERVICE_IMAGE_BY_KEY, isExcludedService } from '../lib/defaultServices';
 import { getServiceIcon } from '../components/home/ServiceIcons';
 import {
@@ -454,8 +454,21 @@ const Home: React.FC = () => {
     features: service.features,
   }));
 
-  // Static YouTube Shorts — directly use real IDs, no DB needed
-  const youtubeShorts = STATIC_YOUTUBE_SHORTS;
+  // CMS YouTube Shorts + Instagram reels (empty slots fall back to defaults)
+  const cmsShorts = homeCopyReady ? homeContent.youtubeShorts || [] : [];
+  const cmsInstagram = homeCopyReady ? homeContent.instagramPosts || [] : [];
+
+  const youtubeShorts = mergeMediaList(
+    cmsShorts,
+    STATIC_YOUTUBE_SHORTS,
+    (item) => Boolean(item?.vid?.trim() || item?.ytId),
+  );
+
+  const instagramPosts = mergeMediaList(
+    cmsInstagram,
+    STATIC_INSTAGRAM_REELS,
+    (item) => Boolean(item?.vid?.trim() || item?.reelId),
+  );
 
   const youtubeChannel = homeContent.youtubeChannel || DEFAULT_YOUTUBE_CHANNEL;
   const youtubeChannelUrl = resolveYoutubeChannelUrl(
@@ -463,10 +476,10 @@ const Home: React.FC = () => {
     DEFAULT_YOUTUBE_CHANNEL_URL,
   );
 
-  // Static Instagram Reels — directly use real IDs, no DB needed
-  const instagramPosts = STATIC_INSTAGRAM_REELS;
-
+  // Instagram handle + section titles from CMS
   const instagramHandle = homeContent.instagramHandle || '@GarimadanceProductions';
+  const instagramSectionTitle = homeContent.instagramSectionTitle || 'Join us';
+  const instagramSectionHighlight = homeContent.instagramSectionHighlight || 'on Instagram';
 
   const aboutYoutubeId = homeContent.aboutYoutubeId || DEFAULT_ABOUT_YOUTUBE_ID;
   const heroYoutubeId = homeContent.heroYoutubeId || DEFAULT_HERO_YOUTUBE_ID;
@@ -928,6 +941,8 @@ const Home: React.FC = () => {
       <InstagramReelsSection
         reels={instagramPosts}
         handle={instagramHandle}
+        sectionTitle={instagramSectionTitle}
+        sectionHighlight={instagramSectionHighlight}
         activeVideoId={activeVideoId}
         setActiveVideoId={setActiveVideoId}
       />
