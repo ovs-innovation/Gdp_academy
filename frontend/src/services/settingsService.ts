@@ -47,6 +47,7 @@ export interface SiteSettings {
   // Used by Home page
   upcomingWorkshopsTitle?: string;
   upcomingWorkshopsSubtitle?: string;
+  heroYoutubeId?: string;
 
   servicesDetailKeyModulesLabel?: string;
   servicesDetailJoinButton?: string;

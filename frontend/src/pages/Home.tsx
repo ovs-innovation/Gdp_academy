@@ -14,7 +14,6 @@ import FormResultModal, { type FormResultType } from '../components/common/FormR
 import Hero from '../components/homes/home-one/Hero';
 import YouTubeShortsSection from '../components/home/YouTubeShortsSection';
 import InstagramReelsSection from '../components/home/InstagramReelsSection';
-import HomeStatsBar from '../components/home/HomeStatsBar';
 import ReviewsSection from '../components/home/ReviewsSection';
 import { useScrollToHash } from '../hooks/useScrollToHash';
 import { buildWhatsAppUrl } from '../utils/whatsapp';
