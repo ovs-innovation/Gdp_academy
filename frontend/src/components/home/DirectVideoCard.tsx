@@ -54,7 +54,7 @@ const DirectVideoCard: React.FC<Props> = ({
         {!isPlaying && (
           <>
             <div className="yt-short-overlay gdp-video-card-overlay" aria-hidden="true" />
-            <MediaPlayButton />
+            <MediaPlayButton size="md" />
           </>
         )}
       </div>

@@ -678,13 +678,7 @@ const Home: React.FC = () => {
                 to={`/services/${service.key}`}
                 className="service-card-link"
               >
-                <motion.div
-                  className="service-card-v2"
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  whileHover={{ y: -8 }}
-                  viewport={{ once: true }}
-                >
+                <div className="service-card-v2">
                   <div className="service-card-img">
                     <LazyImage
                       src={service.image}
@@ -705,7 +699,7 @@ const Home: React.FC = () => {
                     </span>
                     <h3>{service.title}</h3>
                   </div>
-                </motion.div>
+                </div>
               </Link>
             )}
           />

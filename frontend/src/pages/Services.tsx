@@ -28,7 +28,9 @@ const Services: React.FC = () => {
     (pageContent.heroSubtitle as string) ||
     "Professional dance training designed for every performer.";
   const heroCtaText = (pageContent.heroCtaText as string) || "BOOK A TRIAL";
-  const heroCtaUrl = (pageContent.heroCtaUrl as string) || "/contact";
+  const heroCtaUrl = /trial/i.test(heroCtaText)
+    ? "/contact"
+    : (pageContent.heroCtaUrl as string) || "/contact";
 
   const stats =
     Array.isArray(pageContent.stats) && pageContent.stats.length > 0

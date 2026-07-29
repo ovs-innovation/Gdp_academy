@@ -126,14 +126,18 @@ export interface MembershipPlan {
 // ================= NEW PUBLIC API IMPLEMENTATIONS =================
 
 export const getPageContentBySlug = async (slug: string): Promise<PageContent> => {
-  return cachedFetch(`page:${slug}`, async () => {
-    const response = await fetch(`${API_BASE_URL}/page-contents/slug/${slug}`);
-    if (!response.ok) {
-      throw new Error(`Page content for slug '${slug}' not found`);
-    }
-    const data = await response.json();
-    return data.page;
-  });
+  return cachedFetch(
+    `page:${slug}`,
+    async () => {
+      const response = await fetch(`${API_BASE_URL}/page-contents/slug/${slug}`);
+      if (!response.ok) {
+        throw new Error(`Page content for slug '${slug}' not found`);
+      }
+      const data = await response.json();
+      return data.page;
+    },
+    15_000,
+  );
 };
 
 export const getSiteSettings = async (): Promise<SiteSettings> => {
