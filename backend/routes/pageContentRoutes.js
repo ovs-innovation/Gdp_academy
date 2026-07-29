@@ -10,13 +10,14 @@ const {
 const { verifyToken } = require("../middlewares/authMiddleware.js");
 const { isAdmin } = require("../middlewares/roleMiddleware.js");
 const { optionalVerifyToken } = require("../middlewares/optionalAuthMiddleware.js");
+const { noStoreCache } = require("../middlewares/noStoreCache.js");
 
 const router = express.Router();
 
 // Public
 router.get("/", getAllPageContent);
 // Public (admins with token see drafts too)
-router.get("/slug/:slug", optionalVerifyToken, getPageContentBySlug);
+router.get("/slug/:slug", noStoreCache, optionalVerifyToken, getPageContentBySlug);
 router.get("/:id", getPageContentById);
 
 // Admin only

@@ -1,6 +1,7 @@
 const express = require("express");
 const { verifyToken } = require("../middlewares/authMiddleware.js");
 const { authorize } = require("../middlewares/permissionMiddleware.js");
+const { noStoreCache } = require("../middlewares/noStoreCache.js");
 const {
   saveCMS,
   getCMSByKey,
@@ -12,8 +13,8 @@ const {
 const router = express.Router();
 
 // Public
-router.get("/section/:section", getCMSBySection);
-router.get("/key/:key", getCMSByKey);
+router.get("/section/:section", noStoreCache, getCMSBySection);
+router.get("/key/:key", noStoreCache, getCMSByKey);
 
 // Admin only
 router.post("/", verifyToken, authorize("admin"), saveCMS);

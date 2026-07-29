@@ -1,5 +1,9 @@
 import { API_BASE_URL } from "../lib/apiConfig";
-import { cachedFetch } from "../lib/apiCache";
+
+async function cmsFetch(url: string, init?: RequestInit) {
+  const response = await fetch(url, { ...init, cache: "no-store" });
+  return response;
+}
 
 // ================= TYPES =================
 export interface CMSContent {
@@ -126,40 +130,30 @@ export interface MembershipPlan {
 // ================= NEW PUBLIC API IMPLEMENTATIONS =================
 
 export const getPageContentBySlug = async (slug: string): Promise<PageContent> => {
-  return cachedFetch(
-    `page:${slug}`,
-    async () => {
-      const response = await fetch(`${API_BASE_URL}/page-contents/slug/${slug}`);
-      if (!response.ok) {
-        throw new Error(`Page content for slug '${slug}' not found`);
-      }
-      const data = await response.json();
-      return data.page;
-    },
-    15_000,
-  );
+  const response = await cmsFetch(`${API_BASE_URL}/page-contents/slug/${slug}`);
+  if (!response.ok) {
+    throw new Error(`Page content for slug '${slug}' not found`);
+  }
+  const data = await response.json();
+  return data.page;
 };
 
 export const getSiteSettings = async (): Promise<SiteSettings> => {
-  return cachedFetch("site-settings", async () => {
-    const response = await fetch(`${API_BASE_URL}/site-settings`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch site settings");
-    }
-    const data = await response.json();
-    return data.settings;
-  });
+  const response = await cmsFetch(`${API_BASE_URL}/site-settings`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch site settings");
+  }
+  const data = await response.json();
+  return data.settings;
 };
 
 export const getFAQs = async (): Promise<FAQItem[]> => {
-  return cachedFetch("faqs:published", async () => {
-    const response = await fetch(`${API_BASE_URL}/faqs?status=published`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch FAQs");
-    }
-    const data = await response.json();
-    return data.faqs;
-  });
+  const response = await cmsFetch(`${API_BASE_URL}/faqs?status=published`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch FAQs");
+  }
+  const data = await response.json();
+  return data.faqs;
 };
 
 export const getGalleryItems = async (): Promise<GalleryItem[]> => {
@@ -216,13 +210,11 @@ export const getCMSByKey = async (key: string): Promise<CMSContent> => {
 export const getCMSBySection = async (
   section: string,
 ): Promise<CMSContent[]> => {
-  return cachedFetch(`cms-section:${section}`, async () => {
-    const response = await fetch(`${API_BASE_URL}/cms/section/${section}`);
-    if (!response.ok) {
-      throw new Error("Failed to fetch CMS content");
-    }
-    return response.json();
-  });
+  const response = await cmsFetch(`${API_BASE_URL}/cms/section/${section}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch CMS content");
+  }
+  return response.json();
 };
 
 // ================= GET ALL CMS (ADMIN) =================

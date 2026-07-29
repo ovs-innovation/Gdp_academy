@@ -1,10 +1,20 @@
 const PageContent = require("../models/pageContentModel.js");
-const { withPublicCache, invalidatePublicCache } = require("../utils/publicCache.js");
+const {
+  withPublicCache,
+  invalidatePublicCache,
+} = require("../utils/publicCache.js");
+
+const PAGE_CONTENT_CACHE_TTL_MS = 5_000;
+
+function bustPageCache(slug) {
+  if (slug) invalidatePublicCache(`page:${slug}`);
+}
 
 // Create page content (admin only)
 const createPageContent = async (req, res, next) => {
   try {
     const page = await PageContent.create(req.body);
+    bustPageCache(page.slug);
     res.status(201).json({ message: "Page content created", page });
   } catch (err) {
     next(err);
@@ -44,7 +54,7 @@ const getPageContentBySlug = async (req, res, next) => {
       return res.json({ page });
     }
 
-    const body = await withPublicCache(`page:${slug}`, 120_000, async () => {
+    const body = await withPublicCache(`page:${slug}`, PAGE_CONTENT_CACHE_TTL_MS, async () => {
       const page = await PageContent.findOne({ slug, status: "published" }).lean();
       if (!page) return null;
       return { page };
@@ -71,14 +81,15 @@ const getPageContentById = async (req, res, next) => {
 // Update page content (admin only)
 const updatePageContent = async (req, res, next) => {
   try {
+    const existing = await PageContent.findById(req.params.id).select("slug").lean();
     const updated = await PageContent.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true, runValidators: true },
     );
     if (!updated) return res.status(404).json({ message: "Page not found" });
-    // Bust the public cache so visitors immediately get the new content
-    invalidatePublicCache(`page:${updated.slug}`);
+    bustPageCache(existing?.slug);
+    bustPageCache(updated.slug);
     res.json({ message: "Page content updated", page: updated });
   } catch (err) {
     next(err);
@@ -90,6 +101,7 @@ const deletePageContent = async (req, res, next) => {
   try {
     const deleted = await PageContent.findByIdAndDelete(req.params.id);
     if (!deleted) return res.status(404).json({ message: "Page not found" });
+    bustPageCache(deleted.slug);
     res.json({ message: "Page content deleted" });
   } catch (err) {
     next(err);

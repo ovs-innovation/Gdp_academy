@@ -1,6 +1,11 @@
 const SiteSettings = require("../models/siteSettings.js");
 const { sanitizeLogoUrl } = require("../utils/siteLogo.js");
-const { withPublicCache } = require("../utils/publicCache.js");
+const {
+  withPublicCache,
+  invalidatePublicCache,
+} = require("../utils/publicCache.js");
+
+const SITE_SETTINGS_CACHE_TTL_MS = 5_000;
 
 function toClientSettings(settings) {
   const doc =
@@ -14,7 +19,7 @@ function toClientSettings(settings) {
 // Get site settings (singleton) – public
 const getSiteSettings = async (req, res, next) => {
   try {
-    const body = await withPublicCache("site-settings", 120_000, async () => {
+    const body = await withPublicCache("site-settings", SITE_SETTINGS_CACHE_TTL_MS, async () => {
       let settings = await SiteSettings.findOne().lean();
       if (!settings) {
         return {
@@ -53,6 +58,7 @@ const updateSiteSettings = async (req, res, next) => {
       Object.assign(settings, body);
       await settings.save();
     }
+    invalidatePublicCache("site-settings");
     res.json({ message: "Site settings updated", settings: toClientSettings(settings) });
   } catch (err) {
     next(err);

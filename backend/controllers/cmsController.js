@@ -1,5 +1,14 @@
 const CMS = require("../models/cmsModel.js");
-const { withPublicCache } = require("../utils/publicCache.js");
+const {
+  withPublicCache,
+  invalidatePublicCache,
+} = require("../utils/publicCache.js");
+
+const CMS_SECTION_CACHE_TTL_MS = 5_000;
+
+function bustCmsSectionCache(section) {
+  if (section) invalidatePublicCache(`cms-section:${section}`);
+}
 
 // Create or update CMS content
 const saveCMS = async (req, res, next) => {
@@ -23,6 +32,7 @@ const saveCMS = async (req, res, next) => {
     }
 
     let cms = await CMS.findOne({ key });
+    const previousSection = cms?.section;
 
     if (cms) {
       cms.section = section;
@@ -50,6 +60,11 @@ const saveCMS = async (req, res, next) => {
         updatedBy: req.user?.id,
         publishedAt: new Date(),
       });
+    }
+
+    bustCmsSectionCache(section);
+    if (previousSection && previousSection !== section) {
+      bustCmsSectionCache(previousSection);
     }
 
     return res.status(201).json({
@@ -84,7 +99,7 @@ const getCMSByKey = async (req, res, next) => {
 const getCMSBySection = async (req, res, next) => {
   try {
     const { section } = req.params;
-    const cmsContent = await withPublicCache(`cms-section:${section}`, 120_000, () =>
+    const cmsContent = await withPublicCache(`cms-section:${section}`, CMS_SECTION_CACHE_TTL_MS, () =>
       CMS.find({
         section,
         isActive: true,
@@ -138,6 +153,8 @@ const deleteCMS = async (req, res, next) => {
         message: "CMS content not found",
       });
     }
+
+    bustCmsSectionCache(cms.section);
 
     return res.json({
       message: "CMS content deleted successfully",
