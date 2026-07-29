@@ -94,7 +94,7 @@ const WEBSITE_MAP = [
     page: "Header & Footer (all pages)",
     slug: "settings",
     sections: [
-      { name: "Logo, nav links, WhatsApp, announcement", edit: "Website Control → Header & Footer", path: "/cms" },
+      { name: "Logo, nav, phone, email, address, WhatsApp", edit: "Website Control → Header & Footer", path: "/cms" },
     ],
   },
 ];

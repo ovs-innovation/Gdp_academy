@@ -47,6 +47,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
       alt={alt}
       className={`lazy-image${loadedSrc ? ' is-loaded' : ''}${className ? ` ${className}` : ''}`}
       decoding="async"
+      loading={loadedSrc ? 'lazy' : undefined}
       onError={onError}
       {...rest}
     />

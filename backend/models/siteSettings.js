@@ -4,6 +4,9 @@ const siteSettingsSchema = new mongoose.Schema(
   {
     logoUrl: { type: String, trim: true },
     whatsappNumber: { type: String, trim: true },
+    phone: { type: String, trim: true },
+    email: { type: String, trim: true },
+    address: { type: String, trim: true },
 
     navLinks: {
       type: [

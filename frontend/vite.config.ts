@@ -60,5 +60,14 @@ export default defineConfig({
     minify: 'esbuild',
     cssCodeSplit: true,
     chunkSizeWarningLimit: 2000,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-motion': ['framer-motion'],
+          'vendor-ui': ['swiper', 'react-toastify'],
+        },
+      },
+    },
   }
 })

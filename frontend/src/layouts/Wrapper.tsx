@@ -11,7 +11,15 @@ interface WrapperProps {
 const Wrapper = ({ children }: WrapperProps) => {
 
     useEffect(() => {
-        AOS.init();
+        AOS.init({
+            once: true,
+            duration: 650,
+            easing: "ease-out-cubic",
+            offset: 40,
+            disable: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+                ? true
+                : "phone",
+        });
     }, []);
 
     MotionAnimation();
@@ -26,4 +34,3 @@ const Wrapper = ({ children }: WrapperProps) => {
 }
 
 export default Wrapper;
-

@@ -4,6 +4,8 @@ import { toast } from "react-toastify";
 import Layout from "../components/layout/Layout";
 import SEO from "../components/SEO";
 import { submitContactMessage, getPageContentBySlug } from "../services/cmsService";
+import { useSiteData } from "../contexts/SiteDataContext";
+import { resolveContactInfo } from "../lib/contactInfo";
 import {
   type EnquiryField,
   type EnquiryFieldErrors,
@@ -35,6 +37,7 @@ const DEFAULT_CONTENT: ContactContent = {
 };
 
 const Contact: React.FC = () => {
+  const { cmsSettings } = useSiteData();
   const [content, setContent] = useState<ContactContent>(DEFAULT_CONTENT);
   const [formData, setFormData] = useState({
     name: "",
@@ -46,26 +49,42 @@ const Contact: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    getPageContentBySlug("contact")
-      .then((page) => {
-        if (page && page.content) {
-          const loadedPhone = page.content.phone || DEFAULT_CONTENT.phone;
-          const loadedEmail = page.content.email || DEFAULT_CONTENT.email;
-          setContent({
-            headerTitle: page.content.headerTitle || DEFAULT_CONTENT.headerTitle,
-            headerSubtitle: page.content.headerSubtitle || DEFAULT_CONTENT.headerSubtitle,
-            address: page.content.address || DEFAULT_CONTENT.address,
-            phone: loadedPhone || DEFAULT_CONTENT.phone,
-            email: loadedEmail || DEFAULT_CONTENT.email,
-            hoursWeekday: page.content.hoursWeekday || DEFAULT_CONTENT.hoursWeekday,
-            hoursWeekend: page.content.hoursWeekend || DEFAULT_CONTENT.hoursWeekend,
-          });
-        }
-      })
-      .catch(() => {
-        setContent(DEFAULT_CONTENT);
-      });
-  }, []);
+    const load = () => {
+      getPageContentBySlug("contact")
+        .then((page) => {
+          const contact = resolveContactInfo(cmsSettings, page?.content);
+          if (page?.content) {
+            setContent({
+              headerTitle: page.content.headerTitle || DEFAULT_CONTENT.headerTitle,
+              headerSubtitle: page.content.headerSubtitle || DEFAULT_CONTENT.headerSubtitle,
+              address: contact.address,
+              phone: contact.phone,
+              email: contact.email,
+              hoursWeekday: page.content.hoursWeekday || DEFAULT_CONTENT.hoursWeekday,
+              hoursWeekend: page.content.hoursWeekend || DEFAULT_CONTENT.hoursWeekend,
+            });
+          } else {
+            setContent((prev) => ({
+              ...prev,
+              address: contact.address,
+              phone: contact.phone,
+              email: contact.email,
+            }));
+          }
+        })
+        .catch(() => {
+          const contact = resolveContactInfo(cmsSettings, null);
+          setContent((prev) => ({
+            ...prev,
+            address: contact.address,
+            phone: contact.phone,
+            email: contact.email,
+          }));
+        });
+    };
+
+    load();
+  }, [cmsSettings]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,

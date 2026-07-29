@@ -32,6 +32,7 @@ import {
 import SEO from '../components/SEO';
 import '../styles/home.css';
 import { normalizeHomeContent, mergeMediaList } from '../lib/homeCms';
+import { resolvePublicMediaUrl } from '../utils/mediaUrl';
 import { DEFAULT_SERVICES, HOME_SERVICE_IMAGE_BY_KEY, isExcludedService } from '../lib/defaultServices';
 import { getServiceIcon } from '../components/home/ServiceIcons';
 import {
@@ -152,12 +153,17 @@ const resolveHomeServiceImage = (
   index: number,
 ): string => {
   const cms = opts.cmsImage?.trim();
-  if (
-    cms &&
-    (cms.startsWith('http') || cms.includes('cloudinary') || cms.includes('/uploads/')) &&
-    !cms.includes('/svc-')
-  ) {
-    return cms;
+  if (cms) {
+    if (
+      cms.startsWith('http') ||
+      cms.includes('cloudinary') ||
+      cms.startsWith('/uploads/') ||
+      (cms.startsWith('/') && !cms.includes('/svc-'))
+    ) {
+      return cms.startsWith('http') || cms.includes('cloudinary')
+        ? cms
+        : resolvePublicMediaUrl(cms) || cms;
+    }
   }
 
   const key = (opts.key || '').toLowerCase();

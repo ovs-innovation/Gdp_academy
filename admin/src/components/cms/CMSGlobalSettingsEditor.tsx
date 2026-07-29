@@ -94,6 +94,45 @@ export function CMSGlobalSettingsEditor({ siteSettings, saving, onChange, onSave
               className="bg-muted/50"
             />
           </div>
+        </Card>
+
+        <Card className="space-y-4 border-border bg-card p-6">
+          <h3 className="border-b border-border pb-2 font-semibold text-foreground">
+            Footer & Contact Info
+          </h3>
+          <p className="text-xs text-muted-foreground">
+            Shown in the website footer and on the Contact page. Saving here updates both.
+          </p>
+          <div className="space-y-2">
+            <Label htmlFor="contactPhone">Phone</Label>
+            <Input
+              id="contactPhone"
+              value={siteSettings.phone || ""}
+              onChange={(e) => onChange({ ...siteSettings, phone: e.target.value })}
+              placeholder="+91 78384 16907"
+              className="bg-muted/50"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="contactEmail">Email</Label>
+            <Input
+              id="contactEmail"
+              value={siteSettings.email || ""}
+              onChange={(e) => onChange({ ...siteSettings, email: e.target.value })}
+              placeholder="Gdp.info2019@gmail.com"
+              className="bg-muted/50"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="contactAddress">Address</Label>
+            <Textarea
+              id="contactAddress"
+              value={siteSettings.address || ""}
+              onChange={(e) => onChange({ ...siteSettings, address: e.target.value })}
+              placeholder="Studio address"
+              className="min-h-[80px] bg-muted/50"
+            />
+          </div>
           <div className="space-y-2">
             <Label htmlFor="footerTagline">Footer tagline</Label>
             <Textarea

@@ -26,6 +26,10 @@ const ServicesCMSPage = () => {
   const [tagline, setTagline] = useState("");
   const [features, setFeatures] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [galleryUrl, setGalleryUrl] = useState("");
+  const [youtubeId, setYoutubeId] = useState("");
+  const [heroBadge, setHeroBadge] = useState("");
+  const [theme, setTheme] = useState("");
   const [isActive, setIsActive] = useState(true);
   const [isAdding, setIsAdding] = useState(false);
   const { toast } = useToast();
@@ -52,6 +56,10 @@ const ServicesCMSPage = () => {
     setTagline("");
     setFeatures("");
     setImageUrl("");
+    setGalleryUrl("");
+    setYoutubeId("");
+    setHeroBadge("");
+    setTheme("");
     setIsActive(true);
   };
 
@@ -64,8 +72,17 @@ const ServicesCMSPage = () => {
         section: "services",
         title,
         description,
-        content: { tagline, features: features.split(",").map((f) => f.trim()).filter(Boolean) },
-        images: imageUrl ? [{ url: imageUrl, alt: title, order: 0 }] : [],
+        content: {
+          tagline,
+          features: features.split(",").map((f) => f.trim()).filter(Boolean),
+          youtubeId: youtubeId.trim() || undefined,
+          heroBadge: heroBadge.trim() || undefined,
+          theme: theme || undefined,
+        },
+        images: [
+          ...(imageUrl ? [{ url: imageUrl, alt: title, order: 0 }] : []),
+          ...(galleryUrl ? [{ url: galleryUrl, alt: `${title} gallery`, order: 1 }] : []),
+        ],
         isActive,
       });
       toast({ title: "Service created successfully" });
@@ -85,8 +102,17 @@ const ServicesCMSPage = () => {
         section: "services",
         title,
         description,
-        content: { tagline, features: features.split(",").map((f) => f.trim()).filter(Boolean) },
-        images: imageUrl ? [{ url: imageUrl, alt: title, order: 0 }] : [],
+        content: {
+          tagline,
+          features: features.split(",").map((f) => f.trim()).filter(Boolean),
+          youtubeId: youtubeId.trim() || undefined,
+          heroBadge: heroBadge.trim() || undefined,
+          theme: theme || undefined,
+        },
+        images: [
+          ...(imageUrl ? [{ url: imageUrl, alt: title, order: 0 }] : []),
+          ...(galleryUrl ? [{ url: galleryUrl, alt: `${title} gallery`, order: 1 }] : []),
+        ],
         isActive,
       });
       toast({ title: "Service updated successfully" });
@@ -117,6 +143,10 @@ const ServicesCMSPage = () => {
     setTagline(svc.content?.tagline || "");
     setFeatures(Array.isArray(svc.content?.features) ? svc.content.features.join(", ") : "");
     setImageUrl(svc.images?.[0]?.url || "");
+    setGalleryUrl(svc.images?.[1]?.url || "");
+    setYoutubeId(svc.content?.youtubeId || "");
+    setHeroBadge(svc.content?.heroBadge || "");
+    setTheme(svc.content?.theme || "");
     setIsActive(svc.isActive);
     setIsAdding(false);
   };
@@ -126,8 +156,8 @@ const ServicesCMSPage = () => {
       <div className="space-y-6">
         <div className="flex items-center justify-between animate-fade-in">
           <div>
-            <h1 className="font-display text-2xl tracking-tight text-foreground sm:text-3xl">Homepage Service Cards</h1>
-            <p className="mt-1 text-muted-foreground">The round service circles shown on the website homepage — edit their photo, title and text here.</p>
+            <h1 className="font-display text-2xl tracking-tight text-foreground sm:text-3xl">Service Cards & Detail Pages</h1>
+            <p className="mt-1 text-muted-foreground">Edit homepage circles and each service&apos;s detail page — photo, badge, theme, and content.</p>
           </div>
           {!isAdding && !editingId && (
             <Button onClick={() => { setIsAdding(true); resetForm(); }} className="gap-2 gradient-primary text-primary-foreground hover:opacity-90">
@@ -169,6 +199,53 @@ const ServicesCMSPage = () => {
                 value={imageUrl}
                 onChange={setImageUrl}
               />
+              </div>
+              <div className="space-y-2">
+                <MediaUrlField
+                  label="Detail page gallery photo (optional)"
+                  hint="Second image shown on the service detail page gallery strip"
+                  value={galleryUrl}
+                  onChange={setGalleryUrl}
+                />
+              </div>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="youtubeId">YouTube video ID (optional)</Label>
+                  <Input
+                    id="youtubeId"
+                    value={youtubeId}
+                    onChange={(e) => setYoutubeId(e.target.value)}
+                    placeholder="e.g. 5EpB_2G9aPA"
+                    className="bg-muted/50"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="heroBadge">Hero badge text</Label>
+                  <Input
+                    id="heroBadge"
+                    value={heroBadge}
+                    onChange={(e) => setHeroBadge(e.target.value)}
+                    placeholder="e.g. Live Interactive Zoom Classes"
+                    className="bg-muted/50"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="theme">Page theme</Label>
+                <select
+                  id="theme"
+                  value={theme}
+                  onChange={(e) => setTheme(e.target.value)}
+                  className="w-full rounded-md border border-input bg-muted/50 p-2 text-foreground"
+                >
+                  <option value="">Auto (from service type)</option>
+                  <option value="wedding">Wedding — warm orange</option>
+                  <option value="online">Online — purple</option>
+                  <option value="recorded">Recorded — cyan</option>
+                  <option value="wellness">Wellness — green</option>
+                  <option value="fitness">Fitness — red</option>
+                  <option value="dance">Dance — default</option>
+                </select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="isActive">Status</Label>

@@ -1143,6 +1143,9 @@ export interface ApiSiteSettings {
   metaDescription?: string;
   canonicalUrl?: string;
   whatsappNumber?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
   announcementBar?: {
     enabled?: boolean;
     text?: string;

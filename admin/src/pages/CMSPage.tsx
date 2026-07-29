@@ -89,6 +89,36 @@ const CMSPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeNavId, selectedSlug]);
 
+  const syncContactFields = async (fields: {
+    phone?: string;
+    email?: string;
+    address?: string;
+  }) => {
+    await SiteSettingsAPI.update({
+      phone: fields.phone,
+      email: fields.email,
+      address: fields.address,
+    });
+  };
+
+  const syncContactPageFromSettings = async (settings: ApiSiteSettings) => {
+    try {
+      const data = await PageContentAPI.getBySlug("contact");
+      const page = data.page;
+      if (!page?._id) return;
+      await PageContentAPI.update(page._id, {
+        content: {
+          ...(page.content || {}),
+          phone: settings.phone ?? page.content?.phone,
+          email: settings.email ?? page.content?.email,
+          address: settings.address ?? page.content?.address,
+        },
+      });
+    } catch {
+      /* contact page may not exist yet */
+    }
+  };
+
   const handlePageSave = async () => {
     if (!pageData || !selectedSlug) return;
     setPageSaving(true);
@@ -108,6 +138,16 @@ const CMSPage = () => {
       };
       if (pageData._id) await PageContentAPI.update(pageData._id, payload);
       else await PageContentAPI.create({ slug: pageData.slug, ...payload });
+
+      if (selectedSlug === "contact" && payload.content) {
+        const c = payload.content as Record<string, string>;
+        await syncContactFields({
+          phone: c.phone,
+          email: c.email,
+          address: c.address,
+        });
+      }
+
       toast({ title: "Page content saved successfully" });
       loadPageContent(selectedSlug);
     } catch (err: any) {
@@ -126,6 +166,7 @@ const CMSPage = () => {
     setSettingsSaving(true);
     try {
       await SiteSettingsAPI.update(siteSettings);
+      await syncContactPageFromSettings(siteSettings);
       toast({ title: "Header & footer saved" });
       loadSiteSettings();
     } catch (err: any) {

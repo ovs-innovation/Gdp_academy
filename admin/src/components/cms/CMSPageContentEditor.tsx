@@ -280,6 +280,10 @@ export function CMSPageContentEditor({
 
       {selectedSlug === "contact" && (
         <div className="space-y-4">
+          <p className="rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
+            Phone, email, and address also appear in the website footer. After saving here, refresh
+            the live site to see updates.
+          </p>
           <div className="space-y-2">
             <Label htmlFor="headerTitle">Header Title</Label>
             <Input

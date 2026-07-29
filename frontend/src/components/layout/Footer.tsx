@@ -1,23 +1,39 @@
-import React, { useState, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { type PageContent } from '../../services/cmsService';
 import SiteLogo from '../common/SiteLogo';
 import { useSiteData } from '../../contexts/SiteDataContext';
 import { getPageContentBySlug } from '../../services/cmsService';
+import { resolveContactInfo } from '../../lib/contactInfo';
 import { buildWhatsAppUrl } from '../../utils/whatsapp';
 import '../../styles/footer.css';
 
 const Footer: React.FC = () => {
-  const { cmsSettings: settings } = useSiteData();
+  const { cmsSettings: settings, refreshSiteData } = useSiteData();
   const [contactPage, setContactPage] = useState<PageContent | null>(null);
 
-  useEffect(() => {
+  const loadContactPage = useCallback(() => {
     getPageContentBySlug('contact')
       .then((data) => {
         if (data) setContactPage(data);
       })
       .catch((err) => console.error('Error loading footer contact settings:', err));
   }, []);
+
+  useEffect(() => {
+    loadContactPage();
+  }, [loadContactPage]);
+
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        refreshSiteData();
+        loadContactPage();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [loadContactPage, refreshSiteData]);
 
   const defaultSocialLinks = [
     { platform: 'Instagram', url: 'https://www.instagram.com/gdp_garimadanceproductions?igsh=MWhueGpqZGQzZGN0ZA==' },
@@ -79,11 +95,7 @@ const Footer: React.FC = () => {
   const brandLine2 = settings?.brandLine2 || 'Dance';
   const brandLine3 = settings?.brandLine3 || 'Productions';
 
-  const address =
-    contactPage?.content?.address ||
-    'K-6, near SANDISH MEDICAL, Sector-12, Block-K, Pratap Vihar, Ghaziabad, Uttar Pradesh 201009';
-  const phone = contactPage?.content?.phone || '+91 78384 16907';
-  const email = contactPage?.content?.email || 'Gdp.info2019@gmail.com';
+  const { phone, email, address } = resolveContactInfo(settings, contactPage?.content);
 
   const resolveSocialUrl = (link: { platform: string; url: string }) => {
     if (
@@ -91,11 +103,11 @@ const Footer: React.FC = () => {
       link.url.includes('wa.me') ||
       link.url.includes('api.whatsapp.com')
     ) {
-      const phone =
+      const waPhone =
         settings?.whatsappNumber ||
         link.url.match(/wa\.me\/(\d+)/)?.[1] ||
         '7838416907';
-      return buildWhatsAppUrl(phone);
+      return buildWhatsAppUrl(waPhone);
     }
     return link.url;
   };
