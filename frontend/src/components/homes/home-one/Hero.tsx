@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import type { SiteSettings } from '../../../services/settingsService';
 import { motion, AnimatePresence } from 'framer-motion';
+import { resolvePublicMediaUrl } from '../../../utils/mediaUrl';
 
 interface HeroProps {
   settings?: SiteSettings | null;
@@ -21,7 +22,9 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
     ];
 
     const dynamicVideos = homeContent?.heroVideos && homeContent.heroVideos.length > 0
-        ? homeContent.heroVideos.map((v: any) => typeof v === 'string' ? v : v.url)
+        ? homeContent.heroVideos
+            .map((v: any) => resolvePublicMediaUrl(typeof v === 'string' ? v : v?.url))
+            .filter(Boolean)
         : defaultVideos;
 
     const defaultGridItems = [
@@ -43,7 +46,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
             .filter((item: { url?: string; src?: string }) => (item.url || item.src || "").trim())
             .map((item: { type?: string; url?: string; src?: string }) => ({
             type: item.type === 'image' ? 'image' : 'video',
-            src: item.url || item.src || '',
+            src: resolvePublicMediaUrl(item.url || item.src || ''),
           }))
         : homeContent?.heroVideos && homeContent.heroVideos.length > 0
         ? [

@@ -30,11 +30,16 @@ export default defineConfig(({ mode }) => ({
         target: backendTarget,
         changeOrigin: true,
         secure: false,
+        // Large hero/shorts videos can take several minutes via Cloudinary.
+        timeout: 600_000,
+        proxyTimeout: 600_000,
       },
       "/uploads": {
         target: backendTarget,
         changeOrigin: true,
         secure: false,
+        timeout: 600_000,
+        proxyTimeout: 600_000,
       },
     },
   },

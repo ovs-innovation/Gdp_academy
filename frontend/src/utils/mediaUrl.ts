@@ -24,7 +24,9 @@ export function isDirectVideoUrl(url: string): boolean {
   const u = url.toLowerCase();
   return (
     /\.(mp4|webm|mov)(\?|$)/i.test(u) ||
-    u.includes("/uploads/") && /\.(mp4|webm|mov)/i.test(u)
+    u.includes("/video/upload/") ||
+    /res\.cloudinary\.com\/[^/]+\/video\//i.test(u) ||
+    (u.includes("/uploads/") && /\.(mp4|webm|mov)/i.test(u))
   );
 }
 
