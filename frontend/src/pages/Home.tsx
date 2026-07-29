@@ -95,21 +95,6 @@ const STATIC_YOUTUBE_SHORTS = [
   { vid: '', ytId: 'xnvhC3obxHg', title: 'Energetic Stage Performance', views: '25K', likes: '2.4K', delay: 0.9 },
 ];
 
-// ─── Static Instagram Reels (real IDs hardcoded) ──────────────────────────
-const STATIC_INSTAGRAM_REELS = [
-  { vid: '', reelId: 'DadAKWthgEB', url: 'https://www.instagram.com/reel/DadAKWthgEB/', delay: 0, offset: '0', likes: '', comments: '' },
-  { vid: '', reelId: 'DX4zIElTyh9', url: 'https://www.instagram.com/reel/DX4zIElTyh9/', delay: 0.1, offset: '-20px', likes: '', comments: '' },
-  { vid: '', reelId: 'DXB8VV3CbLc', url: 'https://www.instagram.com/reel/DXB8VV3CbLc/', delay: 0.2, offset: '20px', likes: '', comments: '' },
-  { vid: '', reelId: 'DVBQlWyCeqY', url: 'https://www.instagram.com/reel/DVBQlWyCeqY/', delay: 0.3, offset: '-10px', likes: '', comments: '' },
-  { vid: '', reelId: 'CqPTAdduo6m', url: 'https://www.instagram.com/reel/CqPTAdduo6m/', delay: 0.4, offset: '10px', likes: '', comments: '' },
-  { vid: '', reelId: 'CpfgqWbNvUo', url: 'https://www.instagram.com/reel/CpfgqWbNvUo/', delay: 0.5, offset: '-30px', likes: '', comments: '' },
-  { vid: '', reelId: 'CtayfVrJ174', url: 'https://www.instagram.com/reel/CtayfVrJ174/', delay: 0.6, offset: '30px', likes: '', comments: '' },
-  { vid: '', reelId: 'DadAKWthgEB', url: 'https://www.instagram.com/reel/DadAKWthgEB/', delay: 0.7, offset: '-15px', likes: '', comments: '' },
-  { vid: '', reelId: 'DX4zIElTyh9', url: 'https://www.instagram.com/reel/DX4zIElTyh9/', delay: 0.8, offset: '15px', likes: '', comments: '' },
-  { vid: '', reelId: 'DXB8VV3CbLc', url: 'https://www.instagram.com/reel/DXB8VV3CbLc/', delay: 0.9, offset: '-5px', likes: '', comments: '' },
-];
-
-
 const DEFAULT_VIDEO_TESTIMONIALS = [
   { id: 1, img: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80', vid: 'https://www.youtube.com/embed/2iM5RoR0khg' },
   { id: 2, img: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&q=80', vid: 'https://www.youtube.com/embed/3PQOq9pMMl4' },
@@ -452,20 +437,14 @@ const Home: React.FC = () => {
     features: service.features,
   }));
 
-  // CMS YouTube Shorts + Instagram reels (empty slots fall back to defaults)
+  // CMS YouTube Shorts + Instagram reels (database/CMS only — no static fallbacks for reels)
   const cmsShorts = homeCopyReady ? homeContent.youtubeShorts || [] : [];
-  const cmsInstagram = homeCopyReady ? homeContent.instagramPosts || [] : [];
+  const instagramPosts = homeCopyReady ? homeContent.instagramPosts || [] : [];
 
   const youtubeShorts = mergeMediaList(
     cmsShorts,
     STATIC_YOUTUBE_SHORTS,
     (item) => Boolean(item?.vid?.trim() || item?.ytId),
-  );
-
-  const instagramPosts = mergeMediaList(
-    cmsInstagram,
-    STATIC_INSTAGRAM_REELS,
-    (item) => Boolean(item?.vid?.trim() || item?.reelId),
   );
 
   const youtubeChannel = homeContent.youtubeChannel || DEFAULT_YOUTUBE_CHANNEL;
@@ -929,6 +908,7 @@ const Home: React.FC = () => {
       </section>
       </LazySection>
 
+      {homeCopyReady && instagramPosts.length > 0 && (
       <LazySection minHeight={520} rootMargin="400px">
       <InstagramReelsSection
         reels={instagramPosts}
@@ -939,6 +919,7 @@ const Home: React.FC = () => {
         setActiveVideoId={setActiveVideoId}
       />
       </LazySection>
+      )}
       <LazySection minHeight={560} rootMargin="400px">
       {!sectionReady.testimonials || !homeCopyReady ? (
         <section className="reviews-v3 section-padding" id="reviews">

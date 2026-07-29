@@ -287,7 +287,7 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
 
       <CMSSection
         title="7. Instagram Reels Section"
-        description="10 Instagram reels on the homepage (2 rows × 5). Any empty slots are filled with defaults on the site."
+        description="Instagram reels on the homepage (from admin — only saved reels appear on the site)."
         websiteLocation="Homepage → Instagram section"
       >
         <div className="grid gap-4 md:grid-cols-2 mb-4">
