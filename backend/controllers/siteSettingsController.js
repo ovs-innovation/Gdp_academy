@@ -4,6 +4,10 @@ const {
   withPublicCache,
   invalidatePublicCache,
 } = require("../utils/publicCache.js");
+const {
+  resolvePublicContactInfo,
+  syncContactPageFromSiteSettings,
+} = require("../utils/contactSync.js");
 
 const SITE_SETTINGS_CACHE_TTL_MS = 5_000;
 
@@ -22,6 +26,7 @@ const getSiteSettings = async (req, res, next) => {
     const body = await withPublicCache("site-settings", SITE_SETTINGS_CACHE_TTL_MS, async () => {
       let settings = await SiteSettings.findOne().lean();
       if (!settings) {
+        const contact = await resolvePublicContactInfo();
         return {
           settings: {
             logoUrl: "",
@@ -32,10 +37,18 @@ const getSiteSettings = async (req, res, next) => {
             metaTitle: "Garima Dance Production",
             metaDescription: "Learn the art of dance with Garima Dance Production",
             canonicalUrl: "",
+            phone: contact.phone,
+            email: contact.email,
+            address: contact.address,
           },
         };
       }
-      return { settings: toClientSettings(settings) };
+      const contact = await resolvePublicContactInfo();
+      const merged = toClientSettings(settings);
+      merged.phone = contact.phone || merged.phone || "";
+      merged.email = contact.email || merged.email || "";
+      merged.address = contact.address || merged.address || "";
+      return { settings: merged };
     });
     res.json(body);
   } catch (err) {
@@ -59,6 +72,7 @@ const updateSiteSettings = async (req, res, next) => {
       await settings.save();
     }
     invalidatePublicCache("site-settings");
+    await syncContactPageFromSiteSettings(settings);
     res.json({ message: "Site settings updated", settings: toClientSettings(settings) });
   } catch (err) {
     next(err);

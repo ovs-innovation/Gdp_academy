@@ -215,9 +215,9 @@ const seed = async () => {
         content: {
           headerTitle: "Get in Touch",
           headerSubtitle: "We love hearing from fellow dancers, prospective students, and collaborators! Reach out for general inquiries, booking details, or customized workshop sessions.",
-          address: "123 Creative Rhythm Way, Dance Arts District, New Delhi, India",
-          phone: "+91 98765 43210",
-          email: "hello@gdpstudio.com"
+          address: "K-6, near SANDISH MEDICAL, Sector-12, Block-K, Pratap Vihar, Ghaziabad, Uttar Pradesh 201009",
+          phone: "+91 78384 16907",
+          email: "Gdp.info2019@gmail.com",
         },
         metaTitle: "Contact Us | Garima Dance Production",
         metaDescription: "Have questions about our programs, zoom classes, or schedules? Get in touch with us today.",

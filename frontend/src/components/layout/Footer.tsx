@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
 
   useEffect(() => {
     loadContactPage();
-  }, [loadContactPage]);
+  }, [loadContactPage, settings?.phone, settings?.email, settings?.address]);
 
   useEffect(() => {
     const onVisible = () => {

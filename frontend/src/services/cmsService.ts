@@ -1,7 +1,9 @@
 import { API_BASE_URL } from "../lib/apiConfig";
 
 async function cmsFetch(url: string, init?: RequestInit) {
-  const response = await fetch(url, { ...init, cache: "no-store" });
+  const bust = `_=${Date.now()}`;
+  const sep = url.includes("?") ? "&" : "?";
+  const response = await fetch(`${url}${sep}${bust}`, { ...init, cache: "no-store" });
   return response;
 }
 

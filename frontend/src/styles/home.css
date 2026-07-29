@@ -1257,7 +1257,16 @@
   color: white;
 }
 
+.yt-header-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px;
+}
+
 .youtube-icon-wrapper {
+  display: inline-flex;
+  flex-shrink: 0;
   width: 22px;
   height: 22px;
   color: #ff0000;
@@ -1811,9 +1820,11 @@
 }
 
 .insta-icon-wrapper {
+  display: inline-flex;
+  flex-shrink: 0;
   width: 20px;
   height: 20px;
-  color: white;
+  color: #e1306c;
 }
 
 .insta-handle {

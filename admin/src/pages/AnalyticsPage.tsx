@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { BarChart3, TrendingUp, Users, BookOpen } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8096/api';
+const API_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
 
 const getToken = () =>
   localStorage.getItem('admin-auth-token') || sessionStorage.getItem('admin-auth-token');

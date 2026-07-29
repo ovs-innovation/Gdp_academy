@@ -3,6 +3,11 @@ const {
   withPublicCache,
   invalidatePublicCache,
 } = require("../utils/publicCache.js");
+const {
+  CONTACT_SLUG,
+  resolvePublicContactInfo,
+  syncSiteSettingsFromContactPage,
+} = require("../utils/contactSync.js");
 
 const PAGE_CONTENT_CACHE_TTL_MS = 5_000;
 
@@ -15,6 +20,7 @@ const createPageContent = async (req, res, next) => {
   try {
     const page = await PageContent.create(req.body);
     bustPageCache(page.slug);
+    await syncSiteSettingsFromContactPage(page);
     res.status(201).json({ message: "Page content created", page });
   } catch (err) {
     next(err);
@@ -57,6 +63,15 @@ const getPageContentBySlug = async (req, res, next) => {
     const body = await withPublicCache(`page:${slug}`, PAGE_CONTENT_CACHE_TTL_MS, async () => {
       const page = await PageContent.findOne({ slug, status: "published" }).lean();
       if (!page) return null;
+      if (slug === CONTACT_SLUG) {
+        const contact = await resolvePublicContactInfo();
+        page.content = {
+          ...(page.content || {}),
+          phone: contact.phone || page.content?.phone,
+          email: contact.email || page.content?.email,
+          address: contact.address || page.content?.address,
+        };
+      }
       return { page };
     });
 
@@ -90,6 +105,7 @@ const updatePageContent = async (req, res, next) => {
     if (!updated) return res.status(404).json({ message: "Page not found" });
     bustPageCache(existing?.slug);
     bustPageCache(updated.slug);
+    await syncSiteSettingsFromContactPage(updated);
     res.json({ message: "Page content updated", page: updated });
   } catch (err) {
     next(err);
