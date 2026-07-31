@@ -275,12 +275,22 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="space-y-2">
-            <Label>About YouTube video ID</Label>
-            <Input value={content.aboutYoutubeId || ""} onChange={(e) => onChange("aboutYoutubeId", e.target.value)} className="bg-muted/50" placeholder="J-yM5y4Kd04" />
+            <Label>About YouTube link</Label>
+            <Input
+              value={content.aboutYoutubeId || ""}
+              onChange={(e) => onChange("aboutYoutubeId", e.target.value)}
+              className="bg-muted/50"
+              placeholder="https://www.youtube.com/watch?v=..."
+            />
           </div>
           <div className="space-y-2">
-            <Label>Hero YouTube video ID</Label>
-            <Input value={content.heroYoutubeId || ""} onChange={(e) => onChange("heroYoutubeId", e.target.value)} className="bg-muted/50" placeholder="1phsCpxcBZU" />
+            <Label>Hero YouTube link</Label>
+            <Input
+              value={content.heroYoutubeId || ""}
+              onChange={(e) => onChange("heroYoutubeId", e.target.value)}
+              className="bg-muted/50"
+              placeholder="https://www.youtube.com/watch?v=..."
+            />
           </div>
         </div>
       </CMSSection>

@@ -32,7 +32,7 @@ import {
 import SEO from '../components/SEO';
 import '../styles/home.css';
 import { normalizeHomeContent, mergeMediaList } from '../lib/homeCms';
-import { resolvePublicMediaUrl } from '../utils/mediaUrl';
+import { resolvePublicMediaUrl, extractYoutubeVideoId } from '../utils/mediaUrl';
 import { DEFAULT_SERVICES, HOME_SERVICE_IMAGE_BY_KEY, isExcludedService } from '../lib/defaultServices';
 import { getServiceIcon } from '../components/home/ServiceIcons';
 import {
@@ -464,8 +464,14 @@ const Home: React.FC = () => {
   const instagramSectionTitle = homeContent.instagramSectionTitle || 'Join us';
   const instagramSectionHighlight = homeContent.instagramSectionHighlight || 'on Instagram';
 
-  const aboutYoutubeId = homeContent.aboutYoutubeId || DEFAULT_ABOUT_YOUTUBE_ID;
-  const heroYoutubeId = homeContent.heroYoutubeId || DEFAULT_HERO_YOUTUBE_ID;
+  const aboutYoutubeId =
+    extractYoutubeVideoId(homeContent.aboutYoutubeId || '') ||
+    homeContent.aboutYoutubeId ||
+    DEFAULT_ABOUT_YOUTUBE_ID;
+  const heroYoutubeId =
+    extractYoutubeVideoId(homeContent.heroYoutubeId || '') ||
+    homeContent.heroYoutubeId ||
+    DEFAULT_HERO_YOUTUBE_ID;
 
   const videoTestimonials = homeCopyReady
     ? homeContent.videoTestimonials?.length > 0

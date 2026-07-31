@@ -27,6 +27,27 @@ export const DEFAULT_HERO_GRID: HeroGridItem[] = [
   { type: "video", url: "/hero.mp4" },
 ];
 
+/** Extract YouTube video id from watch, shorts, embed, youtu.be, or raw 11-char id */
+export function extractYoutubeVideoId(url: string): string | null {
+  const raw = (url || "").trim();
+  if (!raw) return null;
+  if (/^[a-zA-Z0-9_-]{11}$/.test(raw)) return raw;
+
+  const shorts = raw.match(/shorts\/([a-zA-Z0-9_-]{11})/);
+  if (shorts) return shorts[1];
+
+  const watch = raw.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+  if (watch) return watch[1];
+
+  const embed = raw.match(/embed\/([a-zA-Z0-9_-]{11})/);
+  if (embed) return embed[1];
+
+  const shortLink = raw.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+  if (shortLink) return shortLink[1];
+
+  return null;
+}
+
 /** Turn YouTube watch/shorts links into embed URLs; keep /uploads paths as-is */
 function normalizeVidForSave(vid: string): string {
   const t = (vid || "").trim();
@@ -87,6 +108,13 @@ export function normalizeHomeContentForSave(content: Record<string, unknown>) {
       ? content.heroGridItems
       : DEFAULT_HERO_GRID;
 
+  const aboutYoutubeId =
+    extractYoutubeVideoId(String(content.aboutYoutubeId || "")) ||
+    String(content.aboutYoutubeId || "").trim();
+  const heroYoutubeId =
+    extractYoutubeVideoId(String(content.heroYoutubeId || "")) ||
+    String(content.heroYoutubeId || "").trim();
+
   return {
     ...content,
     heroBadgeText: badge,
@@ -99,6 +127,8 @@ export function normalizeHomeContentForSave(content: Record<string, unknown>) {
     highlightVideos: shorts,
     instagramPosts,
     videoTestimonials,
+    aboutYoutubeId,
+    heroYoutubeId,
     ctaText,
     ctaUrl,
     heroGridItems: grid,

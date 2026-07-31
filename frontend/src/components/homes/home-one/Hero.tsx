@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { SiteSettings } from '../../../services/settingsService';
 import { motion, AnimatePresence } from 'framer-motion';
-import { resolvePublicMediaUrl } from '../../../utils/mediaUrl';
+import { resolvePublicMediaUrl, extractYoutubeVideoId } from '../../../utils/mediaUrl';
 
 interface HeroProps {
   settings?: SiteSettings | null;
@@ -123,7 +123,8 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
     }, [state, uniqueVideos.length]);
 
     const [showDemoModal, setShowDemoModal] = useState(false);
-    const heroYoutubeId = homeContent?.heroYoutubeId || propSettings?.heroYoutubeId || '1phsCpxcBZU';
+    const rawHeroYt = homeContent?.heroYoutubeId || propSettings?.heroYoutubeId || '1phsCpxcBZU';
+    const heroYoutubeId = extractYoutubeVideoId(rawHeroYt) || rawHeroYt;
 
     const handleScrollTo = (id: string) => (e: React.MouseEvent) => {
         e.preventDefault();
