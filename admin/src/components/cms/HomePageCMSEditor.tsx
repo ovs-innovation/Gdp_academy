@@ -273,25 +273,14 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
           <Label>Description</Label>
           <Textarea value={content.aboutShortText || ""} onChange={(e) => onChange("aboutShortText", e.target.value)} className="bg-muted/50 min-h-[100px]" />
         </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label>About YouTube link</Label>
-            <Input
-              value={content.aboutYoutubeId || ""}
-              onChange={(e) => onChange("aboutYoutubeId", e.target.value)}
-              className="bg-muted/50"
-              placeholder="https://www.youtube.com/watch?v=..."
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Hero YouTube link</Label>
-            <Input
-              value={content.heroYoutubeId || ""}
-              onChange={(e) => onChange("heroYoutubeId", e.target.value)}
-              className="bg-muted/50"
-              placeholder="https://www.youtube.com/watch?v=..."
-            />
-          </div>
+        <div className="space-y-2">
+          <Label>About YouTube link</Label>
+          <Input
+            value={content.aboutYoutubeId || ""}
+            onChange={(e) => onChange("aboutYoutubeId", e.target.value)}
+            className="bg-muted/50"
+            placeholder="https://www.youtube.com/watch?v=..."
+          />
         </div>
       </CMSSection>
 
