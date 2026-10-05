@@ -1,4 +1,5 @@
 const Blog = require("../models/blogModel.js");
+const User = require("../models/userModel.js");
 
 // Create blog post
 const createBlog = async (req, res, next) => {
@@ -20,22 +21,41 @@ const createBlog = async (req, res, next) => {
       });
     }
 
+    let authorId = req.user?.id || req.body?.author;
+    if (!authorId) {
+      const defaultAdmin = await User.findOne({ role: "admin" });
+      if (defaultAdmin) authorId = defaultAdmin._id;
+    }
+
+    let safeFeaturedImage = undefined;
+    if (featuredImage) {
+      if (typeof featuredImage === "string") {
+        safeFeaturedImage = { url: featuredImage, alt: typeof title === "string" ? title : "" };
+      } else if (typeof featuredImage === "object" && featuredImage.url) {
+        safeFeaturedImage = featuredImage;
+      }
+    }
+
     const blog = await Blog.create({
       title,
-      excerpt,
+      excerpt: excerpt || "",
       content,
-      featuredImage,
+      featuredImage: safeFeaturedImage,
       category: category || "General",
       tags: tags || [],
       metadata: metadata || {},
       status: status || "draft",
-      author: req.user?.id,
+      author: authorId,
       publishedAt: status === "published" ? new Date() : null,
     });
 
+    if (authorId) {
+      await blog.populate("author", "name email");
+    }
+
     return res.status(201).json({
       message: "Blog created successfully",
-      blog: await blog.populate("author", "name email"),
+      blog,
     });
   } catch (error) {
     next(error);
@@ -156,7 +176,13 @@ const updateBlog = async (req, res, next) => {
     if (title) blog.title = title;
     if (excerpt) blog.excerpt = excerpt;
     if (content) blog.content = content;
-    if (featuredImage) blog.featuredImage = featuredImage;
+    if (featuredImage !== undefined) {
+      if (typeof featuredImage === "string") {
+        blog.featuredImage = { url: featuredImage, alt: "" };
+      } else {
+        blog.featuredImage = featuredImage;
+      }
+    }
     if (category) blog.category = category;
     if (tags) blog.tags = tags;
     if (metadata) blog.metadata = metadata;
@@ -168,7 +194,9 @@ const updateBlog = async (req, res, next) => {
     }
 
     await blog.save();
-    blog = await blog.populate("author", "name email");
+    if (blog.author) {
+      await blog.populate("author", "name email");
+    }
 
     return res.json({
       message: "Blog updated successfully",

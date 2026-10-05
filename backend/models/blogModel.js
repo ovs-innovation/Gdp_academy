@@ -9,7 +9,6 @@ const blogSchema = new mongoose.Schema(
     },
     slug: {
       type: String,
-      required: true,
       unique: true,
       trim: true,
       lowercase: true,
@@ -31,7 +30,7 @@ const blogSchema = new mongoose.Schema(
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: false,
     },
     category: {
       type: String,
@@ -65,7 +64,7 @@ const blogSchema = new mongoose.Schema(
 
 const generateSlug = (text) => {
   if (!text) return "";
-  return text
+  const cleaned = text
     .toString()
     .toLowerCase()
     .trim()
@@ -74,9 +73,10 @@ const generateSlug = (text) => {
     .replace(/\-\-+/g, "-")
     .replace(/^-+/, "")
     .replace(/-+$/, "");
+  return cleaned || `blog-${Date.now()}`;
 };
 
-blogSchema.pre("save", async function (next) {
+blogSchema.pre("validate", async function (next) {
   if (typeof this.title === "string") {
     this.title = { en: this.title };
   }
@@ -87,20 +87,21 @@ blogSchema.pre("save", async function (next) {
     this.content = { en: this.content };
   }
 
-  if (this.isNew || this.isModified("title")) {
-    const titleValue = this.title?.en || this.title;
-    let slugValue = generateSlug(titleValue);
+  if (!this.slug || this.isModified("title")) {
+    const titleValue = this.title?.en || this.title || "untitled-blog";
+    let baseSlug = generateSlug(titleValue);
+    let slugValue = baseSlug;
 
     let counter = 1;
     const Blog = this.constructor;
     while (await Blog.findOne({ slug: slugValue, _id: { $ne: this._id } })) {
-      slugValue = `${generateSlug(titleValue)}-${counter}`;
+      slugValue = `${baseSlug}-${counter}`;
       counter++;
     }
     this.slug = slugValue;
   }
 
-  next();
+  if (typeof next === "function") next();
 });
 
 blogSchema.index({ status: 1, publishedAt: -1 });

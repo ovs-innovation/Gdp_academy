@@ -44,11 +44,12 @@ const Footer: React.FC = () => {
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
     { label: 'Services', href: '/services' },
-    { label: 'Review', href: '/#reviews' },
-    { label: 'Contact', href: '/contact' },
     { label: 'Programs', href: '/programs' },
     { label: 'Upcoming Workshops', href: '/workshops' },
     { label: 'Gallery', href: '/gallery' },
+    { label: 'Blog', href: '/blog' },
+    { label: 'Review', href: '/#reviews' },
+    { label: 'Contact', href: '/contact' },
   ];
   const defaultServiceLinks = [
     { label: 'Regular Dance Sessions', href: '/services' },
@@ -76,9 +77,17 @@ const Footer: React.FC = () => {
     settings?.footerLinks && settings.footerLinks.length > 0
       ? settings.footerLinks
       : defaultFooterLinks;
-  const footerLinks = rawFooterLinks.filter(
+  const filteredFooterLinks = rawFooterLinks.filter(
     (link) => !isLibraryNavItem(link.href, link.label),
   );
+
+  const hasBlogLink = filteredFooterLinks.some(
+    (link) => link.href.toLowerCase().replace(/\/+$/, '') === '/blog',
+  );
+
+  const footerLinks = hasBlogLink
+    ? filteredFooterLinks
+    : [...filteredFooterLinks, { label: 'Blog', href: '/blog' }];
 
   const serviceLinks =
     settings?.footerServiceLinks && settings.footerServiceLinks.length > 0

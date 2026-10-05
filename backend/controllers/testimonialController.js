@@ -1,10 +1,22 @@
+const mongoose = require("mongoose");
 const Testimonial = require("../models/testimonialModel.js");
+require("../models/userModel.js");
+require("../models/programModel.js");
 
 // Create testimonial
 const createTestimonial = async (req, res, next) => {
   try {
-    const { name, position, message, image, rating, courseId, userId } =
-      req.body;
+    const {
+      name,
+      position,
+      message,
+      image,
+      rating,
+      courseId,
+      userId,
+      isActive,
+      order,
+    } = req.body;
 
     if (!name || !message) {
       return res.status(400).json({
@@ -12,22 +24,36 @@ const createTestimonial = async (req, res, next) => {
       });
     }
 
+    const numRating = Number(rating);
+    const numOrder = Number(order);
+
+    const validCourseId =
+      courseId && mongoose.Types.ObjectId.isValid(courseId) ? courseId : null;
+    const validUserId =
+      userId && mongoose.Types.ObjectId.isValid(userId) ? userId : null;
+
     const testimonial = await Testimonial.create({
-      name,
-      position,
+      name: String(name).trim(),
+      position: position ? String(position).trim() : "",
       message,
-      image,
-      rating: rating || 5,
-      courseId,
-      userId,
-      isActive: true,
+      image: image ? String(image).trim() : "",
+      rating: !isNaN(numRating) && numRating >= 1 && numRating <= 5 ? numRating : 5,
+      courseId: validCourseId,
+      userId: validUserId,
+      isActive: isActive !== undefined ? (isActive === true || isActive === "true") : true,
+      order: !isNaN(numOrder) ? numOrder : 0,
     });
+
+    const populates = [];
+    if (validCourseId) populates.push({ path: "courseId", select: "name" });
+    if (validUserId) populates.push({ path: "userId", select: "name email" });
+    if (populates.length > 0) {
+      await testimonial.populate(populates);
+    }
 
     return res.status(201).json({
       message: "Testimonial created successfully",
-      testimonial: await testimonial
-        .populate("courseId", "name")
-        .populate("userId", "name email"),
+      testimonial,
     });
   } catch (error) {
     next(error);
@@ -126,19 +152,36 @@ const updateTestimonial = async (req, res, next) => {
       });
     }
 
-    if (name) testimonial.name = name;
-    if (position) testimonial.position = position;
+    if (name) testimonial.name = String(name).trim();
+    if (position !== undefined) testimonial.position = String(position).trim();
     if (message) testimonial.message = message;
-    if (image) testimonial.image = image;
-    if (rating) testimonial.rating = rating;
-    if (courseId) testimonial.courseId = courseId;
-    if (isActive !== undefined) testimonial.isActive = isActive;
-    if (order !== undefined) testimonial.order = order;
+    if (image !== undefined) testimonial.image = String(image).trim();
+    if (rating !== undefined) {
+      const numRating = Number(rating);
+      if (!isNaN(numRating) && numRating >= 1 && numRating <= 5) {
+        testimonial.rating = numRating;
+      }
+    }
+    if (courseId !== undefined) {
+      testimonial.courseId =
+        courseId && mongoose.Types.ObjectId.isValid(courseId) ? courseId : null;
+    }
+    if (isActive !== undefined) {
+      testimonial.isActive = isActive === true || isActive === "true";
+    }
+    if (order !== undefined) {
+      const numOrder = Number(order);
+      if (!isNaN(numOrder)) testimonial.order = numOrder;
+    }
 
     await testimonial.save();
-    testimonial = await testimonial
-      .populate("courseId", "name")
-      .populate("userId", "name email");
+
+    const populates = [];
+    if (testimonial.courseId) populates.push({ path: "courseId", select: "name" });
+    if (testimonial.userId) populates.push({ path: "userId", select: "name email" });
+    if (populates.length > 0) {
+      await testimonial.populate(populates);
+    }
 
     return res.json({
       message: "Testimonial updated successfully",
