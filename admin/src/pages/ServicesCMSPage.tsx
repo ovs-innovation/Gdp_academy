@@ -9,6 +9,8 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2, Edit2, Save, X, ArrowUp, ArrowDown } from "lucide-react";
 import { MediaUrlField } from "@/components/cms/MediaUrlField";
+import { YoutubeUrlField } from "@/components/cms/YoutubeUrlField";
+import { extractYoutubeVideoId, toYoutubeWatchUrl } from "@/lib/youtube";
 
 const getText = (val: string | Record<string, string> | undefined): string => {
   if (!val) return "";
@@ -74,8 +76,11 @@ const ServicesCMSPage = () => {
         description,
         content: {
           tagline,
-          features: features.split(",").map((f) => f.trim()).filter(Boolean),
-          youtubeId: youtubeId.trim() || undefined,
+          features: features
+            .split(/[\n,]/)
+            .map((f) => f.trim())
+            .filter(Boolean),
+          youtubeId: extractYoutubeVideoId(youtubeId) || youtubeId.trim() || undefined,
           heroBadge: heroBadge.trim() || undefined,
           theme: theme || undefined,
         },
@@ -104,8 +109,11 @@ const ServicesCMSPage = () => {
         description,
         content: {
           tagline,
-          features: features.split(",").map((f) => f.trim()).filter(Boolean),
-          youtubeId: youtubeId.trim() || undefined,
+          features: features
+            .split(/[\n,]/)
+            .map((f) => f.trim())
+            .filter(Boolean),
+          youtubeId: extractYoutubeVideoId(youtubeId) || youtubeId.trim() || undefined,
           heroBadge: heroBadge.trim() || undefined,
           theme: theme || undefined,
         },
@@ -141,10 +149,10 @@ const ServicesCMSPage = () => {
     setTitle(getText(svc.title));
     setDescription(getText(svc.description));
     setTagline(svc.content?.tagline || "");
-    setFeatures(Array.isArray(svc.content?.features) ? svc.content.features.join(", ") : "");
+    setFeatures(Array.isArray(svc.content?.features) ? svc.content.features.join("\n") : "");
     setImageUrl(svc.images?.[0]?.url || "");
     setGalleryUrl(svc.images?.[1]?.url || "");
-    setYoutubeId(svc.content?.youtubeId || "");
+    setYoutubeId(toYoutubeWatchUrl(svc.content?.youtubeId || "") || svc.content?.youtubeId || "");
     setHeroBadge(svc.content?.heroBadge || "");
     setTheme(svc.content?.theme || "");
     setIsActive(svc.isActive);
@@ -189,8 +197,14 @@ const ServicesCMSPage = () => {
                 <Input id="tagline" value={tagline} onChange={(e) => setTagline(e.target.value)} className="bg-muted/50" />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="features">Features (comma separated)</Label>
-                <Input id="features" value={features} onChange={(e) => setFeatures(e.target.value)} className="bg-muted/50" />
+                <Label htmlFor="features">Features (one per line)</Label>
+                <Textarea
+                  id="features"
+                  value={features}
+                  onChange={(e) => setFeatures(e.target.value)}
+                  className="bg-muted/50 min-h-[80px]"
+                  placeholder={"Live Zoom classes\nPersonal feedback\nFlexible timing"}
+                />
               </div>
               <div className="space-y-2">
               <MediaUrlField
@@ -209,16 +223,13 @@ const ServicesCMSPage = () => {
                 />
               </div>
               <div className="grid gap-4 md:grid-cols-2">
-                <div className="space-y-2">
-                  <Label htmlFor="youtubeId">YouTube video ID (optional)</Label>
-                  <Input
-                    id="youtubeId"
-                    value={youtubeId}
-                    onChange={(e) => setYoutubeId(e.target.value)}
-                    placeholder="e.g. 5EpB_2G9aPA"
-                    className="bg-muted/50"
-                  />
-                </div>
+                <YoutubeUrlField
+                  label="YouTube video (optional)"
+                  hint="Paste a full YouTube link. This plays on the service detail page."
+                  websiteLocation="Service detail page → hero video"
+                  value={youtubeId}
+                  onChange={setYoutubeId}
+                />
                 <div className="space-y-2">
                   <Label htmlFor="heroBadge">Hero badge text</Label>
                   <Input

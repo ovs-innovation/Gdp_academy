@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
+import { useEnquiryPopup } from '../contexts/EnquiryPopupContext';
 import SEO from '../components/SEO';
 import { getPageContentBySlug } from '../services/cmsService';
 import '../styles/about.css';
@@ -92,6 +93,7 @@ const DEFAULT_CONTENT: AboutContent = {
 };
 
 const About: React.FC = () => {
+  const { openEnquiry } = useEnquiryPopup();
   const [content, setContent] = useState<AboutContent>(DEFAULT_CONTENT);
   const [ready, setReady] = useState(false);
 
@@ -235,6 +237,17 @@ const About: React.FC = () => {
 
                 <div className="cyber-circle-glow" aria-hidden />
 
+                <picture style={{ display: 'block', height: '100%' }}>
+                <source
+                  type="image/avif"
+                  sizes="(max-width: 768px) 90vw, 520px"
+                  srcSet="/anubhav-480.avif 480w, /anubhav-768.avif 768w, /anubhav.avif 1122w"
+                />
+                <source
+                  type="image/webp"
+                  sizes="(max-width: 768px) 90vw, 520px"
+                  srcSet="/anubhav-480.webp 480w, /anubhav-768.webp 768w, /anubhav.webp 1122w"
+                />
                 <motion.img
                   src="/anubhav.png"
                   alt="Anubhav Dancer Cutout"
@@ -243,6 +256,7 @@ const About: React.FC = () => {
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
                 />
+                </picture>
               </div>
 
             </div>
@@ -503,9 +517,9 @@ const About: React.FC = () => {
                 {content.ctaText}
               </p>
               <div style={{ marginTop: '40px' }}>
-                <Link to="/contact" className="glow-btn-primary" style={{ padding: '20px 45px', fontSize: '13px', display: 'inline-block' }}>
+                <button type="button" className="glow-btn-primary" style={{ padding: '20px 45px', fontSize: '13px', display: 'inline-block' }} onClick={() => openEnquiry({ purpose: 'contact', topic: 'About GDP' })}>
                   {content.ctaButtonText}
-                </Link>
+                </button>
               </div>
             </motion.div>
           </div>

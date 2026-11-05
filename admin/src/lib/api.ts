@@ -1,6 +1,10 @@
 import { Permission, Role } from "./rbac";
 
-const API_URL = (import.meta.env.VITE_API_URL || "/api").replace(/\/$/, "");
+const API_URL = (
+  import.meta.env.DEV
+    ? "/api"
+    : import.meta.env.VITE_API_URL || "https://api.garimadanceproductions.com/api"
+).replace(/\/$/, "");
 export const TOKEN_KEY = "admin-auth-token";
 export const ROLE_KEY = "admin-role";
 

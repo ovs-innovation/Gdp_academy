@@ -75,6 +75,12 @@ button {
   box-shadow: 0 5px 15px rgba(99, 75, 250, 0.4);
 }
 
+button.primary-btn {
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
 .gradient-text {
   background: var(--highlight-gradient);
   -webkit-background-clip: text;

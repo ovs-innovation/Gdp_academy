@@ -20,6 +20,31 @@ export function resolvePublicMediaUrl(url: string | undefined | null): string {
   return trimmed;
 }
 
+/** Resize a Cloudinary image to the size the page actually shows. Other URLs stay as they are. */
+export function optimizeCloudinaryImage(url: string | undefined | null, width: number): string {
+  const raw = url?.trim() || "";
+  if (!raw) return "";
+
+  try {
+    const parsed = new URL(raw);
+    if (!parsed.hostname.endsWith("res.cloudinary.com")) return raw;
+
+    const marker = "/image/upload/";
+    const idx = parsed.pathname.indexOf(marker);
+    if (idx === -1) return raw;
+
+    const rest = parsed.pathname.slice(idx + marker.length);
+    const first = rest.split("/")[0] || "";
+    if (!/^v\d+$/.test(first) && /[_ ,]/.test(first)) return raw;
+
+    const safeWidth = Math.max(160, Math.min(1600, Math.round(width)));
+    parsed.pathname = `${parsed.pathname.slice(0, idx)}${marker}f_auto,q_auto,w_${safeWidth},c_limit/${rest}`;
+    return parsed.toString();
+  } catch {
+    return raw;
+  }
+}
+
 export function isDirectVideoUrl(url: string): boolean {
   const u = url.toLowerCase();
   return (

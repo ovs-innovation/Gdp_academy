@@ -62,6 +62,7 @@ async function resolvePublicContactInfo() {
 function bustContactCaches() {
   invalidatePublicCache("site-settings");
   invalidatePublicCache(`page:${CONTACT_SLUG}`);
+  invalidatePublicCache("homepage");
 }
 
 /** After site-settings save — mirror contact fields onto contact page. */

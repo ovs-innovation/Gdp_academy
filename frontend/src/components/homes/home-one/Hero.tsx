@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { SiteSettings } from '../../../services/settingsService';
 import { motion, AnimatePresence } from 'framer-motion';
 import { resolvePublicMediaUrl, extractYoutubeVideoId } from '../../../utils/mediaUrl';
+import { useEnquiryPopup } from '../../../contexts/EnquiryPopupContext';
+import ResponsiveImage from '../../common/ResponsiveImage';
 
 interface HeroProps {
   settings?: SiteSettings | null;
@@ -14,56 +16,100 @@ interface HeroProps {
 const FALLBACK_SUBTITLE =
   'Premium Kathak, Contemporary, and Bollywood dance classes tailored for students worldwide. Discover rhythm, precision, and passion under expert guidance.';
 
+const DEFAULT_HERO_VIDEOS = ['/hero.mp4', '/services.mp4', '/services4.mp4', '/service3.mp4'];
+
+const DEFAULT_GRID_ITEMS: Array<{ type: 'video' | 'image'; src: string }> = [
+  { type: 'video', src: '/hero.mp4' },
+  { type: 'image', src: '/svc-stage.png' },
+  { type: 'video', src: '/services4.mp4' },
+  { type: 'image', src: '/svc-wedding.jpg' },
+  { type: 'video', src: '/service3.mp4' },
+  { type: 'image', src: '/svc-hiphop.png' },
+  { type: 'video', src: '/services.mp4' },
+  { type: 'image', src: '/laptop.png' },
+  { type: 'video', src: '/hero.mp4' },
+];
+
+const HERO_VIDEO_FILL: React.CSSProperties = { position: 'absolute', inset: 0 };
+
+type HeroVideoProps = {
+  src: string;
+  style?: React.CSSProperties;
+};
+
+/** One mounted clip. Unmount pauses and drops the media buffer. */
+const HeroVideo = React.memo(function HeroVideo({ src, style }: HeroVideoProps) {
+  const ref = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.muted = true;
+    if (el.getAttribute('src') !== src) el.src = src;
+    el.play().catch(() => {});
+    return () => {
+      el.pause();
+    };
+  }, [src]);
+
+  return (
+    <video
+      ref={ref}
+      src={src}
+      autoPlay
+      muted
+      loop
+      playsInline
+      preload="metadata"
+      style={style}
+    />
+  );
+});
+
 const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, contentReady = true }) => {
-    const defaultVideos = [
-        '/hero.mp4', 
-        '/services.mp4', 
-        '/services4.mp4', 
-        '/service3.mp4'
-    ];
+  const { openEnquiry } = useEnquiryPopup();
+    const uniqueVideos = useMemo(() => {
+      const list = homeContent?.heroVideos;
+      if (contentReady && Array.isArray(list) && list.length > 0) {
+        const resolved = list
+          .map((v: { url?: string } | string) => resolvePublicMediaUrl(typeof v === 'string' ? v : v?.url))
+          .filter(Boolean);
+        if (resolved.length > 0) return resolved;
+      }
+      return DEFAULT_HERO_VIDEOS;
+    }, [contentReady, homeContent]);
 
-    const dynamicVideos = homeContent?.heroVideos && homeContent.heroVideos.length > 0
-        ? homeContent.heroVideos
-            .map((v: any) => resolvePublicMediaUrl(typeof v === 'string' ? v : v?.url))
-            .filter(Boolean)
-        : defaultVideos;
-
-    const defaultGridItems = [
-        { type: 'video', src: '/hero.mp4' },
-        { type: 'image', src: '/svc-stage.png' },
-        { type: 'video', src: '/services4.mp4' },
-        { type: 'image', src: '/svc-wedding.jpg' },
-        { type: 'video', src: '/service3.mp4' },
-        { type: 'image', src: '/svc-hiphop.png' },
-        { type: 'video', src: '/services.mp4' },
-        { type: 'image', src: '/laptop.png' },
-        { type: 'video', src: '/hero.mp4' }
-    ];
-
-    const gridItems = !contentReady
-      ? defaultGridItems
-      : homeContent?.heroGridItems?.length > 0
-        ? homeContent.heroGridItems
-            .filter((item: { url?: string; src?: string }) => (item.url || item.src || "").trim())
-            .map((item: { type?: string; url?: string; src?: string }) => ({
-            type: item.type === 'image' ? 'image' : 'video',
+    const gridItems = useMemo(() => {
+      if (!contentReady) return DEFAULT_GRID_ITEMS;
+      const cmsGrid = homeContent?.heroGridItems;
+      if (Array.isArray(cmsGrid) && cmsGrid.length > 0) {
+        return cmsGrid
+          .filter((item: { url?: string; src?: string }) => (item.url || item.src || '').trim())
+          .map((item: { type?: string; url?: string; src?: string }) => ({
+            type: item.type === 'image' ? 'image' as const : 'video' as const,
             src: resolvePublicMediaUrl(item.url || item.src || ''),
-          }))
-        : homeContent?.heroVideos && homeContent.heroVideos.length > 0
-        ? [
-            { type: 'video', src: dynamicVideos[0] || '/hero.mp4' },
-            { type: 'image', src: '/svc-stage.png' },
-            { type: 'video', src: dynamicVideos[1] || dynamicVideos[0] || '/services4.mp4' },
-            { type: 'image', src: '/svc-wedding.jpg' },
-            { type: 'video', src: dynamicVideos[2] || dynamicVideos[0] || '/service3.mp4' },
-            { type: 'image', src: '/svc-hiphop.png' },
-            { type: 'video', src: dynamicVideos[3] || dynamicVideos[0] || '/services.mp4' },
-            { type: 'image', src: '/laptop.png' },
-            { type: 'video', src: dynamicVideos[0] || '/hero.mp4' }
-          ]
-        : defaultGridItems;
+          }));
+      }
+      if (Array.isArray(homeContent?.heroVideos) && homeContent.heroVideos.length > 0) {
+        return [
+          { type: 'video' as const, src: uniqueVideos[0] || '/hero.mp4' },
+          { type: 'image' as const, src: '/svc-stage.png' },
+          { type: 'video' as const, src: uniqueVideos[1] || uniqueVideos[0] || '/services4.mp4' },
+          { type: 'image' as const, src: '/svc-wedding.jpg' },
+          { type: 'video' as const, src: uniqueVideos[2] || uniqueVideos[0] || '/service3.mp4' },
+          { type: 'image' as const, src: '/svc-hiphop.png' },
+          { type: 'video' as const, src: uniqueVideos[3] || uniqueVideos[0] || '/services.mp4' },
+          { type: 'image' as const, src: '/laptop.png' },
+          { type: 'video' as const, src: uniqueVideos[0] || '/hero.mp4' },
+        ];
+      }
+      return DEFAULT_GRID_ITEMS;
+    }, [contentReady, homeContent, uniqueVideos]);
 
-    const uniqueVideos = dynamicVideos;
+    const primaryGridVideoIndex = useMemo(
+      () => gridItems.findIndex((item) => item.type === 'video' && item.src),
+      [gridItems],
+    );
     const [state, setState] = useState(1);
 
     const welcomeLine1 = contentReady
@@ -97,7 +143,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
 
     useEffect(() => {
         let interval: ReturnType<typeof setInterval>;
-        if (state === 2) {
+        if (state === 2 && uniqueVideos.length > 0) {
             interval = setInterval(() => {
                 setSingleIndex(prev => (prev + 1) % uniqueVideos.length);
             }, 3000);
@@ -108,7 +154,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
     useEffect(() => {
         let leftInterval: ReturnType<typeof setInterval>;
         let rightInterval: ReturnType<typeof setInterval>;
-        if (state === 3) {
+        if (state === 3 && uniqueVideos.length > 0) {
             leftInterval = setInterval(() => {
                 setLeftIndex(prev => (prev + 1) % uniqueVideos.length);
             }, 3200);
@@ -126,7 +172,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
     const rawHeroYt = homeContent?.heroYoutubeId || propSettings?.heroYoutubeId || '1phsCpxcBZU';
     const heroYoutubeId = extractYoutubeVideoId(rawHeroYt) || rawHeroYt;
 
-    const handleScrollTo = (id: string) => (e: React.MouseEvent) => {
+    const handleScrollTo = useCallback((id: string) => (e: React.MouseEvent) => {
         e.preventDefault();
         const el = document.getElementById(id);
         if (el) {
@@ -134,7 +180,12 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
         } else if (id === 'services') {
             window.location.href = '/services';
         }
-    };
+    }, []);
+
+    const videoCount = uniqueVideos.length;
+    const activeSingle = videoCount ? uniqueVideos[singleIndex % videoCount] : '';
+    const activeLeft = videoCount ? uniqueVideos[leftIndex % videoCount] : '';
+    const activeRight = videoCount ? uniqueVideos[rightIndex % videoCount] : '';
 
     return (
         <>
@@ -721,7 +772,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                 </div>
 
                 <div className="hero-btns-row">
-                    <Link to="/contact" className="hero-btn-primary">
+                    <button type="button" className="hero-btn-primary" onClick={() => openEnquiry({ purpose: 'trial' })}>
                         <svg className="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
                             <line x1="16" y1="2" x2="16" y2="6" />
@@ -730,7 +781,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                         </svg>
                         Book Free Trial
                         <span style={{ marginLeft: '4px' }}>→</span>
-                    </Link>
+                    </button>
                     <a href="#services" onClick={handleScrollTo('services')} className="hero-btn-secondary">
                         <svg className="btn-icon" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
@@ -753,13 +804,17 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                                         transition={{ duration: 0.8 }}
                                         style={{ zIndex: 2 }}
                                     >
-                                        {gridItems.map((item, i) => (
-                                            item.type === 'video' ? (
-                                                <video key={`grid-${i}`} src={item.src} autoPlay muted loop playsInline preload="none" />
-                                            ) : (
-                                                <img key={`grid-${i}`} src={item.src} alt={`collage-${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                            )
-                                        ))}
+                                        {gridItems.map((item, i) => {
+                                            if (item.type === 'video') {
+                                                if (!contentReady || i !== primaryGridVideoIndex || !item.src) {
+                                                    return <div key={`grid-${i}`} />;
+                                                }
+                                                return <HeroVideo key={`grid-${item.src}`} src={item.src} />;
+                                            }
+                                            return (
+                                                <ResponsiveImage key={`grid-${i}`} src={item.src} alt={`collage-${i}`} fill style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            );
+                                        })}
                                     </motion.div>
                                 )}
 
@@ -773,18 +828,13 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                                         transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
                                         style={{ zIndex: 3, transformOrigin: 'center center' }}
                                     >
-                                        {uniqueVideos.map((vid, i) => (
-                                            <video 
-                                                key={`single-${i}`} 
-                                                src={vid} 
-                                                autoPlay muted loop playsInline preload="none"
-                                                style={{
-                                                    position: 'absolute', inset: 0,
-                                                    opacity: singleIndex === i ? 1 : 0,
-                                                    transition: 'none' 
-                                                }}
+                                        {activeSingle && (
+                                            <HeroVideo
+                                                key={activeSingle}
+                                                src={activeSingle}
+                                                style={HERO_VIDEO_FILL}
                                             />
-                                        ))}
+                                        )}
                                     </motion.div>
                                 )}
 
@@ -799,33 +849,23 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                                         style={{ zIndex: 2 }}
                                     >
                                         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                                            {uniqueVideos.map((vid, i) => (
-                                                <video 
-                                                    key={`left-${i}`} 
-                                                    src={vid} 
-                                                    autoPlay muted loop playsInline preload="none"
-                                                    style={{
-                                                        position: 'absolute', inset: 0,
-                                                        opacity: leftIndex === i ? 1 : 0,
-                                                        transition: 'none'
-                                                    }}
+                                            {activeLeft && (
+                                                <HeroVideo
+                                                    key={`left-${activeLeft}`}
+                                                    src={activeLeft}
+                                                    style={HERO_VIDEO_FILL}
                                                 />
-                                            ))}
+                                            )}
                                         </div>
                                         
                                         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-                                            {uniqueVideos.map((vid, i) => (
-                                                <video 
-                                                    key={`right-${i}`} 
-                                                    src={vid} 
-                                                    autoPlay muted loop playsInline preload="none"
-                                                    style={{
-                                                        position: 'absolute', inset: 0,
-                                                        opacity: rightIndex === i ? 1 : 0,
-                                                        transition: 'none'
-                                                    }}
+                                            {activeRight && (
+                                                <HeroVideo
+                                                    key={`right-${rightIndex}-${activeRight}`}
+                                                    src={activeRight}
+                                                    style={HERO_VIDEO_FILL}
                                                 />
-                                            ))}
+                                            )}
                                         </div>
                                     </motion.div>
                                 )}

@@ -1,11 +1,10 @@
 import { ReactNode, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AdminSidebar } from './AdminSidebar';
-import { RoleSwitcher } from '@/components/RoleSwitcher';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { UserMenu } from '@/components/UserMenu';
-import { Bell, Menu, Search } from 'lucide-react';
+import { Bell, Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 
 interface AdminLayoutProps {
   children: ReactNode;
@@ -32,33 +31,24 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <div className="relative hidden min-w-0 flex-1 sm:block sm:max-w-xs md:max-w-sm lg:max-w-md">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search..."
-                className="w-full border-border bg-muted/50 pl-9 placeholder:text-muted-foreground focus:bg-background"
-              />
-            </div>
             <span
-              className="truncate text-sm font-bold tracking-tighter sm:hidden"
+              className="truncate text-sm font-bold tracking-tighter"
               style={{ fontFamily: 'Krona One' }}
             >
               GDP<span style={{ color: '#634BFA' }}>.</span>
             </span>
           </div>
           <div className="flex shrink-0 items-center gap-1 sm:gap-2 md:gap-3">
-            <div className="hidden lg:block">
-              <RoleSwitcher />
-            </div>
             <ThemeToggle />
             <Button
               variant="ghost"
               size="icon"
-              className="relative text-muted-foreground hover:text-foreground"
-              aria-label="Notifications"
+              className="text-muted-foreground hover:text-foreground"
+              asChild
             >
-              <Bell className="h-5 w-5" />
-              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary" />
+              <Link to="/notifications" aria-label="System alerts">
+                <Bell className="h-5 w-5" />
+              </Link>
             </Button>
             <UserMenu />
           </div>

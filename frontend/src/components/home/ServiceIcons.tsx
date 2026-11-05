@@ -1,4 +1,5 @@
 import type { ImgHTMLAttributes, ReactNode } from 'react';
+import ResponsiveImage from '../common/ResponsiveImage';
 
 export const SERVICE_ICON_IMAGES = {
   onlineDance: '/onlineclass.png',
@@ -12,7 +13,7 @@ type ServiceIconImgProps = ImgHTMLAttributes<HTMLImageElement> & {
 };
 
 const ServiceIconImg: React.FC<ServiceIconImgProps> = ({ src, alt = '', className, ...rest }) => (
-  <img
+  <ResponsiveImage
     src={src}
     alt={alt}
     className={className ? `service-icon-img ${className}` : 'service-icon-img'}

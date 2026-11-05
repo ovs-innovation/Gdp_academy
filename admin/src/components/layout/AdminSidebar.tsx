@@ -88,18 +88,6 @@ const adminNavItems: NavItem[] = [
     permission: "analytics.view",
   },
   {
-    to: "/reports",
-    icon: FileText,
-    label: "Reports",
-    permission: "reports.view",
-  },
-  {
-    to: "/support-tickets",
-    icon: MessageSquare,
-    label: "Support",
-    permission: "reports.view",
-  },
-  {
     to: "/contact-messages",
     icon: MessageSquare,
     label: "Contact Messages",
@@ -201,12 +189,6 @@ const StudentOperationsItems: NavItem[] = [
     label: "Contact Messages",
     permission: "contactMessages.view",
   },
-  {
-    to: "/support-tickets",
-    icon: MessageSquare,
-    label: "Support Tickets",
-    permission: "reports.view",
-  },
 ];
 
 const SystemAdminItems: NavItem[] = [
@@ -221,12 +203,6 @@ const SystemAdminItems: NavItem[] = [
     icon: BarChart3,
     label: "Analytics",
     permission: "analytics.view",
-  },
-  {
-    to: "/reports",
-    icon: FileText,
-    label: "Reports",
-    permission: "reports.view",
   },
   {
     to: "/users",
@@ -310,37 +286,39 @@ export function AdminSidebar({ mobileOpen = false, onMobileClose }: AdminSidebar
     if (isMobile) onMobileClose?.();
   };
 
-  const renderNavLink = (item: NavItem, compact = false) => (
+  const renderNavLink = (item: NavItem) => (
     <NavLink
       key={item.to}
       to={item.to}
       end={item.to === "/"}
+      title={item.label}
       onClick={handleNavClick}
       className={cn(
-        "flex items-center gap-3 rounded-lg px-3 text-sm font-medium text-sidebar-foreground transition-all hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-        compact ? "py-2" : "py-2.5",
-        collapsed && !isMobile && "justify-center px-2",
+        "flex h-10 w-full min-w-0 items-center gap-2.5 rounded-lg px-2.5 text-sm font-medium leading-none text-sidebar-foreground transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+        collapsed && !isMobile && "justify-center px-0",
       )}
       activeClassName="bg-sidebar-accent text-sidebar-primary shadow-glow"
     >
-      <item.icon className={cn("flex-shrink-0", compact ? "h-4 w-4" : "h-5 w-5")} />
-      {(!collapsed || isMobile) && <span>{item.label}</span>}
+      <item.icon className="h-[18px] w-[18px] shrink-0" />
+      {(!collapsed || isMobile) && (
+        <span className="min-w-0 flex-1 truncate text-left">{item.label}</span>
+      )}
     </NavLink>
   );
 
   const sidebarContent = (
     <>
-      <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
+      <div className="flex h-16 shrink-0 items-center justify-between gap-2 border-b border-sidebar-border px-3">
         {(!collapsed || isMobile) ? (
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground font-display font-semibold text-lg tracking-wider">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground font-display font-semibold text-lg tracking-wider">
               GD
             </div>
-            <div className="flex flex-col">
-              <span className="font-display text-sm font-semibold tracking-tight text-foreground">
+            <div className="min-w-0">
+              <span className="block truncate font-display text-sm font-semibold tracking-tight text-foreground">
                 GDP ACADEMY
               </span>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">
+              <span className="block truncate text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
                 Admin Control
               </span>
             </div>
@@ -366,9 +344,9 @@ export function AdminSidebar({ mobileOpen = false, onMobileClose }: AdminSidebar
         )}
       </div>
 
-      <nav className="flex-1 space-y-4 overflow-y-auto p-3 admin-mobile-sidebar">
+      <nav className="flex-1 space-y-4 overflow-y-auto overflow-x-hidden p-2.5 admin-mobile-sidebar">
         {showDashboard && (
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {renderNavLink({
               to: "/",
               icon: LayoutDashboard,
@@ -378,55 +356,55 @@ export function AdminSidebar({ mobileOpen = false, onMobileClose }: AdminSidebar
         )}
 
         {websiteItems.length > 0 && (
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {(!collapsed || isMobile) && (
-              <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+              <p className="px-2.5 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-foreground">
                 Website Content
               </p>
             )}
-            {websiteItems.map((item) => renderNavLink(item, true))}
+            {websiteItems.map((item) => renderNavLink(item))}
           </div>
         )}
 
         {studentItems.length > 0 && (
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {(!collapsed || isMobile) && (
-              <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+              <p className="px-2.5 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-foreground">
                 Students & Enquiries
               </p>
             )}
-            {studentItems.map((item) => renderNavLink(item, true))}
+            {studentItems.map((item) => renderNavLink(item))}
           </div>
         )}
 
         {adminItems.length > 0 && (
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {(!collapsed || isMobile) && (
-              <p className="px-3 pt-2 pb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+              <p className="px-2.5 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-foreground">
                 Administration
               </p>
             )}
-            {adminItems.map((item) => renderNavLink(item, true))}
+            {adminItems.map((item) => renderNavLink(item))}
           </div>
         )}
       </nav>
 
-      <div className="border-t border-sidebar-border p-4">
+      <div className="shrink-0 border-t border-sidebar-border p-3">
         <div
           className={cn(
-            "flex items-center gap-3",
+            "flex min-w-0 items-center gap-2.5",
             collapsed && !isMobile && "justify-center",
           )}
         >
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/20 text-sm font-medium text-primary">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary/20 text-sm font-medium text-primary">
             {initials}
           </div>
           {(!collapsed || isMobile) && (
-            <div className="flex-1 overflow-hidden">
-              <p className="truncate text-sm font-medium text-foreground">
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-medium leading-5 text-foreground">
                 {displayName}
               </p>
-              <p className="truncate text-xs text-muted-foreground">
+              <p className="truncate text-xs leading-4 text-muted-foreground">
                 {currentRole
                   .replace("_", " ")
                   .replace(/\b\w/g, (l) => l.toUpperCase())}
@@ -451,7 +429,7 @@ export function AdminSidebar({ mobileOpen = false, onMobileClose }: AdminSidebar
         )}
         <aside
           className={cn(
-            "fixed inset-y-0 left-0 z-50 flex w-[min(18rem,88vw)] flex-col border-r border-sidebar-border bg-sidebar shadow-2xl transition-transform duration-300 md:hidden",
+            "fixed inset-y-0 left-0 z-50 flex w-[min(21rem,92vw)] flex-col border-r border-sidebar-border bg-sidebar shadow-2xl transition-transform duration-300 md:hidden",
             mobileOpen ? "translate-x-0" : "-translate-x-full",
           )}
           aria-hidden={!mobileOpen}
@@ -466,7 +444,7 @@ export function AdminSidebar({ mobileOpen = false, onMobileClose }: AdminSidebar
     <aside
       className={cn(
         "sticky top-0 hidden h-screen shrink-0 flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300 md:flex",
-        collapsed ? "w-16" : "w-64",
+        collapsed ? "w-16" : "w-[21rem]",
       )}
     >
       {sidebarContent}

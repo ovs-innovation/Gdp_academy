@@ -15,7 +15,7 @@ const InstructorSettingPassword = () => {
          return;
       }
       try {
-         const API_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+         const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.garimadanceproductions.com/api';
          const response = await fetch(`${API_URL}/auth/change-password`, {
             method: 'POST',
             headers: {

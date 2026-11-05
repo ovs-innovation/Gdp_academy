@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import LazyVideo from '../common/LazyVideo';
 import LazyImage from '../common/LazyImage';
+import { extractYoutubeVideoId, normalizeVideoSource } from '../../utils/mediaUrl';
 
 export type ClientReviewCard = {
   name: string;
@@ -36,6 +36,104 @@ const renderStars = (rating: number) =>
 const truncate = (text: string, max = 140) =>
   text.length <= max ? text : `${text.slice(0, max).trim()}…`;
 
+function youtubePoster(ytId: string, kind: 'max' | 'hq'): string {
+  if (kind === 'max') return `https://i.ytimg.com/vi/${ytId}/maxresdefault.jpg`;
+  return `https://i.ytimg.com/vi/${ytId}/hqdefault.jpg`;
+}
+
+function ClientVideoCard({
+  vid,
+  img,
+  quote,
+  isPlaying,
+  onPlay,
+}: {
+  vid: string;
+  img?: string;
+  quote?: string;
+  isPlaying: boolean;
+  onPlay: () => void;
+}) {
+  const normalized = normalizeVideoSource(vid);
+  const ytId = extractYoutubeVideoId(normalized);
+  const [thumbKind, setThumbKind] = useState<'max' | 'hq' | 'image'>(ytId ? 'max' : 'image');
+
+  useEffect(() => {
+    setThumbKind(ytId ? 'max' : 'image');
+  }, [ytId, vid]);
+
+  const stepDownPoster = () => {
+    if (!ytId) return;
+    setThumbKind((current) => {
+      if (current === 'max') return 'hq';
+      if (current === 'hq' && img) return 'image';
+      return current;
+    });
+  };
+
+  const poster = ytId
+    ? thumbKind === 'image' && img
+      ? img
+      : youtubePoster(ytId, thumbKind === 'hq' ? 'hq' : 'max')
+    : img;
+
+  return (
+    <div className="reviews-v3-carousel-item reviews-v3-video-card">
+      {isPlaying && ytId ? (
+        <iframe
+          className="reviews-v3-video-media"
+          src={`https://www.youtube-nocookie.com/embed/${ytId}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
+          title="Client story"
+          allow="autoplay; encrypted-media; picture-in-picture"
+          allowFullScreen
+        />
+      ) : isPlaying && normalized ? (
+        <video className="reviews-v3-video-media" src={normalized} controls autoPlay playsInline />
+      ) : (
+        <div
+          className="reviews-v3-video-hit"
+          role="button"
+          tabIndex={0}
+          aria-label="Play client story"
+          onClick={onPlay}
+          onKeyDown={(event) => {
+            if (event.key !== 'Enter' && event.key !== ' ') return;
+            event.preventDefault();
+            onPlay();
+          }}
+        >
+          {poster ? (
+            <img
+              src={poster}
+              alt=""
+              className="reviews-v3-video-media"
+              loading="lazy"
+              decoding="async"
+              draggable={false}
+              onLoad={(event) => {
+                if (event.currentTarget.naturalWidth > 0 && event.currentTarget.naturalWidth < 200) {
+                  stepDownPoster();
+                }
+              }}
+              onError={stepDownPoster}
+            />
+          ) : null}
+          <span className="reviews-v3-video-shade" />
+          <span className="reviews-v3-play-btn reviews-v3-play-btn--sm" aria-hidden="true">
+            <span>▶</span>
+          </span>
+          {quote ? (
+            <span className="reviews-v3-video-quote">
+              <span>&ldquo;</span>
+              <p>{truncate(quote, 72)}</p>
+            </span>
+          ) : null}
+        </div>
+      )}
+    </div>
+  );
+}
+
 const ReviewsSection: React.FC<ReviewsSectionProps> = ({
   titlePrefix = 'From Our',
   titleHighlight = 'Clients',
@@ -52,6 +150,7 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
   const [expanded, setExpanded] = useState<Record<number, boolean>>({});
   const [activeCardDot, setActiveCardDot] = useState(0);
   const [activeDot, setActiveDot] = useState(0);
+  const [playingId, setPlayingId] = useState<string | number | null>(null);
 
   const textReviewCards = useMemo(
     () => [{ type: 'google' as const, id: 'google' }, ...reviews.slice(0, 2).map((r, i) => ({ type: 'quote' as const, id: `${r.name}-${i}`, review: r, index: i }))],
@@ -258,23 +357,14 @@ const ReviewsSection: React.FC<ReviewsSectionProps> = ({
                       <span className="reviews-v3-yt-badge">YouTube</span>
                     </div>
                   ) : (
-                    <div key={item.id} className="reviews-v3-carousel-item reviews-v3-video-card">
-                      <LazyVideo
-                        src={item.vid}
-                        className="reviews-v3-video-media"
-                        scale={1.1}
-                      />
-                      <div className="reviews-v3-video-shade" />
-                      <div className="reviews-v3-play-btn reviews-v3-play-btn--sm" aria-hidden="true">
-                        <span>▶</span>
-                      </div>
-                      {item.quote && (
-                        <div className="reviews-v3-video-quote">
-                          <span>&ldquo;</span>
-                          <p>{truncate(item.quote, 72)}</p>
-                        </div>
-                      )}
-                    </div>
+                    <ClientVideoCard
+                      key={item.id}
+                      vid={item.vid}
+                      img={item.img}
+                      quote={item.quote}
+                      isPlaying={playingId === item.id}
+                      onPlay={() => setPlayingId(item.id)}
+                    />
                   ),
                 )}
               </div>

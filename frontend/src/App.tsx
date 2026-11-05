@@ -7,6 +7,7 @@ import { CurrencyProvider } from './contexts/CurrencyContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { WishlistProvider } from './contexts/WishlistContext'
 import { SiteDataProvider } from './contexts/SiteDataContext'
+import { EnquiryPopupProvider } from './contexts/EnquiryPopupContext'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import './styles/share-actions.css'
@@ -19,12 +20,14 @@ function App() {
           <WishlistProvider>
             <CurrencyProvider>
               <SiteDataProvider>
+              <EnquiryPopupProvider>
               <HelmetProvider>
                 <div className="dance-studio-app">
                   <AppNavigation />
                   <ToastContainer position="bottom-right" theme="dark" />
                 </div>
               </HelmetProvider>
+              </EnquiryPopupProvider>
               </SiteDataProvider>
             </CurrencyProvider>
           </WishlistProvider>

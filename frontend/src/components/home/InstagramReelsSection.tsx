@@ -1,10 +1,143 @@
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import HomeMediaMarquee from './HomeMediaMarquee';
 import InstaReelCard from './InstaReelCard';
-import DirectVideoCard from './DirectVideoCard';
+import MediaPlayButton from './MediaPlayButton';
 import { isDirectVideoUrl, resolvePublicMediaUrl } from '../../utils/mediaUrl';
 import type { InstagramReelItem } from '../../lib/homeCms';
+
+const mediaFillStyle: React.CSSProperties = {
+  position: 'absolute',
+  inset: 0,
+  width: '100%',
+  height: '100%',
+  objectFit: 'cover',
+};
+
+/** First-frame poster. Image request only — never the MP4. */
+function cloudinaryVideoPoster(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    if (!parsed.hostname.endsWith('res.cloudinary.com')) return null;
+    const marker = '/video/upload/';
+    const idx = parsed.pathname.indexOf(marker);
+    if (idx === -1) return null;
+    const rest = parsed.pathname.slice(idx + marker.length).replace(/\.(mp4|webm|mov|m4v)$/i, '');
+    parsed.pathname = `${parsed.pathname.slice(0, idx)}${marker}so_0,f_auto,q_auto,w_600/${rest}.jpg`;
+    parsed.search = '';
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+}
+
+type DirectReelProps = {
+  id: string;
+  src: string;
+  isPlaying: boolean;
+  onActivate: (id: string) => void;
+  likes?: string;
+  comments?: string;
+};
+
+const InstagramDirectReelCard = React.memo(function InstagramDirectReelCard({
+  id,
+  src,
+  isPlaying,
+  onActivate,
+  likes,
+  comments,
+}: DirectReelProps) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [ready, setReady] = useState(false);
+  const poster = useMemo(() => cloudinaryVideoPoster(src), [src]);
+
+  useEffect(() => {
+    if (!isPlaying) {
+      setReady(false);
+      return;
+    }
+    const video = videoRef.current;
+    if (!video) return;
+    video.play().catch(() => {});
+  }, [isPlaying, src]);
+
+  const play = () => onActivate(id);
+
+  const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    play();
+  };
+
+  return (
+    <div
+      className="yt-short-card"
+      role="button"
+      tabIndex={0}
+      aria-label="Play reel"
+      onClick={play}
+      onKeyDown={onKeyDown}
+    >
+      <div
+        className="yt-short-iframe-wrapper"
+        style={{ width: '100%', height: '100%', position: 'relative' }}
+      >
+        {poster && (
+          <img
+            src={poster}
+            alt=""
+            className="yt-short-iframe"
+            decoding="async"
+            draggable={false}
+            style={{
+              ...mediaFillStyle,
+              opacity: isPlaying && ready ? 0 : 1,
+              transition: 'opacity 0.35s ease',
+            }}
+          />
+        )}
+        {isPlaying && (
+          <video
+            ref={videoRef}
+            src={src}
+            className="yt-short-iframe"
+            muted
+            loop
+            playsInline
+            autoPlay
+            controls
+            preload="auto"
+            onPlaying={() => setReady(true)}
+            style={{
+              ...mediaFillStyle,
+              opacity: ready ? 1 : 0,
+              transition: 'opacity 0.35s ease',
+            }}
+          />
+        )}
+        {!isPlaying && (
+          <>
+            <div className="yt-short-overlay gdp-video-card-overlay" aria-hidden="true" />
+            <MediaPlayButton size="md" />
+          </>
+        )}
+      </div>
+
+      {(likes || comments) && (
+        <div className="yt-shorts-ui">
+          <div className="yt-shorts-bottom-info">
+            <span className="yt-short-views">
+              {[likes && `${likes} likes`, comments && `${comments} comments`]
+                .filter(Boolean)
+                .join(' · ')}
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+});
 
 const InstagramIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" width="20" height="20" aria-hidden>
@@ -90,10 +223,11 @@ const InstagramReelsSection: React.FC<Props> = ({
 
               if (videoSrc) {
                 return (
-                  <DirectVideoCard
+                  <InstagramDirectReelCard
+                    id={itemId}
                     src={videoSrc}
                     isPlaying={activeVideoId === itemId}
-                    onPlay={() => setActiveVideoId(itemId)}
+                    onActivate={setActiveVideoId}
                     likes={r.likes}
                     comments={r.comments}
                   />

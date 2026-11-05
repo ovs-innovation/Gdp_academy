@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Plus, Trash2 } from "lucide-react";
 import { CMSSection } from "@/components/cms/CMSSection";
 import { MediaUrlField } from "@/components/cms/MediaUrlField";
+import { YoutubeUrlField } from "@/components/cms/YoutubeUrlField";
 import {
   DEFAULT_HERO_GRID,
   HERO_GRID_SLOTS,
@@ -55,9 +56,11 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
     onChange("heroGridItems", next);
   };
 
-  const heroVideosRaw = Array.isArray(content.heroVideos)
-    ? content.heroVideos.map((v: unknown) => (typeof v === "string" ? v : (v as { url?: string }).url || "")).join(", ")
-    : "";
+  const extraVideos: string[] = Array.isArray(content.heroVideos)
+    ? content.heroVideos
+        .map((v: unknown) => (typeof v === "string" ? v : (v as { url?: string }).url || ""))
+        .filter(Boolean)
+    : [];
 
   return (
     <div className="space-y-4">
@@ -158,18 +161,46 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
             </div>
           ))}
         </div>
-        <div className="space-y-2 pt-2 border-t border-border">
-          <Label>Extra slideshow videos (comma separated)</Label>
-          <Textarea
-            value={heroVideosRaw}
-            onChange={(e) => {
-              const urls = e.target.value.split(",").map((u) => u.trim()).filter(Boolean);
-              onChange("heroVideos", urls);
-            }}
-            className="bg-muted/50 min-h-[60px]"
-            placeholder="/hero.mp4, /services.mp4"
-          />
-          <p className="text-xs text-muted-foreground">These videos also play in the other states of the hero animation.</p>
+        <div className="space-y-3 pt-2 border-t border-border">
+          <Label>Extra slideshow videos</Label>
+          <p className="text-xs text-muted-foreground">
+            These videos also play in the other states of the hero animation.
+          </p>
+          {extraVideos.map((url, i) => (
+            <div key={i} className="flex items-start gap-2">
+              <div className="flex-1">
+                <MediaUrlField
+                  value={url}
+                  onChange={(nextUrl) => {
+                    const next = [...extraVideos];
+                    next[i] = nextUrl;
+                    onChange("heroVideos", next);
+                  }}
+                  placeholder="/hero.mp4"
+                  mediaType="video"
+                  uploadFolder="gdp-hero"
+                />
+              </div>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="mt-6"
+                onClick={() => onChange("heroVideos", extraVideos.filter((_, j) => j !== i))}
+              >
+                <Trash2 className="h-4 w-4 text-red-500" />
+              </Button>
+            </div>
+          ))}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-1"
+            onClick={() => onChange("heroVideos", [...extraVideos, ""])}
+          >
+            <Plus className="h-4 w-4" /> Add extra video
+          </Button>
         </div>
       </CMSSection>
 
@@ -194,11 +225,17 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
         websiteLocation="Homepage → YouTube Shorts"
       >
         <div className="grid gap-4 md:grid-cols-2 mb-4">
-          <Input value={content.youtubeChannel || ""} onChange={(e) => onChange("youtubeChannel", e.target.value)} placeholder="@channel handle" className="bg-muted/50" />
-          <Input value={content.youtubeChannelUrl || ""} onChange={(e) => onChange("youtubeChannelUrl", e.target.value)} placeholder="https://www.youtube.com/@..." className="bg-muted/50" />
+          <div className="space-y-2">
+            <Label>Channel handle</Label>
+            <Input value={content.youtubeChannel || ""} onChange={(e) => onChange("youtubeChannel", e.target.value)} placeholder="@garimadanceproductions1146" className="bg-muted/50" />
+          </div>
+          <div className="space-y-2">
+            <Label>Channel URL</Label>
+            <Input value={content.youtubeChannelUrl || ""} onChange={(e) => onChange("youtubeChannelUrl", e.target.value)} placeholder="https://www.youtube.com/@..." className="bg-muted/50" />
+          </div>
         </div>
         <div className="space-y-2 mb-4">
-          <Label>YouTube Channel ID (for Subscribe button)</Label>
+          <Label>Channel ID (Subscribe button only)</Label>
           <Input
             value={content.youtubeChannelId || ""}
             onChange={(e) => onChange("youtubeChannelId", e.target.value)}
@@ -206,7 +243,7 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
             className="bg-muted/50 font-mono text-xs"
           />
           <p className="text-xs text-muted-foreground">
-            Required for in-page Subscribe. Find under YouTube → Settings → Advanced, or channel page source. Default works for @garimadanceproductions1146.
+            Only needed for the in-page Subscribe button. YouTube → Settings → Advanced. Leave blank to keep the default channel.
           </p>
         </div>
         {shorts.map((item, i) => (
@@ -219,11 +256,12 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
             </div>
             <MediaUrlField
               label="Video file or YouTube link (required)"
-              hint="Upload an .mp4 video OR paste a YouTube link (watch / shorts / youtu.be). After uploading, make sure to click Save Page Content."
+              hint="Upload an .mp4 OR paste a full YouTube link (watch / Shorts / youtu.be). Then click Save Page Content."
               websiteLocation={`Homepage → YouTube Shorts → card #${i + 1} background video`}
               value={item.vid || ""}
               mediaType="video"
               uploadFolder="gdp-shorts"
+              placeholder="https://www.youtube.com/watch?v=... or /uploads/..."
               onChange={(vid) => {
                 const n = [...shorts];
                 n[i] = { ...n[i], vid };
@@ -273,15 +311,13 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
           <Label>Description</Label>
           <Textarea value={content.aboutShortText || ""} onChange={(e) => onChange("aboutShortText", e.target.value)} className="bg-muted/50 min-h-[100px]" />
         </div>
-        <div className="space-y-2">
-          <Label>About YouTube link</Label>
-          <Input
-            value={content.aboutYoutubeId || ""}
-            onChange={(e) => onChange("aboutYoutubeId", e.target.value)}
-            className="bg-muted/50"
-            placeholder="https://www.youtube.com/watch?v=..."
-          />
-        </div>
+        <YoutubeUrlField
+          label="About section YouTube video"
+          hint="Paste the full YouTube link. This plays in the homepage About block (video + text)."
+          websiteLocation="Homepage → About section video"
+          value={content.aboutYoutubeId || ""}
+          onChange={(url) => onChange("aboutYoutubeId", url)}
+        />
       </CMSSection>
 
       <CMSSection
@@ -318,8 +354,8 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
               </Button>
             </div>
             <MediaUrlField
-              label="Reel video or YouTube link (required)"
-              hint="Upload an .mp4 OR paste a link. Save the page after uploading."
+              label="Reel video or Instagram / YouTube link (required)"
+              hint="Upload an .mp4 OR paste a reel/YouTube link. Save the page after uploading."
               websiteLocation={`Homepage → Instagram row → reel #${i + 1}`}
               value={item.vid || ""}
               mediaType="video"
@@ -382,7 +418,12 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
               </Button>
             </div>
             <MediaUrlField label="Thumbnail image" value={item.img || ""} onChange={(img) => { const n = [...videoTests]; n[i] = { ...n[i], img }; onChange("videoTestimonials", n); }} />
-            <MediaUrlField label="YouTube embed URL" value={item.vid || ""} onChange={(vid) => { const n = [...videoTests]; n[i] = { ...n[i], vid }; onChange("videoTestimonials", n); }} placeholder="https://www.youtube.com/embed/..." />
+            <YoutubeUrlField
+              label="YouTube video"
+              hint="Paste a full YouTube link — watch, Shorts, or youtu.be."
+              value={item.vid || ""}
+              onChange={(vid) => { const n = [...videoTests]; n[i] = { ...n[i], vid }; onChange("videoTestimonials", n); }}
+            />
           </div>
         ))}
         <Button type="button" variant="outline" size="sm" className="gap-1" onClick={() => onChange("videoTestimonials", [...videoTests, { img: "", vid: "" }])}>

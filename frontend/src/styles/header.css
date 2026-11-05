@@ -66,6 +66,13 @@
   opacity: 0.85;
 }
 
+button.nav-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
 .nav-link:hover,
 .nav-link.active {
   opacity: 1;

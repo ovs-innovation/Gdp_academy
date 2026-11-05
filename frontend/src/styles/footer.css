@@ -103,6 +103,21 @@
   color: #fff;
 }
 
+.footer-text-btn {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 14px;
+  line-height: 1.5;
+  font-family: inherit;
+}
+
+.footer-text-btn:hover {
+  color: #fff;
+}
+
 .footer-contact-list li {
   display: flex;
   flex-direction: column;

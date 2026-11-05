@@ -12,6 +12,7 @@ import {
   uploadMediaFile,
   type MediaType,
 } from "@/lib/mediaUpload";
+import { extractYoutubeVideoId, youtubeThumbnailUrl } from "@/lib/youtube";
 
 interface MediaUrlFieldProps {
   label?: string;
@@ -86,7 +87,9 @@ export function MediaUrlField({
     disabled: uploading,
   });
 
-  const showVideo = preview && isVideoUrl(preview);
+  const youtubeId = extractYoutubeVideoId(preview);
+  const youtubeThumb = youtubeThumbnailUrl(preview);
+  const showVideo = Boolean(preview && isVideoUrl(preview) && !youtubeId);
 
   return (
     <div className={cn("space-y-2", className)}>
@@ -138,13 +141,16 @@ export function MediaUrlField({
         )}
       </div>
 
+      {youtubeId && (
+        <p className="text-xs text-muted-foreground">YouTube link detected — this will play on the website.</p>
+      )}
       {preview && (
         <div className="rounded-md border border-border overflow-hidden max-w-xs">
           {showVideo ? (
             <video src={preview} className="h-28 w-full object-cover" muted playsInline controls />
           ) : (
             <img
-              src={preview}
+              src={youtubeThumb || preview}
               alt=""
               className="h-28 w-full object-cover"
               onError={(e) => {

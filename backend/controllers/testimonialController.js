@@ -1,4 +1,23 @@
 const Testimonial = require("../models/testimonialModel.js");
+const { invalidatePublicCache } = require("../utils/publicCache.js");
+
+function bustHomepageCache() {
+  invalidatePublicCache("homepage");
+}
+
+async function readFeaturedTestimonials(limit = 6) {
+  try {
+    const safeLimit = Math.min(Math.max(Number(limit) || 6, 1), 20);
+    return await Testimonial.find({ isActive: true })
+      .select("name position message image rating order")
+      .sort({ order: 1, createdAt: -1 })
+      .limit(safeLimit)
+      .lean();
+  } catch (error) {
+    console.error("featured testimonials:", error.message);
+    return [];
+  }
+}
 
 // Create testimonial
 const createTestimonial = async (req, res, next) => {
@@ -22,6 +41,7 @@ const createTestimonial = async (req, res, next) => {
       userId,
       isActive: true,
     });
+    bustHomepageCache();
 
     return res.status(201).json({
       message: "Testimonial created successfully",
@@ -66,20 +86,9 @@ const getAllTestimonials = async (req, res, next) => {
 };
 
 // Get featured testimonials
-const getFeaturedTestimonials = async (req, res, next) => {
-  try {
-    const { limit = 5 } = req.query;
-
-    const testimonials = await Testimonial.find({ isActive: true })
-      .populate("courseId", "name")
-      .populate("userId", "name email")
-      .sort({ order: 1, createdAt: -1 })
-      .limit(Number(limit));
-
-    return res.json(testimonials);
-  } catch (error) {
-    next(error);
-  }
+const getFeaturedTestimonials = async (req, res) => {
+  const testimonials = await readFeaturedTestimonials(req.query.limit || 6);
+  return res.json(testimonials);
 };
 
 // Get testimonial by ID
@@ -136,6 +145,7 @@ const updateTestimonial = async (req, res, next) => {
     if (order !== undefined) testimonial.order = order;
 
     await testimonial.save();
+    bustHomepageCache();
     testimonial = await testimonial
       .populate("courseId", "name")
       .populate("userId", "name email");
@@ -162,6 +172,7 @@ const deleteTestimonial = async (req, res, next) => {
       });
     }
 
+    bustHomepageCache();
     return res.json({
       message: "Testimonial deleted successfully",
     });
@@ -185,6 +196,7 @@ const reorderTestimonials = async (req, res, next) => {
       await Testimonial.findByIdAndUpdate(item.id, { order: item.order });
     }
 
+    bustHomepageCache();
     return res.json({
       message: "Testimonials reordered successfully",
     });
@@ -201,4 +213,5 @@ module.exports = {
   updateTestimonial,
   deleteTestimonial,
   reorderTestimonials,
+  readFeaturedTestimonials,
 };

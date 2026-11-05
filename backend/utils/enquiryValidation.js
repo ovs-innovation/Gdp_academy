@@ -26,16 +26,15 @@ const validateLeadFields = ({ name, email, phone, message, requireMessage = true
     errors.push("Name can only contain letters and spaces");
   }
 
-  if (!cleanEmail) errors.push("Email is required");
-  else if (cleanEmail.length > MAX_EMAIL || !EMAIL_RE.test(cleanEmail)) {
+  if (cleanEmail && (cleanEmail.length > MAX_EMAIL || !EMAIL_RE.test(cleanEmail))) {
     errors.push("Invalid email address");
   }
 
+  const indiaPhone = PHONE_RE.test(cleanPhone) && /^[6-9]/.test(cleanPhone);
+  const internationalPhone = /^\d{8,16}$/.test(cleanPhone);
   if (!cleanPhone) errors.push("Phone is required");
-  else if (!PHONE_RE.test(cleanPhone)) {
-    errors.push("Phone must be a 10-digit number");
-  } else if (!/^[6-9]/.test(cleanPhone)) {
-    errors.push("Mobile number must start with 6, 7, 8, or 9");
+  else if (!indiaPhone && !internationalPhone) {
+    errors.push("Enter a valid mobile number");
   }
 
   if (requireMessage && !cleanMessage) errors.push("Message is required");

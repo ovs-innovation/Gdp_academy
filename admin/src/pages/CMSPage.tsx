@@ -18,7 +18,7 @@ import { WebsitePageNav } from "@/components/cms/WebsitePageNav";
 import { RelatedContentLinks } from "@/components/cms/RelatedContentLinks";
 import { CMSPageContentEditor } from "@/components/cms/CMSPageContentEditor";
 import { CMSGlobalSettingsEditor } from "@/components/cms/CMSGlobalSettingsEditor";
-import { normalizeHomeContentForSave } from "@/lib/homeCms";
+import { normalizeHomeContentForSave, normalizeHomeContentFromApi } from "@/lib/homeCms";
 import { normalizeWorkshopsPageContentForSave } from "@/lib/workshopsPageCms";
 import {
   findWebsiteNavItem,
@@ -47,6 +47,12 @@ const CMSPage = () => {
     try {
       const data = await PageContentAPI.getBySlug(slug);
       let page = data.page;
+      if (slug === "home" && page) {
+        page = {
+          ...page,
+          content: normalizeHomeContentFromApi(page.content || {}),
+        };
+      }
       if (slug === "workshops" && page) {
         page = {
           ...page,
@@ -199,9 +205,8 @@ const CMSPage = () => {
             <h1 className="font-display text-2xl tracking-tight text-foreground sm:text-3xl">
               Website Control
             </h1>
-            <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
-              Edit the public site in the same order visitors browse. Choose a page on the left,
-              update its sections, then save.
+            <p className="mt-1 max-w-2xl text-sm text-foreground/70">
+              Pick a page, edit that page, then save. The list follows the same order as the live site.
             </p>
           </div>
           {activeNavItem?.path ? (
@@ -216,8 +221,8 @@ const CMSPage = () => {
           ) : null}
         </div>
 
-        <div className="grid gap-6 xl:grid-cols-[240px_minmax(0,1fr)]">
-          <Card className="h-fit border-border bg-card p-3 xl:sticky xl:top-6">
+        <div className="grid items-start gap-4 lg:grid-cols-[240px_minmax(0,1fr)]">
+          <Card className="max-h-[42vh] overflow-y-auto border-border bg-card p-3 lg:sticky lg:top-4 lg:max-h-[calc(100dvh-7.5rem)]">
             <WebsitePageNav activeId={activeNavId} onSelect={setActiveNavId} />
           </Card>
 
@@ -333,7 +338,20 @@ const CMSPage = () => {
                       <Save className="h-4 w-4" />
                       {pageSaving ? "Saving..." : "Save Page Content"}
                     </Button>
+                    <p className="text-center text-xs text-muted-foreground">
+                      After save, refresh the live website to see changes.
+                    </p>
                   </Card>
+                </div>
+                <div className="sticky bottom-4 z-20 lg:hidden">
+                  <Button
+                    onClick={handlePageSave}
+                    disabled={pageSaving}
+                    className="w-full gap-2 py-6 font-semibold shadow-lg gradient-primary text-primary-foreground"
+                  >
+                    <Save className="h-4 w-4" />
+                    {pageSaving ? "Saving..." : "Save Page Content"}
+                  </Button>
                 </div>
               </div>
             )}

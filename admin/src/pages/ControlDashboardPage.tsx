@@ -1,6 +1,5 @@
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -10,12 +9,9 @@ import {
   GraduationCap, 
   TrendingUp, 
   TrendingDown,
-  Download,
   Calendar,
   Filter,
-  Activity,
   Eye,
-  Clock
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {
@@ -35,34 +31,16 @@ import {
   PieChart,
   Pie,
   Cell,
-  LineChart,
-  Line,
 } from 'recharts';
 import { useToast } from '@/hooks/use-toast';
 
-const API_URL = (import.meta.env.VITE_API_URL || '/api').replace(/\/$/, '');
+const API_URL = (
+  import.meta.env.DEV
+    ? "/api"
+    : import.meta.env.VITE_API_URL || "https://api.garimadanceproductions.com/api"
+).replace(/\/$/, "");
 
 const getToken = () => localStorage.getItem('admin-auth-token') || sessionStorage.getItem('admin-auth-token');
-
-// Mock data for traffic (as per user request to exclude)
-const trafficData = [
-  { day: 'Mon', visitors: 2400, pageViews: 4800 },
-  { day: 'Tue', visitors: 1398, pageViews: 3200 },
-  { day: 'Wed', visitors: 3800, pageViews: 7600 },
-  { day: 'Thu', visitors: 3908, pageViews: 7800 },
-  { day: 'Fri', visitors: 4800, pageViews: 9600 },
-  { day: 'Sat', visitors: 3800, pageViews: 7200 },
-  { day: 'Sun', visitors: 4300, pageViews: 8600 },
-];
-
-// Mock data for recent activity
-const recentActivity = [
-  { id: 1, user: 'Rahul Sharma', action: 'Enrolled in Kathak Fundamentals', time: '2 min ago', type: 'Registration' },
-  { id: 2, user: 'Priya Patel', action: 'Completed Contemporary Masterclass', time: '5 min ago', type: 'completion' },
-  { id: 3, user: 'Amit Singh', action: 'Purchased Elite Member Plan', time: '12 min ago', type: 'purchase' },
-  { id: 4, user: 'Anjali Gupta', action: 'Booked Private Session', time: '18 min ago', type: 'booking' },
-  { id: 5, user: 'Vikram Rao', action: 'Started new Program', time: '25 min ago', type: 'Registration' },
-];
 
 const chartConfig = {
   Registrations: { label: 'Registrations', color: 'hsl(var(--primary))' },
@@ -218,7 +196,7 @@ const ControlDashboardPage = () => {
           <div>
             <h1 className="font-display text-2xl tracking-tight text-foreground sm:text-3xl">Control Dashboard</h1>
             <p className="mt-1 text-muted-foreground">
-              Real-time analytics and platform insights
+              Students, payments, and registrations
             </p>
           </div>
           
@@ -271,17 +249,6 @@ const ControlDashboardPage = () => {
                 })}
               </SelectContent>
             </Select>
-
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="border-border">
-                <Download className="mr-2 h-4 w-4" />
-                PDF
-              </Button>
-              <Button variant="outline" size="sm" className="border-border">
-                <Download className="mr-2 h-4 w-4" />
-                Excel
-              </Button>
-            </div>
           </div>
         </div>
 
@@ -381,17 +348,12 @@ const ControlDashboardPage = () => {
         )}
 
         {/* Charts Row 1 */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className="grid gap-6">
           {/* Registration Trends */}
           <Card className="border-border bg-card p-6 animate-slide-up" style={{ animationDelay: '400ms' }}>
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-foreground">Registration Trends</h3>
-                <p className="text-sm text-muted-foreground">Monthly Registration & revenue</p>
-              </div>
-              <Badge variant="outline" className="border-primary/30 bg-primary/10 text-primary">
-                <TrendingUp className="mr-1 h-3 w-3" /> +18.3%
-              </Badge>
+            <div className="mb-4">
+              <h3 className="font-semibold text-foreground">Registration Trends</h3>
+              <p className="text-sm text-muted-foreground">Monthly Registration & revenue</p>
             </div>
             <ChartContainer config={chartConfig} className="h-[280px] w-full">
               <AreaChart data={RegistrationData}>
@@ -413,48 +375,6 @@ const ControlDashboardPage = () => {
                   strokeWidth={2}
                 />
               </AreaChart>
-            </ChartContainer>
-          </Card>
-
-          {/* Website Traffic */}
-          <Card className="border-border bg-card p-6 animate-slide-up" style={{ animationDelay: '500ms' }}>
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h3 className="font-semibold text-foreground">Website Traffic</h3>
-                <p className="text-sm text-muted-foreground">Daily visitors & page views</p>
-              </div>
-              <div className="flex gap-4 text-sm">
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-primary" />
-                  <span className="text-muted-foreground">Visitors</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-chart-2" />
-                  <span className="text-muted-foreground">Page Views</span>
-                </div>
-              </div>
-            </div>
-            <ChartContainer config={chartConfig} className="h-[280px] w-full">
-              <LineChart data={trafficData}>
-                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                <XAxis dataKey="day" className="text-muted-foreground" />
-                <YAxis className="text-muted-foreground" />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <Line 
-                  type="monotone" 
-                  dataKey="visitors" 
-                  stroke="hsl(var(--primary))" 
-                  strokeWidth={2}
-                  dot={{ fill: 'hsl(var(--primary))' }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="pageViews" 
-                  stroke="hsl(var(--chart-2))" 
-                  strokeWidth={2}
-                  dot={{ fill: 'hsl(var(--chart-2))' }}
-                />
-              </LineChart>
             </ChartContainer>
           </Card>
         </div>
@@ -517,42 +437,6 @@ const ControlDashboardPage = () => {
             </div>
           </Card>
         </div>
-
-        {/* Recent Activity */}
-        <Card className="border-border bg-card p-6 animate-slide-up" style={{ animationDelay: '800ms' }}>
-          <div className="mb-4 flex items-center justify-between">
-            <div>
-              <h3 className="font-semibold text-foreground">Real-time Activity</h3>
-              <p className="text-sm text-muted-foreground">Latest platform activities</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <Activity className="h-4 w-4 text-emerald-500 animate-pulse" />
-              <span className="text-sm text-emerald-500">Live</span>
-            </div>
-          </div>
-          <div className="space-y-4">
-            {recentActivity.map((activity) => (
-              <div 
-                key={activity.id} 
-                className="flex items-center justify-between rounded-lg border border-border bg-muted/30 p-3 transition-colors hover:bg-muted/50"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                    <Users className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-foreground">{activity.user}</p>
-                    <p className="text-sm text-muted-foreground">{activity.action}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                  <Clock className="h-3 w-3" />
-                  {activity.time}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
       </div>
     </AdminLayout>
   );

@@ -1,7 +1,11 @@
+import { extractYoutubeVideoId, toYoutubeWatchUrl } from "@/lib/youtube";
+
 export type HeroGridItem = { type: "video" | "image"; url: string };
 export type YoutubeShortItem = { vid: string; title: string; views?: string; likes?: string; delay?: number };
 export type InstagramPostItem = { vid: string; likes?: string; comments?: string; delay?: number; offset?: string };
 export type VideoTestimonialItem = { img: string; vid: string; id?: number };
+
+export { extractYoutubeVideoId, toYoutubeWatchUrl } from "@/lib/youtube";
 
 export const HERO_GRID_SLOTS = [
   "Top-left (1)",
@@ -27,43 +31,13 @@ export const DEFAULT_HERO_GRID: HeroGridItem[] = [
   { type: "video", url: "/hero.mp4" },
 ];
 
-/** Extract YouTube video id from watch, shorts, embed, youtu.be, or raw 11-char id */
-export function extractYoutubeVideoId(url: string): string | null {
-  const raw = (url || "").trim();
-  if (!raw) return null;
-  if (/^[a-zA-Z0-9_-]{11}$/.test(raw)) return raw;
-
-  const shorts = raw.match(/shorts\/([a-zA-Z0-9_-]{11})/);
-  if (shorts) return shorts[1];
-
-  const watch = raw.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
-  if (watch) return watch[1];
-
-  const embed = raw.match(/embed\/([a-zA-Z0-9_-]{11})/);
-  if (embed) return embed[1];
-
-  const shortLink = raw.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
-  if (shortLink) return shortLink[1];
-
-  return null;
-}
-
 /** Turn YouTube watch/shorts links into embed URLs; keep /uploads paths as-is */
 function normalizeVidForSave(vid: string): string {
   const t = (vid || "").trim();
   if (!t) return "";
 
-  const shorts = t.match(/shorts\/([a-zA-Z0-9_-]+)/);
-  if (shorts) return `https://www.youtube.com/embed/${shorts[1]}`;
-
-  const watch = t.match(/[?&]v=([a-zA-Z0-9_-]+)/);
-  if (watch) return `https://www.youtube.com/embed/${watch[1]}`;
-
-  const embed = t.match(/embed\/([a-zA-Z0-9_-]+)/);
-  if (embed) return `https://www.youtube.com/embed/${embed[1]}`;
-
-  const shortLink = t.match(/youtu\.be\/([a-zA-Z0-9_-]+)/);
-  if (shortLink) return `https://www.youtube.com/embed/${shortLink[1]}`;
+  const id = extractYoutubeVideoId(t);
+  if (id) return `https://www.youtube.com/embed/${id}`;
 
   if (t.startsWith("http://localhost:8096/uploads/")) {
     return t.replace("http://localhost:8096", "");
@@ -140,6 +114,28 @@ export function normalizeHomeContentForSave(content: Record<string, unknown>) {
   };
 }
 
+function displayYoutubeOrFile(vid: string): string {
+  return extractYoutubeVideoId(vid) ? toYoutubeWatchUrl(vid) : vid;
+}
+
+/** Load into the editor as pasteable YouTube links (not raw IDs). */
 export function normalizeHomeContentFromApi(content: Record<string, unknown>) {
-  return normalizeHomeContentForSave(content);
+  const saved = normalizeHomeContentForSave(content);
+  const shorts = (saved.youtubeShorts as YoutubeShortItem[]).map((item) => ({
+    ...item,
+    vid: displayYoutubeOrFile(item.vid || ""),
+  }));
+  const videoTestimonials = (saved.videoTestimonials as VideoTestimonialItem[]).map((item) => ({
+    ...item,
+    vid: displayYoutubeOrFile(item.vid || ""),
+  }));
+
+  return {
+    ...saved,
+    aboutYoutubeId: toYoutubeWatchUrl(String(saved.aboutYoutubeId || "")),
+    heroYoutubeId: toYoutubeWatchUrl(String(saved.heroYoutubeId || "")),
+    youtubeShorts: shorts,
+    highlightVideos: shorts,
+    videoTestimonials,
+  };
 }

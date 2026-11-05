@@ -5,12 +5,15 @@ import SiteLogo from "../common/SiteLogo";
 import LazyImage from "../common/LazyImage";
 import ServicesMegaMenu from "./ServicesMegaMenu";
 import { useSiteData } from "../../contexts/SiteDataContext";
+import { useEnquiryPopup } from "../../contexts/EnquiryPopupContext";
+import { isContactHref } from "../../lib/trialEnquiry";
 import {
   DEFAULT_SERVICES,
   HOME_SERVICE_IMAGE_BY_KEY,
   isExcludedService,
 } from "../../lib/defaultServices";
 import { getLocalizedValue } from "../../utils/contentHelper";
+import { optimizeCloudinaryImage } from "../../utils/mediaUrl";
 import "../../styles/header.css";
 
 const HOME_SERVICE_IMAGES = {
@@ -36,7 +39,7 @@ const resolveHomeServiceImage = (
       cms.includes("/uploads/")) &&
     !cms.includes("/svc-")
   ) {
-    return cms;
+    return optimizeCloudinaryImage(cms, 480);
   }
 
   const key = (opts.key || "").toLowerCase();
@@ -69,6 +72,7 @@ const Header: React.FC = () => {
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isMobileServicesOpen, setIsMobileServicesOpen] = useState(false);
   const { cmsSettings: settings, servicesCms } = useSiteData();
+  const { openEnquiry } = useEnquiryPopup();
   const servicesRef = useRef<HTMLLIElement>(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -276,6 +280,20 @@ const Header: React.FC = () => {
                 );
               }
 
+              if (isContactHref(link.path, link.name)) {
+                return (
+                  <li key={link.name}>
+                    <button
+                      type="button"
+                      className={`nav-link ${isNavActive(link.path) ? "active" : ""}`}
+                      onClick={() => openEnquiry({ purpose: "contact" })}
+                    >
+                      {link.name}
+                    </button>
+                  </li>
+                );
+              }
+
               return (
                 <li key={link.name}>
                   <Link
@@ -380,6 +398,22 @@ const Header: React.FC = () => {
                   >
                     {link.name}
                   </a>
+                );
+              }
+
+              if (isContactHref(link.path, link.name)) {
+                return (
+                  <button
+                    key={link.name}
+                    type="button"
+                    className={`nav-link ${isNavActive(link.path) ? "active" : ""}`}
+                    onClick={() => {
+                      closeMobile();
+                      openEnquiry({ purpose: "contact" });
+                    }}
+                  >
+                    {link.name}
+                  </button>
                 );
               }
 

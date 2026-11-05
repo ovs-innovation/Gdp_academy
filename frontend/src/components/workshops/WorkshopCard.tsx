@@ -1,8 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import ShareActions from '../common/ShareActions';
 import LazyImage from '../common/LazyImage';
+import { useEnquiryPopup } from '../../contexts/EnquiryPopupContext';
+import { programFromLabel } from '../../lib/trialEnquiry';
 
 export interface WorkshopItem {
   _id?: string;
@@ -72,6 +73,7 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
   index = 0,
   variant = 'default',
 }) => {
+  const { openEnquiry } = useEnquiryPopup();
   const title =
     typeof workshop.name === 'string'
       ? workshop.name
@@ -103,6 +105,13 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
     typeof workshop.description === 'string'
       ? workshop.description
       : workshop.description?.en || 'Join this live session with GDP mentors.';
+  const bookWorkshop = () => {
+    openEnquiry({
+      purpose: 'service',
+      topic: title,
+      program: programFromLabel(title, style),
+    });
+  };
 
   if (variant === 'cw') {
     return (
@@ -133,12 +142,9 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
             <span>{date}</span>
             <span>{time}</span>
           </div>
-          <Link
-            to={`/contact?source=workshop&workshop=${encodeURIComponent(title)}`}
-            className="wsh-cw-card__btn"
-          >
+          <button type="button" className="wsh-cw-card__btn" onClick={bookWorkshop}>
             Book Now
-          </Link>
+          </button>
         </div>
       </motion.article>
     );
@@ -186,12 +192,9 @@ const WorkshopCard: React.FC<WorkshopCardProps> = ({
         </div>
 
         <div className="wsh-event-card__actions">
-          <Link
-            to={`/contact?source=workshop&workshop=${encodeURIComponent(title)}`}
-            className="wsh-event-card__btn"
-          >
+          <button type="button" className="wsh-event-card__btn" onClick={bookWorkshop}>
             Book Your Spot
-          </Link>
+          </button>
           {workshop.zoomLink && (
             <a
               href={workshop.zoomLink}

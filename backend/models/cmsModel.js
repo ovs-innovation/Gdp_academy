@@ -71,6 +71,8 @@ const cmsSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
+cmsSchema.index({ section: 1, isActive: 1 });
+
 cmsSchema.pre("save", function (next) {
   if (typeof this.title === "string") {
     this.title = { en: this.title };

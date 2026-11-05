@@ -2,17 +2,18 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Layout from '../components/layout/Layout';
-import { getFAQs, getPageContentBySlug, type CMSContent } from '../services/cmsService';
+import { type CMSContent } from '../services/cmsService';
 import { useSiteData } from '../contexts/SiteDataContext';
-import { submitEnquiry } from '../services/enquiryService';
-import { getFeaturedTestimonials, type Testimonial } from '../services/testimonialService';
+import { type Testimonial } from '../services/testimonialService';
 import { getLocalizedValue } from '../utils/contentHelper';
 
 import LazyImage from '../components/common/LazyImage';
 import LazySection from '../components/common/LazySection';
-import FormResultModal, { type FormResultType } from '../components/common/FormResultModal';
+import { useEnquiryPopup } from '../contexts/EnquiryPopupContext';
+import { programFromLabel } from '../lib/trialEnquiry';
 import Hero from '../components/homes/home-one/Hero';
 import YouTubeShortsSection from '../components/home/YouTubeShortsSection';
+import MediaPlayButton from '../components/home/MediaPlayButton';
 import InstagramReelsSection from '../components/home/InstagramReelsSection';
 import ReviewsSection from '../components/home/ReviewsSection';
 import { useScrollToHash } from '../hooks/useScrollToHash';
@@ -24,7 +25,6 @@ import {
   HomeServicesSkeleton,
 } from '../components/home/HomeSkeletons';
 
-import { invalidateCache } from '../lib/apiCache';
 import {
   DEFAULT_YOUTUBE_CHANNEL_URL,
   resolveYoutubeChannelUrl,
@@ -32,17 +32,9 @@ import {
 import SEO from '../components/SEO';
 import '../styles/home.css';
 import { normalizeHomeContent, mergeMediaList } from '../lib/homeCms';
-import { resolvePublicMediaUrl, extractYoutubeVideoId } from '../utils/mediaUrl';
+import { resolvePublicMediaUrl, extractYoutubeVideoId, optimizeCloudinaryImage } from '../utils/mediaUrl';
 import { DEFAULT_SERVICES, HOME_SERVICE_IMAGE_BY_KEY, isExcludedService } from '../lib/defaultServices';
 import { getServiceIcon } from '../components/home/ServiceIcons';
-import {
-  type EnquiryField,
-  type EnquiryFieldErrors,
-  hasEnquiryErrors,
-  validateEnquiryField,
-  validateEnquiryForm,
-  sanitizeEnquiryField,
-} from '../utils/enquiryValidation';
 
 interface HomeContent {
   aboutShortTitle: string;
@@ -104,7 +96,6 @@ const DEFAULT_VIDEO_TESTIMONIALS = [
 ];
 
 const DEFAULT_ABOUT_YOUTUBE_ID = 'J-yM5y4Kd04';
-const DEFAULT_HERO_YOUTUBE_ID = '1phsCpxcBZU';
 
 const DEFAULT_TESTIMONIALS_SUBTITLE =
   'Real stories from students, couples & performers who learned, celebrated & grew with GDP.';
@@ -160,9 +151,12 @@ const resolveHomeServiceImage = (
       cms.startsWith('/uploads/') ||
       (cms.startsWith('/') && !cms.includes('/svc-'))
     ) {
-      return cms.startsWith('http') || cms.includes('cloudinary')
-        ? cms
-        : resolvePublicMediaUrl(cms) || cms;
+      return optimizeCloudinaryImage(
+        cms.startsWith('http') || cms.includes('cloudinary')
+          ? cms
+          : resolvePublicMediaUrl(cms) || cms,
+        480,
+      );
     }
   }
 
@@ -229,16 +223,21 @@ const buildHomeServices = (
 
 const Home: React.FC = () => {
   useScrollToHash();
-  const { appSettings: settings, servicesCms, ready: siteDataReady } = useSiteData();
+  const {
+    appSettings: settings,
+    servicesCms,
+    ready: siteDataReady,
+    homePage,
+    faqs: homepageFaqs,
+    testimonials: homepageTestimonials,
+  } = useSiteData();
+  const { openEnquiry } = useEnquiryPopup();
   const [homeContent, setHomeContent] = useState<any>(DEFAULT_HOME_CONTENT);
   const [cmsServices, setCmsServices] = useState<CMSContent[]>([]);
   const [selectedService, setSelectedService] = useState<any>(null);
   const [faqs, setFaqs] = useState<any[]>([]);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(0);
   const [featuredTestimonials, setFeaturedTestimonials] = useState<Testimonial[]>([]);
-  const [enquiryForm, setEnquiryForm] = useState({ name: '', phone: '', email: '', message: '', whatsappConsent: false });
-  const [enquiryErrors, setEnquiryErrors] = useState<EnquiryFieldErrors>({});
-  const [isEnquirySubmitting, setIsEnquirySubmitting] = useState(false);
   const [sectionReady, setSectionReady] = useState({
     home: false,
     settings: true,
@@ -246,19 +245,8 @@ const Home: React.FC = () => {
     faqs: true,
     testimonials: true,
   });
-  const [formModal, setFormModal] = useState<{
-    open: boolean;
-    type: FormResultType;
-    title: string;
-    message: string;
-  }>({ open: false, type: 'success', title: '', message: '' });
-
   // Track the currently active playing video (YouTube short or Instagram reel)
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
-
-  const showFormModal = (type: FormResultType, title: string, message: string) => {
-    setFormModal({ open: true, type, title, message });
-  };
 
   const homeCopyReady = sectionReady.home && sectionReady.settings;
 
@@ -278,159 +266,25 @@ const Home: React.FC = () => {
   }, [servicesCms, siteDataReady]);
 
   useEffect(() => {
-    // Bust in-memory API cache on every mount so DB changes always load fresh
-    invalidateCache();
+    if (!siteDataReady) return;
 
-    getFeaturedTestimonials(6)
-      .then((data) => {
-        if (data && data.length > 0) {
-          setFeaturedTestimonials(data);
-        }
-      })
-      .catch(() => {})
-      .finally(() => setSectionReady((s) => ({ ...s, testimonials: true })));
-
-    getPageContentBySlug('home')
-      .then((page) => {
-        if (page && page.content) {
-          setHomeContent(normalizeHomeContent(page.content));
-        }
-      })
-      .catch(() => setHomeContent(DEFAULT_HOME_CONTENT))
-      .finally(() => setSectionReady((s) => ({ ...s, home: true })));
-
-    getFAQs()
-      .then((data) => {
-        if (data && data.length > 0) {
-          setFaqs(data);
-        } else {
-          setFaqs(DEFAULT_FAQS);
-        }
-      })
-      .catch(() => setFaqs(DEFAULT_FAQS))
-      .finally(() => setSectionReady((s) => ({ ...s, faqs: true })));
-  }, []);
-
-  const handleEnquiryChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type } = e.target;
-    const checked = type === 'checkbox' && 'checked' in e.target ? e.target.checked : false;
-    const fieldName = name as EnquiryField | 'whatsappConsent';
-
-    if (fieldName === 'whatsappConsent') {
-      setEnquiryForm((prev) => ({ ...prev, whatsappConsent: checked }));
-      return;
+    if (homePage?.content) {
+      setHomeContent(normalizeHomeContent(homePage.content));
+    } else {
+      setHomeContent(DEFAULT_HOME_CONTENT);
     }
 
-    const sanitized = sanitizeEnquiryField(fieldName, value);
-    setEnquiryForm((prev) => ({
-      ...prev,
-      [name]: sanitized,
+    setFaqs(homepageFaqs.length > 0 ? homepageFaqs : DEFAULT_FAQS);
+    setFeaturedTestimonials(homepageTestimonials);
+    setSectionReady((s) => ({
+      ...s,
+      home: true,
+      settings: true,
+      services: true,
+      faqs: true,
+      testimonials: true,
     }));
-
-    setEnquiryErrors((prev) => {
-      if (!prev[fieldName]) return prev;
-      const next = { ...prev };
-      delete next[fieldName];
-      return next;
-    });
-  };
-
-  const handleEnquiryBlur = (
-    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
-    requireMessage = false,
-  ) => {
-    const field = e.target.name as EnquiryField;
-    const error = validateEnquiryField(field, e.target.value, { requireMessage });
-    setEnquiryErrors((prev) => {
-      const next = { ...prev };
-      if (error) next[field] = error;
-      else delete next[field];
-      return next;
-    });
-  };
-
-  const handleCatchUpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const errors = validateEnquiryForm(enquiryForm);
-    if (hasEnquiryErrors(errors)) {
-      setEnquiryErrors(errors);
-      showFormModal('error', 'Almost there', 'Please fix the highlighted fields and try again.');
-      return;
-    }
-
-    setIsEnquirySubmitting(true);
-    try {
-      await submitEnquiry({
-        name: enquiryForm.name.trim(),
-        phone: enquiryForm.phone.trim(),
-        email: enquiryForm.email.trim(),
-        message:
-          enquiryForm.message?.trim() ||
-          `Homepage Let's Catch up enquiry. WhatsApp consent: ${enquiryForm.whatsappConsent ? 'Yes' : 'No'}`,
-        subject: "Homepage Let's Catch up",
-        whatsappConsent: enquiryForm.whatsappConsent,
-        source: 'contact_form',
-      });
-      setEnquiryForm({ name: '', phone: '', email: '', message: '', whatsappConsent: false });
-      setEnquiryErrors({});
-      showFormModal(
-        'success',
-        'Message sent!',
-        'Thank you for reaching out. Our team will contact you within 24–48 hours.',
-      );
-    } catch (err: any) {
-      showFormModal('error', 'Could not send', err.message || 'Something went wrong. Please try again.');
-    } finally {
-      setIsEnquirySubmitting(false);
-    }
-  };
-
-  const handleServiceEnquirySubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedService) return;
-
-    const errors = validateEnquiryForm(enquiryForm, { requireMessage: true });
-    if (hasEnquiryErrors(errors)) {
-      setEnquiryErrors(errors);
-      showFormModal('error', 'Almost there', 'Please fill in all required fields correctly.');
-      return;
-    }
-
-    setIsEnquirySubmitting(true);
-    try {
-      await submitEnquiry({
-        name: enquiryForm.name.trim(),
-        phone: enquiryForm.phone.trim(),
-        email: enquiryForm.email.trim(),
-        message:
-          enquiryForm.message?.trim() ||
-          `Enquiry about ${selectedService.title} from homepage services section`,
-        subject: `Service enquiry: ${selectedService.title}`,
-        whatsappConsent: enquiryForm.whatsappConsent,
-        source: 'general',
-      });
-      setEnquiryForm({ name: '', phone: '', email: '', message: '', whatsappConsent: false });
-      setEnquiryErrors({});
-      setSelectedService(null);
-      showFormModal(
-        'success',
-        'Enquiry sent!',
-        'We received your details and will get back to you soon.',
-      );
-    } catch (err: any) {
-      showFormModal('error', 'Could not send', err.message || 'Something went wrong. Please try again.');
-    } finally {
-      setIsEnquirySubmitting(false);
-    }
-  };
-
-  const renderEnquiryFieldError = (field: EnquiryField) =>
-    enquiryErrors[field] ? (
-      <p className="enquiry-field-error" role="alert">
-        {enquiryErrors[field]}
-      </p>
-    ) : null;
+  }, [siteDataReady, homePage, homepageFaqs, homepageTestimonials]);
 
   const defaultServices = DEFAULT_SERVICES.map((service, index) => ({
     _id: service._id,
@@ -468,10 +322,6 @@ const Home: React.FC = () => {
     extractYoutubeVideoId(homeContent.aboutYoutubeId || '') ||
     homeContent.aboutYoutubeId ||
     DEFAULT_ABOUT_YOUTUBE_ID;
-  const heroYoutubeId =
-    extractYoutubeVideoId(homeContent.heroYoutubeId || '') ||
-    homeContent.heroYoutubeId ||
-    DEFAULT_HERO_YOUTUBE_ID;
 
   const videoTestimonials = homeCopyReady
     ? homeContent.videoTestimonials?.length > 0
@@ -507,8 +357,12 @@ const Home: React.FC = () => {
     : [];
 
   const [isMuted, setIsMuted] = useState(true);
-  const [aboutSectionVisible, setAboutSectionVisible] = useState(false);
-  const playerRef = useRef<any>(null);
+  const [aboutPlaying, setAboutPlaying] = useState(false);
+  const [aboutPosterFailed, setAboutPosterFailed] = useState(false);
+  const aboutFrameRef = useRef<HTMLIFrameElement>(null);
+  const aboutPoster = aboutPosterFailed
+    ? `https://i.ytimg.com/vi/${aboutYoutubeId}/hqdefault.jpg`
+    : `https://i.ytimg.com/vi/${aboutYoutubeId}/maxresdefault.jpg`;
 
   // WhatsApp float: only visible between services section and catch-up section
   const [showWhatsApp, setShowWhatsApp] = useState(false);
@@ -534,98 +388,20 @@ const Home: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (!homeCopyReady) return;
-
-    // Load YouTube API
-    if (!(window as any).YT) {
-      const tag = document.createElement('script');
-      tag.src = "https://www.youtube.com/iframe_api";
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
-    }
-
-    const initPlayer = () => {
-      // About Player — only when section scrolls into view
-      if (
-        aboutSectionVisible &&
-        document.getElementById('about-video-player') &&
-        !(document.getElementById('about-video-player') as HTMLElement)?.dataset?.ytReady
-      ) {
-        new (window as any).YT.Player('about-video-player', {
-          videoId: aboutYoutubeId,
-          playerVars: {
-            autoplay: 1,
-            mute: 1,
-            controls: 0,
-            loop: 1,
-            playlist: aboutYoutubeId,
-            modestbranding: 1,
-            rel: 0,
-            showinfo: 0,
-            iv_load_policy: 3,
-            origin: window.location.origin,
-            vq: 'hd1080'
-          },
-          events: {
-            onReady: (event: any) => {
-              const el = document.getElementById('about-video-player');
-              if (el) el.dataset.ytReady = '1';
-              playerRef.current = event.target;
-              event.target.playVideo();
-            }
-          }
-        });
-      }
-
-      // Hero Player
-      if (document.getElementById('hero-video-player') && !(document.getElementById('hero-video-player') as HTMLElement)?.dataset?.ytReady) {
-        new (window as any).YT.Player('hero-video-player', {
-          videoId: heroYoutubeId,
-          playerVars: {
-            autoplay: 1,
-            mute: 1,
-            controls: 0,
-            loop: 1,
-            playlist: heroYoutubeId,
-            modestbranding: 1,
-            rel: 0,
-            showinfo: 0,
-            iv_load_policy: 3,
-            origin: window.location.origin,
-            vq: 'hd1080'
-          },
-          events: {
-            onReady: (event: any) => {
-              const el = document.getElementById('hero-video-player');
-              if (el) el.dataset.ytReady = '1';
-              event.target.playVideo();
-              setInterval(() => {
-                if (event.target.getCurrentTime() >= 42) {
-                  event.target.seekTo(0);
-                }
-              }, 200);
-            }
-          }
-        });
-      }
-    };
-
-    (window as any).onYouTubeIframeAPIReady = initPlayer;
-
-    if ((window as any).YT && (window as any).YT.Player) {
-      initPlayer();
-    }
-  }, [homeCopyReady, aboutYoutubeId, heroYoutubeId, aboutSectionVisible]);
+    setAboutPosterFailed(false);
+    setAboutPlaying(false);
+    setIsMuted(true);
+  }, [aboutYoutubeId]);
 
   const toggleMute = () => {
-    if (playerRef.current) {
-      if (isMuted) {
-        playerRef.current.unMute();
-      } else {
-        playerRef.current.mute();
-      }
-      setIsMuted(!isMuted);
-    }
+    const frame = aboutFrameRef.current?.contentWindow;
+    if (!frame) return;
+    const nextMuted = !isMuted;
+    frame.postMessage(
+      JSON.stringify({ event: 'command', func: nextMuted ? 'mute' : 'unMute', args: [] }),
+      '*',
+    );
+    setIsMuted(nextMuted);
   };
 
   return (
@@ -768,76 +544,18 @@ const Home: React.FC = () => {
                 <div className="modal-right">
                   <div className="contact-form-box">
                     <h3>Let us reach you!</h3>
-                    <form className="modal-form" onSubmit={handleServiceEnquirySubmit} noValidate>
-                      <div className="input-group">
-                        <input
-                          type="text"
-                          name="name"
-                          placeholder="Full Name"
-                          value={enquiryForm.name}
-                          onChange={handleEnquiryChange}
-                          onBlur={(e) => handleEnquiryBlur(e, true)}
-                          className={enquiryErrors.name ? 'has-error' : ''}
-                          maxLength={60}
-                          autoComplete="name"
-                        />
-                        {renderEnquiryFieldError('name')}
-                      </div>
-                      <div className="input-group">
-                        <input
-                          type="tel"
-                          name="phone"
-                          inputMode="numeric"
-                          placeholder="10-digit mobile number"
-                          value={enquiryForm.phone}
-                          onChange={handleEnquiryChange}
-                          onBlur={(e) => handleEnquiryBlur(e, true)}
-                          className={enquiryErrors.phone ? 'has-error' : ''}
-                          maxLength={10}
-                          autoComplete="tel"
-                        />
-                        {renderEnquiryFieldError('phone')}
-                      </div>
-                      <div className="input-group">
-                        <input
-                          type="email"
-                          name="email"
-                          placeholder="Email ID"
-                          value={enquiryForm.email}
-                          onChange={handleEnquiryChange}
-                          onBlur={(e) => handleEnquiryBlur(e, true)}
-                          className={enquiryErrors.email ? 'has-error' : ''}
-                          maxLength={100}
-                          autoComplete="email"
-                        />
-                        {renderEnquiryFieldError('email')}
-                      </div>
-                      <div className="input-group">
-                        <textarea
-                          name="message"
-                          placeholder="Your Message"
-                          value={enquiryForm.message}
-                          onChange={handleEnquiryChange}
-                          onBlur={(e) => handleEnquiryBlur(e, true)}
-                          className={enquiryErrors.message ? 'has-error' : ''}
-                          maxLength={500}
-                        />
-                        {renderEnquiryFieldError('message')}
-                      </div>
-                      <div className="checkbox-group">
-                        <input
-                          type="checkbox"
-                          id="wa-consent-modal"
-                          name="whatsappConsent"
-                          checked={enquiryForm.whatsappConsent}
-                          onChange={handleEnquiryChange}
-                        />
-                        <label htmlFor="wa-consent-modal">agree to receive messages on WhatsApp</label>
-                      </div>
-                      <button type="submit" className="primary-btn submit-modal-btn" disabled={isEnquirySubmitting}>
-                        {isEnquirySubmitting ? 'Sending…' : 'Send details'}
-                      </button>
-                    </form>
+                    <p>Same trial form, already set for {selectedService.title}.</p>
+                    <button
+                      type="button"
+                      className="primary-btn submit-modal-btn"
+                      onClick={() => openEnquiry({
+                        purpose: 'trial',
+                        program: programFromLabel(selectedService.key, selectedService.title),
+                        topic: selectedService.title,
+                      })}
+                    >
+                      Book a free trial
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -860,16 +578,73 @@ const Home: React.FC = () => {
       </LazySection>
 
       {/* 3. About Section */}
-      <LazySection minHeight={480} rootMargin="400px" onVisible={() => setAboutSectionVisible(true)}>
+      <LazySection minHeight={480} rootMargin="400px">
       <section className="about-section section-padding">
         <div className="container">
           <div className="about-content-wrapper">
             <div className="about-image-container animate-fade-in" style={{ position: 'relative', aspectRatio: '16/9', background: '#000' }}>
-              <div id="about-video-player" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}></div>
-              
+              {aboutPlaying ? (
+                <iframe
+                  ref={aboutFrameRef}
+                  title="About studio video"
+                  src={`https://www.youtube-nocookie.com/embed/${aboutYoutubeId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${encodeURIComponent(aboutYoutubeId)}&modestbranding=1&rel=0&playsinline=1&enablejsapi=1`}
+                  style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
+                  allow="autoplay; encrypted-media; picture-in-picture"
+                  allowFullScreen
+                />
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setAboutPlaying(true)}
+                  aria-label="Play about video"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    border: 'none',
+                    padding: 0,
+                    background: 'transparent',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <img
+                    src={aboutPoster}
+                    alt=""
+                    onError={() => {
+                      if (!aboutPosterFailed) setAboutPosterFailed(true);
+                    }}
+                    onLoad={(event) => {
+                      if (!aboutPosterFailed && event.currentTarget.naturalWidth < 200) {
+                        setAboutPosterFailed(true);
+                      }
+                    }}
+                    style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                  />
+                  <span
+                    style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: 64,
+                      height: 64,
+                      borderRadius: '50%',
+                      background: 'rgba(99, 75, 250, 0.75)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      color: '#fff',
+                    }}
+                  >
+                    <MediaPlayButton size="md" />
+                  </span>
+                </button>
+              )}
+
+              {aboutPlaying && (
               <button 
                 onClick={toggleMute}
                 className="mute-toggle-btn"
+                aria-label={isMuted ? 'Unmute video' : 'Mute video'}
                 style={{
                   position: 'absolute',
                   bottom: '20px',
@@ -892,6 +667,7 @@ const Home: React.FC = () => {
               >
                 {isMuted ? '🔇' : '🔊'}
               </button>
+              )}
             </div>
             <div className="about-text">
               {!homeCopyReady ? (
@@ -1083,61 +859,14 @@ const Home: React.FC = () => {
             >
               <div className="contact-v3-form-glow" aria-hidden="true" />
               <h3>{homeCopyReady ? (homeContent.contactFormTitle || 'Or let us reach you!') : '…'}</h3>
-              <form className="contact-v3-form" onSubmit={handleCatchUpSubmit} noValidate>
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Full Name"
-                  className={`contact-v3-input${enquiryErrors.name ? ' has-error' : ''}`}
-                  value={enquiryForm.name}
-                  onChange={handleEnquiryChange}
-                  onBlur={(e) => handleEnquiryBlur(e)}
-                  maxLength={60}
-                  autoComplete="name"
-                />
-                {renderEnquiryFieldError('name')}
-                <input
-                  type="tel"
-                  name="phone"
-                  inputMode="numeric"
-                  placeholder="10-digit mobile number"
-                  className={`contact-v3-input${enquiryErrors.phone ? ' has-error' : ''}`}
-                  value={enquiryForm.phone}
-                  onChange={handleEnquiryChange}
-                  onBlur={(e) => handleEnquiryBlur(e)}
-                  maxLength={10}
-                  autoComplete="tel"
-                />
-                {renderEnquiryFieldError('phone')}
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email ID"
-                  className={`contact-v3-input${enquiryErrors.email ? ' has-error' : ''}`}
-                  value={enquiryForm.email}
-                  onChange={handleEnquiryChange}
-                  onBlur={(e) => handleEnquiryBlur(e)}
-                  maxLength={100}
-                  autoComplete="email"
-                />
-                {renderEnquiryFieldError('email')}
-                <div className="contact-v3-checkbox">
-                  <input
-                    type="checkbox"
-                    id="wa-consent-home"
-                    name="whatsappConsent"
-                    checked={enquiryForm.whatsappConsent}
-                    onChange={handleEnquiryChange}
-                  />
-                  <label htmlFor="wa-consent-home">
-                    I agree to receive messages on WhatsApp.{' '}
-                    <Link to="/terms" className="contact-v3-terms">Terms &amp; Conditions</Link>
-                  </label>
-                </div>
-                <button type="submit" className="contact-v3-submit" disabled={isEnquirySubmitting}>
-                  {isEnquirySubmitting ? 'Sending…' : 'Send details'}
-                </button>
-              </form>
+              <p className="contact-v3-desc">Name, WhatsApp, program, and city. That's it.</p>
+              <button
+                type="button"
+                className="contact-v3-submit"
+                onClick={() => openEnquiry({ purpose: 'contact', topic: "Let's catch up" })}
+              >
+                Open the form
+              </button>
             </motion.div>
           </div>
         </div>
@@ -1175,13 +904,6 @@ const Home: React.FC = () => {
         </a>
       )}
 
-      <FormResultModal
-        open={formModal.open}
-        type={formModal.type}
-        title={formModal.title}
-        message={formModal.message}
-        onClose={() => setFormModal((m) => ({ ...m, open: false }))}
-      />
     </Layout>
   );
 };

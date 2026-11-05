@@ -72,6 +72,7 @@ const updateSiteSettings = async (req, res, next) => {
       await settings.save();
     }
     invalidatePublicCache("site-settings");
+    invalidatePublicCache("homepage");
     await syncContactPageFromSiteSettings(settings);
     res.json({ message: "Site settings updated", settings: toClientSettings(settings) });
   } catch (err) {

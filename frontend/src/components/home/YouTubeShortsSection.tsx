@@ -95,14 +95,14 @@ const YouTubeShortsSection: React.FC<Props> = ({
                 }
 
                 if (ytId) {
-                  const isPlaying = activeVideoId === ytId;
+                  const cardId = `yt-${index}-${ytId}`;
                   return (
                     <YTShortCard
                       ytId={ytId}
                       title={s.title}
                       views={s.views}
-                      isPlaying={isPlaying}
-                      onPlay={() => setActiveVideoId(ytId)}
+                      isPlaying={activeVideoId === cardId}
+                      onPlay={() => setActiveVideoId(cardId)}
                     />
                   );
                 }

@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import LazyImage from '../common/LazyImage';
+import { useEnquiryPopup } from '../../contexts/EnquiryPopupContext';
+import { intentFromContactUrl } from '../../lib/trialEnquiry';
 import type { WorkshopsPageContent } from '../../lib/workshopsPageCms';
 
 type Props = {
@@ -46,6 +48,8 @@ function useOfferCountdown(endIso: string, enabled: boolean) {
 }
 
 const WorkshopsLanding: React.FC<Props> = ({ content }) => {
+  const { openEnquiry } = useEnquiryPopup();
+  const featuredIntent = intentFromContactUrl(content.ctaLink, content.featuredTitle);
   const [descOpen, setDescOpen] = useState(false);
   const countdownLabel = useOfferCountdown(content.countdownEnd, content.showCountdown);
 
@@ -126,9 +130,15 @@ const WorkshopsLanding: React.FC<Props> = ({ content }) => {
                     <span className="wsh-price-old">{content.featuredOriginalPrice}</span>
                   )}
                 </div>
-                <Link to={content.ctaLink} className="prog-btn-glow wsh-cta">
-                  {content.ctaText}
-                </Link>
+                {featuredIntent ? (
+                  <button type="button" className="prog-btn-glow wsh-cta" onClick={() => openEnquiry(featuredIntent)}>
+                    {content.ctaText}
+                  </button>
+                ) : (
+                  <Link to={content.ctaLink} className="prog-btn-glow wsh-cta">
+                    {content.ctaText}
+                  </Link>
+                )}
               </div>
 
               <div className="wsh-proof">
@@ -232,9 +242,15 @@ const WorkshopsLanding: React.FC<Props> = ({ content }) => {
               <span>{content.featuredOriginalPrice}</span>
             )}
           </div>
-          <Link to={content.ctaLink} className="prog-btn-glow">
-            {content.ctaText}
-          </Link>
+          {featuredIntent ? (
+            <button type="button" className="prog-btn-glow" onClick={() => openEnquiry(featuredIntent)}>
+              {content.ctaText}
+            </button>
+          ) : (
+            <Link to={content.ctaLink} className="prog-btn-glow">
+              {content.ctaText}
+            </Link>
+          )}
         </div>
       </div>
     </div>

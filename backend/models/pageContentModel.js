@@ -51,4 +51,6 @@ const pageContentSchema = new mongoose.Schema(
   },
 );
 
+pageContentSchema.index({ slug: 1, status: 1 });
+
 module.exports = mongoose.model("PageContent", pageContentSchema);

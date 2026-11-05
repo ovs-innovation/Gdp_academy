@@ -55,7 +55,7 @@ const BookingModal = ({ teacher, programId, isOpen, onClose, onConfirm }: Bookin
       endDate.setDate(endDate.getDate() + 30);
       const tz = tzOverride || studentTimezone;
 
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.garimadanceproductions.com/api';
       const response = await fetch(
         `${API_BASE_URL}/public/courses/availability?courseId=${programId}&teacherId=${teacherId}&startDate=${startDate.toISOString()}&endDate=${endDate.toISOString()}&studentTimezone=${encodeURIComponent(tz)}`
       );

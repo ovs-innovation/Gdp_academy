@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import Layout from '../components/layout/Layout';
+import { useEnquiryPopup } from '../contexts/EnquiryPopupContext';
+import { intentFromContactUrl, programFromLabel } from '../lib/trialEnquiry';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { fetchPrograms, type Program } from '../services/programService';
@@ -138,6 +140,7 @@ const formatPrice = (program: Program) => {
 };
 
 const Programs: React.FC = () => {
+  const { openEnquiry } = useEnquiryPopup();
   const { content: pageContent, loaded } = usePageContent('programs');
   const [programs, setPrograms] = useState<Program[]>(fallbackPrograms);
   const heroLines = renderMultiLineHeroTitle(pageContent, ['LEARN.', 'PERFORM.', 'EVOLVE.']);
@@ -243,7 +246,17 @@ const Programs: React.FC = () => {
 
             <div className="prog-hero-actions">
               <a href={ctaPrimaryUrl} className="prog-btn-glow">{ctaPrimary}</a>
-              <Link to={ctaSecondaryUrl} className="prog-btn-outline">{ctaSecondary}</Link>
+              {intentFromContactUrl(ctaSecondaryUrl, 'Programs') ? (
+                <button
+                  type="button"
+                  className="prog-btn-outline"
+                  onClick={() => openEnquiry(intentFromContactUrl(ctaSecondaryUrl, 'Programs')!)}
+                >
+                  {ctaSecondary}
+                </button>
+              ) : (
+                <Link to={ctaSecondaryUrl} className="prog-btn-outline">{ctaSecondary}</Link>
+              )}
             </div>
 
             <div className="prog-hero-stats">
@@ -296,8 +309,6 @@ const Programs: React.FC = () => {
               const title = getText(program.name);
               const description = getText(program.description);
               const style = program.danceStyle || program.DanceStyle || program.category || 'General';
-              const href = `/contact?source=program&program=${encodeURIComponent(title)}`;
-
               return (
                 <motion.article
                   key={program._id || title}
@@ -330,7 +341,17 @@ const Programs: React.FC = () => {
                       <span>{program.recordedClasses?.length || 6}+ sessions</span>
                     </div>
                     <div className="program-footer">
-                      <Link to={href} className="primary-btn">Enquire Now</Link>
+                      <button
+                        type="button"
+                        className="primary-btn"
+                        onClick={() => openEnquiry({
+                          purpose: 'service',
+                          topic: title,
+                          program: programFromLabel(title, style),
+                        })}
+                      >
+                        Enquire Now
+                      </button>
                       <ShareActions
                         title={title}
                         text={`I want to join ${title} at GDP Studio`}
@@ -348,7 +369,7 @@ const Programs: React.FC = () => {
             <div className="programs-empty">
               <h3>No matching programs found</h3>
               <p>Try another dance style or send us a custom choreography request.</p>
-              <Link to="/contact" className="primary-btn">Contact GDP Studio</Link>
+              <button type="button" className="primary-btn" onClick={() => openEnquiry({ purpose: 'contact', topic: 'a custom program' })}>Contact GDP Studio</button>
             </div>
           )}
         </div>

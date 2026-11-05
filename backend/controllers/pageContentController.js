@@ -13,6 +13,7 @@ const PAGE_CONTENT_CACHE_TTL_MS = 5_000;
 
 function bustPageCache(slug) {
   if (slug) invalidatePublicCache(`page:${slug}`);
+  invalidatePublicCache("homepage");
 }
 
 // Create page content (admin only)

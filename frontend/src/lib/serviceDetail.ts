@@ -1,6 +1,6 @@
 import type { CMSContent } from "../services/cmsService";
 import { getLocalizedValue } from "../utils/contentHelper";
-import { resolvePublicMediaUrl } from "../utils/mediaUrl";
+import { resolvePublicMediaUrl, extractYoutubeVideoId, optimizeCloudinaryImage } from "../utils/mediaUrl";
 import { SERVICE_DATA } from "./serviceDetailData";
 import {
   getServiceCategory,
@@ -44,14 +44,23 @@ function resolveServiceImage(cms: CMSContent): string {
     raw.startsWith("/uploads/") ||
     raw.startsWith("/")
   ) {
-    return resolvePublicMediaUrl(raw) || raw;
+    return optimizeCloudinaryImage(resolvePublicMediaUrl(raw) || raw, 1200);
   }
   return DEFAULT_SERVICE_IMAGE;
 }
 
+function shrinkStepImages(
+  steps: ServiceDetailData["processSteps"],
+): ServiceDetailData["processSteps"] {
+  return steps?.map((step) => ({
+    ...step,
+    image: optimizeCloudinaryImage(step.image, 960),
+  }));
+}
+
 function resolveGallery(cms: CMSContent, heroImage: string): string[] {
   const urls = (cms.images || [])
-    .map((img) => resolvePublicMediaUrl(img.url) || img.url)
+    .map((img) => optimizeCloudinaryImage(resolvePublicMediaUrl(img.url) || img.url, 960))
     .filter(Boolean);
   const unique = [...new Set(urls)];
   if (unique.length === 0) return [heroImage];
@@ -158,7 +167,7 @@ export function cmsContentToServiceDetail(cms: CMSContent): ServiceDetailData {
     features,
     image,
     gallery: resolveGallery(cms, image),
-    youtubeId: c.youtubeId,
+    youtubeId: extractYoutubeVideoId(c.youtubeId || "") || c.youtubeId,
     heroBadge: c.heroBadge,
     theme: c.theme as ServiceThemeId | undefined,
     stats: Array.isArray(c.stats) ? c.stats : undefined,
@@ -211,9 +220,11 @@ export function buildServiceDetail(
       cmsPartial?.processSubtitle ||
       hardcoded?.processSubtitle ||
       theme.processSubtitle,
-    processSteps: isNonEmpty(cmsPartial?.processSteps)
-      ? cmsPartial!.processSteps
-      : hardcoded?.processSteps,
+    processSteps: shrinkStepImages(
+      isNonEmpty(cmsPartial?.processSteps)
+        ? cmsPartial!.processSteps
+        : hardcoded?.processSteps,
+    ),
     faq: isNonEmpty(cmsPartial?.faq) ? cmsPartial!.faq : hardcoded?.faq || theme.defaultFaq,
     ctaLabel: cmsPartial?.ctaLabel || hardcoded?.ctaLabel || theme.ctaLabel,
     bookingTitle:

@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import { Link, useLocation } from "react-router-dom";
 
 import Layout from "../components/layout/Layout";
+import { useEnquiryPopup } from "../contexts/EnquiryPopupContext";
+import { isContactHref } from "../lib/trialEnquiry";
 import SEO from "../components/SEO";
 import { usePageContent, renderMultiLineHeroTitle } from "../hooks/usePageContent";
 import {
@@ -23,6 +25,7 @@ const DEFAULT_STATS = [
 
 const Services: React.FC = () => {
   const location = useLocation();
+  const { openEnquiry } = useEnquiryPopup();
   const { content: pageContent, loaded } = usePageContent("services");
   const heroLines = renderMultiLineHeroTitle(pageContent, ["TRAIN.", "PERFORM.", "EVOLVE."]);
   const heroSubtitle =
@@ -143,9 +146,22 @@ const Services: React.FC = () => {
               </motion.p>
 
               <motion.div variants={fadeInUp}>
-                <Link to={heroCtaUrl} className="svc-btn-glow">
-                  {heroCtaText}
-                </Link>
+                {isContactHref(heroCtaUrl) ? (
+                  <button
+                    type="button"
+                    className="svc-btn-glow"
+                    onClick={() => openEnquiry({
+                      purpose: /trial/i.test(heroCtaText) ? 'trial' : 'contact',
+                      topic: 'our classes',
+                    })}
+                  >
+                    {heroCtaText}
+                  </button>
+                ) : (
+                  <Link to={heroCtaUrl} className="svc-btn-glow">
+                    {heroCtaText}
+                  </Link>
+                )}
               </motion.div>
             </motion.div>
           </div>
@@ -306,9 +322,15 @@ const Services: React.FC = () => {
               transition={{ duration: 0.8 }}
             >
               <h2 className="svc-final-cta-title">{finalCtaTitle}</h2>
-              <Link to={finalCtaUrl} className="svc-btn-glow">
-                {finalCtaButtonText}
-              </Link>
+              {isContactHref(finalCtaUrl) ? (
+                <button type="button" className="svc-btn-glow" onClick={() => openEnquiry({ purpose: 'contact', topic: 'our classes' })}>
+                  {finalCtaButtonText}
+                </button>
+              ) : (
+                <Link to={finalCtaUrl} className="svc-btn-glow">
+                  {finalCtaButtonText}
+                </Link>
+              )}
             </motion.div>
           </div>
         </section>

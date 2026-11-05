@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
+import { useEnquiryPopup } from '../contexts/EnquiryPopupContext';
 import { motion } from 'framer-motion';
 import { fetchWorkshops } from '../services/programService';
 import WorkshopCard, { defaultWorkshops } from '../components/workshops/WorkshopCard';
@@ -11,6 +11,7 @@ import SEO from '../components/SEO';
 import '../styles/workshops.css';
 
 const Workshops: React.FC = () => {
+  const { openEnquiry } = useEnquiryPopup();
   const { content } = usePageContent('workshops');
   const page = normalizeWorkshopsPageContent(content as Record<string, unknown>);
   const [workshopsList, setWorkshopsList] = useState(defaultWorkshops);
@@ -67,9 +68,13 @@ const Workshops: React.FC = () => {
             <div className="wsh-list-empty">
               <h3>No workshops scheduled right now</h3>
               <p>Contact us to know about the next live session.</p>
-              <Link to="/contact?source=workshop" className="primary-btn">
+              <button
+                type="button"
+                className="primary-btn"
+                onClick={() => openEnquiry({ purpose: 'service', topic: 'the next workshop' })}
+              >
                 Contact GDP Studio
-              </Link>
+              </button>
             </div>
           )}
         </div>

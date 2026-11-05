@@ -4,8 +4,9 @@ import { motion } from "framer-motion";
 import Layout from "../components/layout/Layout";
 import SEO from "../components/SEO";
 import { ServiceDetailIcon } from "../components/services/ServiceDetailIcons";
-import FormResultModal, { type FormResultType } from "../components/common/FormResultModal";
 import { useSiteData } from "../contexts/SiteDataContext";
+import { useEnquiryPopup } from "../contexts/EnquiryPopupContext";
+import { programFromLabel } from "../lib/trialEnquiry";
 import {
   buildServiceDetail,
   cmsContentToServiceDetail,
@@ -14,20 +15,13 @@ import {
 } from "../lib/serviceDetail";
 import { getServiceTheme } from "../lib/serviceThemes";
 import { buildWhatsAppUrl } from "../utils/whatsapp";
-import { submitEnquiry } from "../services/enquiryService";
 import { getCMSByKey } from "../services/cmsService";
-import {
-  sanitizeEnquiryField,
-  validateEnquiryField,
-  validateEnquiryForm,
-  hasEnquiryErrors,
-  type EnquiryFieldErrors,
-} from "../utils/enquiryValidation";
 import "../styles/services.css";
 
 const ServiceDetail: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { appSettings: settings, servicesCms, ready: siteDataReady } = useSiteData();
+  const { openEnquiry } = useEnquiryPopup();
   const [remoteCms, setRemoteCms] = useState<ReturnType<typeof cmsContentToServiceDetail> | null>(
     null,
   );
@@ -82,15 +76,6 @@ const ServiceDetail: React.FC = () => {
     };
   }, [slug, cmsFromList, siteDataReady]);
 
-  const [form, setForm] = useState({ name: "", phone: "", email: "", message: "" });
-  const [fieldErrors, setFieldErrors] = useState<EnquiryFieldErrors>({});
-  const [submitting, setSubmitting] = useState(false);
-  const [modal, setModal] = useState<{
-    open: boolean;
-    type: FormResultType;
-    title: string;
-    message: string;
-  }>({ open: false, type: "success", title: "", message: "" });
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
 
@@ -120,65 +105,12 @@ const ServiceDetail: React.FC = () => {
       ? service.gallery.filter((url) => url !== service.image)
       : [];
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const field = e.target.name as keyof typeof form;
-    const sanitized = sanitizeEnquiryField(
-      field as Parameters<typeof sanitizeEnquiryField>[0],
-      e.target.value,
-    );
-    setForm((prev) => ({ ...prev, [field]: sanitized }));
-    if (sanitized.length > 0) {
-      const err = validateEnquiryField(
-        field as Parameters<typeof validateEnquiryField>[0],
-        sanitized,
-      );
-      setFieldErrors((prev) => ({ ...prev, [field]: err }));
-    } else {
-      setFieldErrors((prev) => {
-        const next = { ...prev };
-        delete next[field as keyof EnquiryFieldErrors];
-        return next;
-      });
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const errors = validateEnquiryForm(
-      { name: form.name, phone: form.phone, email: form.email, message: form.message },
-      { requireMessage: false },
-    );
-    setFieldErrors(errors);
-    if (hasEnquiryErrors(errors)) return;
-
-    setSubmitting(true);
-    try {
-      await submitEnquiry({
-        name: form.name.trim(),
-        phone: form.phone.trim(),
-        email: form.email.trim(),
-        message: form.message.trim() || `Enquiry about ${service.title}`,
-        subject: `Service enquiry: ${service.title}`,
-        source: "general",
-      });
-      setForm({ name: "", phone: "", email: "", message: "" });
-      setFieldErrors({});
-      setModal({
-        open: true,
-        type: "success",
-        title: "Enquiry sent!",
-        message: "We'll get back to you within 24 hours.",
-      });
-    } catch {
-      setModal({
-        open: true,
-        type: "error",
-        title: "Could not send",
-        message: "Something went wrong. Please try WhatsApp.",
-      });
-    } finally {
-      setSubmitting(false);
-    }
+  const openServiceEnquiry = (purpose: "trial" | "service" = "service") => {
+    openEnquiry({
+      purpose,
+      program: programFromLabel(slug, service.title),
+      topic: service.title,
+    });
   };
 
   return (
@@ -217,9 +149,13 @@ const ServiceDetail: React.FC = () => {
                     </span>
                   ))}
                 </div>
-                <a href="#enquire" className="svc-btn-glow svcd-hero-cta">
+                <button
+                  type="button"
+                  className="svc-btn-glow svcd-hero-cta"
+                  onClick={() => openServiceEnquiry(/trial/i.test(service.ctaLabel || "") ? "trial" : "service")}
+                >
                   {service.ctaLabel}
-                </a>
+                </button>
               </motion.div>
 
               <motion.div
@@ -406,70 +342,10 @@ const ServiceDetail: React.FC = () => {
               >
                 <div className="svcd-form-glow" />
                 <h3>Enquire about {service.title}</h3>
-                <form className="svcd-form" onSubmit={handleSubmit} noValidate>
-                  <div className="svcd-field-wrap">
-                    <input
-                      type="text"
-                      name="name"
-                      placeholder="Full Name *"
-                      className={`svcd-input${fieldErrors.name ? " svcd-input-error" : ""}`}
-                      value={form.name}
-                      onChange={handleChange}
-                      maxLength={60}
-                      autoComplete="name"
-                    />
-                    {fieldErrors.name ? (
-                      <span className="svcd-field-error">{fieldErrors.name}</span>
-                    ) : null}
-                  </div>
-                  <div className="svcd-field-wrap">
-                    <input
-                      type="tel"
-                      name="phone"
-                      placeholder="10-digit mobile number *"
-                      inputMode="numeric"
-                      className={`svcd-input${fieldErrors.phone ? " svcd-input-error" : ""}`}
-                      value={form.phone}
-                      onChange={handleChange}
-                      maxLength={10}
-                      autoComplete="tel"
-                    />
-                    {fieldErrors.phone ? (
-                      <span className="svcd-field-error">{fieldErrors.phone}</span>
-                    ) : null}
-                  </div>
-                  <div className="svcd-field-wrap">
-                    <input
-                      type="email"
-                      name="email"
-                      placeholder="Email ID"
-                      className={`svcd-input${fieldErrors.email ? " svcd-input-error" : ""}`}
-                      value={form.email}
-                      onChange={handleChange}
-                      maxLength={100}
-                      autoComplete="email"
-                    />
-                    {fieldErrors.email ? (
-                      <span className="svcd-field-error">{fieldErrors.email}</span>
-                    ) : null}
-                  </div>
-                  <div className="svcd-field-wrap">
-                    <textarea
-                      name="message"
-                      placeholder={`Tell us about your ${service.title} goals`}
-                      className={`svcd-input svcd-textarea${fieldErrors.message ? " svcd-input-error" : ""}`}
-                      value={form.message}
-                      onChange={handleChange}
-                      maxLength={500}
-                    />
-                    {fieldErrors.message ? (
-                      <span className="svcd-field-error">{fieldErrors.message}</span>
-                    ) : null}
-                  </div>
-                  <button type="submit" className="svcd-submit-btn" disabled={submitting}>
-                    {submitting ? "Sending…" : "Send Enquiry"}
-                  </button>
-                </form>
+                <p>Opens the same trial form, with {service.title} already selected.</p>
+                <button type="button" className="svcd-submit-btn" onClick={() => openServiceEnquiry("trial")}>
+                  Book a free trial
+                </button>
               </motion.div>
             </div>
           </div>
@@ -525,13 +401,6 @@ const ServiceDetail: React.FC = () => {
         </section>
       </div>
 
-      <FormResultModal
-        open={modal.open}
-        type={modal.type}
-        title={modal.title}
-        message={modal.message}
-        onClose={() => setModal((m) => ({ ...m, open: false }))}
-      />
     </Layout>
   );
 };

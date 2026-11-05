@@ -170,7 +170,9 @@ const withLogoAttachment = (mailOptions) => {
 };
 
 const getAdminPanelUrl = () =>
-  process.env.ADMIN_URL || process.env.ADMIN_PANEL_URL || "http://localhost:8080";
+  process.env.ADMIN_URL ||
+  process.env.ADMIN_PANEL_URL ||
+  "https://admin.garimadanceproductions.com";
 
 module.exports = {
   escapeHtml,

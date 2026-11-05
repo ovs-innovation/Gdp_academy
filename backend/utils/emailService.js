@@ -173,7 +173,7 @@ const sendInstructorApprovalEmail = async (email, userName) => {
           <p>Your instructor account on GDP Studio has been approved by the administrators.</p>
           <p>You can now log in to the platform and start managing your profile.</p>
           <div style="margin-top: 30px;">
-            <a href="${process.env.FRONTEND_URL || "http://localhost:5173"}/login" style="background: #10b981; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login to your Account</a>
+            <a href="${process.env.FRONTEND_URL || "https://garimadanceproductions.com"}/login" style="background: #10b981; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold;">Login to your Account</a>
           </div>
           <p style="margin-top: 30px;">Welcome to the GDP Studio community!</p>
           <p>Regards,<br/>GDP Studio Team</p>
@@ -269,7 +269,7 @@ const sendWorkshopNotificationToAdmin = async (workshop, action = "published") =
   const title = getLanguageValue(workshop.name) || "Workshop";
   const when = formatWorkshopWhen(workshop);
   const zoom = workshop.zoomLink || "Link will be shared with enrolled students";
-  const frontend = process.env.FRONTEND_URL || "http://localhost:3000";
+  const frontend = process.env.FRONTEND_URL || "https://garimadanceproductions.com";
 
   const mailOptions = {
     from: `"GDP Studio" <${getEmailUser()}>`,
@@ -295,7 +295,7 @@ const sendWorkshopNotificationToStudent = async (student, workshop) => {
 
   const title = getLanguageValue(workshop.name) || "GDP Workshop";
   const when = formatWorkshopWhen(workshop);
-  const frontend = process.env.FRONTEND_URL || "http://localhost:3000";
+  const frontend = process.env.FRONTEND_URL || "https://garimadanceproductions.com";
   const joinBlock = workshop.zoomLink
     ? `<p><a href="${workshop.zoomLink}" style="background:#634BFA;color:#fff;padding:12px 20px;text-decoration:none;border-radius:6px;font-weight:bold;">Join Zoom Session</a></p>`
     : `<p>Visit <a href="${frontend}/live-zoom">Live Zoom page</a> for the join link.</p>`;

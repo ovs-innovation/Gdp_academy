@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { User, LogOut, Settings, Palette } from 'lucide-react';
+import { User, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PermissionGate } from '@/components/PermissionGate';
 import { useRole } from '@/contexts/RoleContext';
@@ -45,10 +45,6 @@ export function UserMenu() {
     toast.info('Profile opened');
   };
 
-  const handleAppearance = () => {
-    navigate('/settings');
-  };
-
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -72,13 +68,6 @@ export function UserMenu() {
           <User className="mr-2 h-4 w-4" />
           Profile
         </DropdownMenuItem>
-        <PermissionGate permission="settings.view">
-          <DropdownMenuItem onClick={handleAppearance} className="cursor-pointer">
-            <Palette className="mr-2 h-4 w-4" />
-            Appearance
-          </DropdownMenuItem>
-        </PermissionGate>
-
         <PermissionGate permission="settings.view">
           <DropdownMenuItem onClick={() => navigate('/settings')} className="cursor-pointer">
             <Settings className="mr-2 h-4 w-4" />

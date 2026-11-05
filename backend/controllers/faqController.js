@@ -1,9 +1,15 @@
 const FAQ = require("../models/faqModel.js");
+const { invalidatePublicCache } = require("../utils/publicCache.js");
+
+function bustHomepageCache() {
+  invalidatePublicCache("homepage");
+}
 
 // Create FAQ (admin only)
 const createFAQ = async (req, res, next) => {
   try {
     const faq = await FAQ.create(req.body);
+    bustHomepageCache();
     return res.status(201).json({ message: "FAQ created", faq });
   } catch (err) {
     next(err);
@@ -59,6 +65,7 @@ const updateFAQ = async (req, res, next) => {
 
     if (!updated) return res.status(404).json({ message: "FAQ not found" });
 
+    bustHomepageCache();
     return res.json({ message: "FAQ updated", faq: updated });
   } catch (err) {
     next(err);
@@ -73,6 +80,7 @@ const deleteFAQ = async (req, res, next) => {
 
     if (!deleted) return res.status(404).json({ message: "FAQ not found" });
 
+    bustHomepageCache();
     return res.json({ message: "FAQ deleted" });
   } catch (err) {
     next(err);
@@ -92,6 +100,7 @@ const reorderFAQs = async (req, res, next) => {
       await FAQ.findByIdAndUpdate(id, { order });
     }
 
+    bustHomepageCache();
     return res.json({ message: "FAQs reordered" });
   } catch (err) {
     next(err);

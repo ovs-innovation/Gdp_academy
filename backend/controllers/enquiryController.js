@@ -92,7 +92,7 @@ const createEnquiry = async (req, res, next) => {
     });
 
     try {
-      await sendEnquiryConfirmationEmail({ name, email });
+      if (cleanEmail) await sendEnquiryConfirmationEmail({ name, email: cleanEmail });
     } catch (emailError) {
       console.error("Failed to send confirmation email:", emailError);
     }

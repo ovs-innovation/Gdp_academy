@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { toast } from "react-toastify";
 import Layout from "../components/layout/Layout";
 import SEO from "../components/SEO";
-import { submitContactMessage, getPageContentBySlug } from "../services/cmsService";
+import { getPageContentBySlug } from "../services/cmsService";
 import { useSiteData } from "../contexts/SiteDataContext";
 import { resolveContactInfo } from "../lib/contactInfo";
-import {
-  type EnquiryField,
-  type EnquiryFieldErrors,
-  sanitizeEnquiryField,
-  validateEnquiryField,
-  validateEnquiryForm,
-  hasEnquiryErrors,
-} from "../utils/enquiryValidation";
+import { useEnquiryPopup } from "../contexts/EnquiryPopupContext";
+import { intentFromSearch } from "../lib/trialEnquiry";
 import "../styles/contact.css";
 
 interface ContactContent {
@@ -40,15 +34,10 @@ const DEFAULT_CONTENT: ContactContent = {
 
 const Contact: React.FC = () => {
   const { cmsSettings } = useSiteData();
+  const { openEnquiry } = useEnquiryPopup();
+  const [searchParams] = useSearchParams();
+  const query = searchParams.toString();
   const [content, setContent] = useState<ContactContent>(DEFAULT_CONTENT);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    message: "",
-  });
-  const [fieldErrors, setFieldErrors] = useState<EnquiryFieldErrors>({});
-  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const load = () => {
@@ -88,68 +77,9 @@ const Contact: React.FC = () => {
     load();
   }, [cmsSettings]);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-    const field = name as EnquiryField;
-    const sanitized = sanitizeEnquiryField(field, value);
-    setFormData((prev) => ({ ...prev, [name]: sanitized }));
-    setFieldErrors((prev) => {
-      if (!prev[field]) return prev;
-      const next = { ...prev };
-      delete next[field];
-      return next;
-    });
-  };
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const field = e.target.name as EnquiryField;
-    const error = validateEnquiryField(field, e.target.value, { requireMessage: true });
-    setFieldErrors((prev) => {
-      const next = { ...prev };
-      if (error) next[field] = error;
-      else delete next[field];
-      return next;
-    });
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const errors = validateEnquiryForm(formData, { requireMessage: true });
-    if (hasEnquiryErrors(errors)) {
-      setFieldErrors(errors);
-      toast.error("Please fix the highlighted fields.");
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      await submitContactMessage({
-        name: formData.name.trim(),
-        email: formData.email.trim(),
-        phone: formData.phone.trim(),
-        subject: "Contact Page Enquiry",
-        message: formData.message.trim(),
-      });
-
-      toast.success("Thank you! We will get back to you soon.");
-      setFormData({ name: "", email: "", phone: "", message: "" });
-      setFieldErrors({});
-    } catch (error: any) {
-      toast.error(error.message || "Failed to submit message");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const renderError = (field: EnquiryField) =>
-    fieldErrors[field] ? (
-      <p className="c-form-error" role="alert">
-        {fieldErrors[field]}
-      </p>
-    ) : null;
+  useEffect(() => {
+    openEnquiry(intentFromSearch(new URLSearchParams(query)));
+  }, [openEnquiry, query]);
 
   return (
     <Layout>
@@ -260,78 +190,15 @@ const Contact: React.FC = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
           >
-            <form onSubmit={handleSubmit} noValidate>
-              <div className="c-form-group">
-                <label>YOUR NAME</label>
-                <input
-                  type="text"
-                  name="name"
-                  className={`c-form-input${fieldErrors.name ? " has-error" : ""}`}
-                  placeholder="e.g. Garima Singh"
-                  value={formData.name}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  maxLength={60}
-                  autoComplete="name"
-                />
-                {renderError("name")}
-              </div>
-
-              <div className="c-form-group">
-                <label>EMAIL ADDRESS</label>
-                <input
-                  type="email"
-                  name="email"
-                  className={`c-form-input${fieldErrors.email ? " has-error" : ""}`}
-                  placeholder="john@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  maxLength={100}
-                  autoComplete="email"
-                />
-                {renderError("email")}
-              </div>
-
-              <div className="c-form-group">
-                <label>PHONE NUMBER</label>
-                <input
-                  type="tel"
-                  name="phone"
-                  inputMode="numeric"
-                  className={`c-form-input${fieldErrors.phone ? " has-error" : ""}`}
-                  placeholder="10-digit mobile number"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  maxLength={10}
-                  autoComplete="tel"
-                />
-                {renderError("phone")}
-              </div>
-
-              <div className="c-form-group">
-                <label>MESSAGE</label>
-                <textarea
-                  name="message"
-                  className={`c-form-textarea${fieldErrors.message ? " has-error" : ""}`}
-                  placeholder="Tell us about your dance goals..."
-                  value={formData.message}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  maxLength={500}
-                />
-                {renderError("message")}
-              </div>
-
-              <button
-                type="submit"
-                className="c-submit-btn"
-                disabled={isLoading}
-              >
-                {isLoading ? "Sending…" : "Send message"}
-              </button>
-            </form>
+            <h3 style={{ marginTop: 0 }}>Send an enquiry</h3>
+            <p>The same form opens here, already set for the page you came from.</p>
+            <button
+              type="button"
+              className="c-submit-btn"
+              onClick={() => openEnquiry(intentFromSearch(new URLSearchParams(query)))}
+            >
+              Open the form
+            </button>
           </motion.div>
         </div>
       </div>

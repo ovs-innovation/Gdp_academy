@@ -38,7 +38,7 @@ const Categories = () => {
     const getImageUrl = (imagePath: string) => {
         if (!imagePath) return '';
         if (imagePath.startsWith('http')) return imagePath;
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || '/api';
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'https://api.garimadanceproductions.com/api';
         return `${baseUrl.replace(/\/api$/, '')}/${imagePath.replace(/^\//, '')}`;
     };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
+import { useEnquiryPopup } from '../contexts/EnquiryPopupContext';
 import SEO from '../components/SEO';
 import { motion } from 'framer-motion';
 import { getMembershipPlans } from '../services/cmsService';
@@ -14,6 +14,7 @@ const DEFAULT_PLANS = [
 ];
 
 const Membership: React.FC = () => {
+  const { openEnquiry } = useEnquiryPopup();
   const { content, loaded } = usePageContent('membership');
   const hero = renderSplitHeroTitle(content, { before: 'CHOOSE YOUR ', highlight: 'MEMBERSHIP' });
   const heroSubtitle =
@@ -87,13 +88,14 @@ const Membership: React.FC = () => {
                 <ul className="features-list">
                   {plan.features.map((f: string) => <li key={f}>{f}</li>)}
                 </ul>
-                <Link
-                  to={`/contact?source=membership&plan=${encodeURIComponent(plan.name)}`}
+                <button
+                  type="button"
                   className={`primary-btn join-btn ${plan.recommended ? '' : 'glass-btn'}`}
                   style={{ width: '100%', display: 'inline-flex', justifyContent: 'center', alignItems: 'center' }}
+                  onClick={() => openEnquiry({ purpose: 'contact', topic: plan.name })}
                 >
                   START MEMBERSHIP
-                </Link>
+                </button>
               </motion.div>
             ))}
           </div>

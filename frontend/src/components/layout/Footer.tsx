@@ -1,39 +1,26 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { type PageContent } from '../../services/cmsService';
 import SiteLogo from '../common/SiteLogo';
 import { useSiteData } from '../../contexts/SiteDataContext';
-import { getPageContentBySlug } from '../../services/cmsService';
 import { resolveContactInfo } from '../../lib/contactInfo';
 import { buildWhatsAppUrl } from '../../utils/whatsapp';
+import { useEnquiryPopup } from '../../contexts/EnquiryPopupContext';
+import { isContactHref } from '../../lib/trialEnquiry';
 import '../../styles/footer.css';
 
 const Footer: React.FC = () => {
-  const { cmsSettings: settings, refreshSiteData } = useSiteData();
-  const [contactPage, setContactPage] = useState<PageContent | null>(null);
-
-  const loadContactPage = useCallback(() => {
-    getPageContentBySlug('contact')
-      .then((data) => {
-        if (data) setContactPage(data);
-      })
-      .catch((err) => console.error('Error loading footer contact settings:', err));
-  }, []);
-
-  useEffect(() => {
-    loadContactPage();
-  }, [loadContactPage, settings?.phone, settings?.email, settings?.address]);
+  const { cmsSettings: settings, contactPage, refreshSiteData } = useSiteData();
+  const { openEnquiry } = useEnquiryPopup();
 
   useEffect(() => {
     const onVisible = () => {
       if (document.visibilityState === 'visible') {
         refreshSiteData();
-        loadContactPage();
       }
     };
     document.addEventListener('visibilitychange', onVisible);
     return () => document.removeEventListener('visibilitychange', onVisible);
-  }, [loadContactPage, refreshSiteData]);
+  }, [refreshSiteData]);
 
   const defaultSocialLinks = [
     { platform: 'Instagram', url: 'https://www.instagram.com/gdp_garimadanceproductions?igsh=MWhueGpqZGQzZGN0ZA==' },
@@ -133,7 +120,13 @@ const Footer: React.FC = () => {
             <ul>
               {footerLinks.map((link) => (
                 <li key={`${link.href}-${link.label}`}>
-                  <Link to={link.href}>{link.label}</Link>
+                  {isContactHref(link.href, link.label) ? (
+                    <button type="button" className="footer-text-btn" onClick={() => openEnquiry({ purpose: 'contact' })}>
+                      {link.label}
+                    </button>
+                  ) : (
+                    <Link to={link.href}>{link.label}</Link>
+                  )}
                 </li>
               ))}
             </ul>

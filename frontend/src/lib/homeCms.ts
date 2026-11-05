@@ -36,6 +36,7 @@ type RawInstagram = {
   offset?: string;
   reelId?: string;
   url?: string;
+  active?: boolean;
 };
 
 type RawShort = {
@@ -80,6 +81,7 @@ export function normalizeInstagramPostsList(raw: unknown): InstagramReelItem[] {
   const offsets = ['0', '-20px', '20px', '-10px', '10px', '-30px', '30px', '-15px', '15px', '-5px'];
 
   return list
+    .filter((item: RawInstagram) => item?.active !== false)
     .map((item: RawInstagram, index) => {
       const fromVid = normalizeInstagramVid(item?.vid || '');
       const reelId = item?.reelId || fromVid.reelId;

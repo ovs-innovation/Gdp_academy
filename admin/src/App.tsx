@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { RoleProvider } from "@/contexts/RoleContext";
 import { ThemeColorProvider } from "@/contexts/ThemeColorContext";
@@ -10,13 +10,10 @@ import UsersPage from "./pages/UsersPage";
 import MembersPage from "./pages/MembersPage";
 import RolesPage from "./pages/RolesPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
-import ReportsPage from "./pages/ReportsPage";
 import SettingsPage from "./pages/SettingsPage";
 import ProfilePage from "./pages/ProfilePage";
 import LoginPage from "./pages/LoginPage";
-import SupportTicketsPage from "./pages/SupportTicketsPage";
 import BlogsPage from "./pages/BlogsPage";
-import ReviewModerationPage from "./pages/ReviewModerationPage";
 import ProgramManagementPage from "./pages/ProgramManagementPage";
 import DanceStyleManagementPage from "./pages/DanceStyleManagementPage";
 import PaymentsPage from "./pages/PaymentsPage";
@@ -87,22 +84,8 @@ const App = () => (
                     </ProtectedRoute>
                   }
                 />
-                <Route
-                  path="/reports"
-                  element={
-                    <ProtectedRoute permission="reports.view">
-                      <ReportsPage />
-                    </ProtectedRoute>
-                  }
-                />
-                <Route
-                  path="/support-tickets"
-                  element={
-                    <ProtectedRoute permission="reports.view">
-                      <SupportTicketsPage />
-                    </ProtectedRoute>
-                  }
-                />
+                <Route path="/reports" element={<Navigate to="/" replace />} />
+                <Route path="/support-tickets" element={<Navigate to="/" replace />} />
                 <Route
                   path="/blogs"
                   element={
@@ -111,14 +94,7 @@ const App = () => (
                     </ProtectedRoute>
                   }
                 />
-                <Route
-                  path="/reviews"
-                  element={
-                    <ProtectedRoute permission="testimonials.view">
-                      <ReviewModerationPage />
-                    </ProtectedRoute>
-                  }
-                />
+                <Route path="/reviews" element={<Navigate to="/testimonials" replace />} />
                 <Route
                   path="/enquiries"
                   element={

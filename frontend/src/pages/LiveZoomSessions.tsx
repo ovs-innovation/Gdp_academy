@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Layout from '../components/layout/Layout';
+import { useEnquiryPopup } from '../contexts/EnquiryPopupContext';
+import { programFromLabel } from '../lib/trialEnquiry';
 import { motion } from 'framer-motion';
 import event_data from '../data/home-data/EventData';
 import { getPageContentBySlug } from '../services/cmsService';
@@ -42,6 +44,7 @@ const DEFAULT_HERO_SUBTITLE =
   'Interactive real-time dance training with our world-class masters from the comfort of your home.';
 
 const LiveZoomSessions: React.FC = () => {
+  const { openEnquiry } = useEnquiryPopup();
   const [sessions, setSessions] = useState<LiveSession[]>(DEFAULT_SESSIONS);
   const [joinSteps, setJoinSteps] = useState<JoinStep[]>(DEFAULT_JOIN_STEPS);
   const [heroTitle, setHeroTitle] = useState(DEFAULT_HERO_TITLE);
@@ -156,9 +159,18 @@ const LiveZoomSessions: React.FC = () => {
                       JOIN SESSION
                     </a>
                   ) : (
-                    <a href="/contact?source=live-zoom" className="primary-btn join-btn" style={{ background: 'var(--primary-color)', display: 'inline-flex' }}>
+                    <button
+                      type="button"
+                      className="primary-btn join-btn"
+                      style={{ background: 'var(--primary-color)', display: 'inline-flex', border: 0, cursor: 'pointer', fontFamily: 'inherit' }}
+                      onClick={() => openEnquiry({
+                        purpose: 'service',
+                        topic: session.title || 'Live Zoom',
+                        program: programFromLabel('online', session.title),
+                      })}
+                    >
                       ENQUIRE
-                    </a>
+                    </button>
                   )}
                 </div>
               </motion.div>

@@ -106,7 +106,23 @@ const uploadsPath = path.join(__dirname, "uploads");
 if (!fs.existsSync(uploadsPath)) {
   fs.mkdirSync(uploadsPath, { recursive: true });
 }
-app.use("/uploads", express.static(uploadsPath));
+app.use(
+  "/uploads",
+  express.static(uploadsPath, {
+    etag: true,
+    lastModified: true,
+    acceptRanges: true,
+    setHeaders(res, filePath) {
+      if (/\.(mp4|webm|mov)$/i.test(filePath)) {
+        res.setHeader("Content-Type", "video/mp4");
+        if (/\.webm$/i.test(filePath)) res.setHeader("Content-Type", "video/webm");
+        if (/\.mov$/i.test(filePath)) res.setHeader("Content-Type", "video/quicktime");
+        res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        res.setHeader("Accept-Ranges", "bytes");
+      }
+    },
+  }),
+);
 
 app.get("/", (req, res) => {
   res.status(200).send("GDP Backend API is running!");
@@ -167,6 +183,7 @@ app.use("/api/membership-plans", membershipPlanRoutes);
 app.use("/api/contact-messages", contactMessageRoutes);
 app.use("/api/page-contents", pageContentRoutes);
 app.use("/api/site-settings", siteSettingsRoutes);
+app.use("/api/homepage", require("./routes/homepageRoutes.js"));
 app.use("/api/media", mediaRoutes);
 app.use("/api/webhooks", webhookRoutes);
 app.use("/api/recordings", recordingRoutes);

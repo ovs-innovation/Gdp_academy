@@ -8,6 +8,7 @@ const CMS_SECTION_CACHE_TTL_MS = 5_000;
 
 function bustCmsSectionCache(section) {
   if (section) invalidatePublicCache(`cms-section:${section}`);
+  invalidatePublicCache("homepage");
 }
 
 // Create or update CMS content

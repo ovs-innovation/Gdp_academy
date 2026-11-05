@@ -1,6 +1,6 @@
 import { getStoredToken, getStoredUser, setStoredUser } from '../services/authService'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://api.garimadanceproductions.com/api'
 
 /** Resolve relative upload paths to a URL the browser can load */
 export function resolvePhotoUrl(photo?: string | null): string {

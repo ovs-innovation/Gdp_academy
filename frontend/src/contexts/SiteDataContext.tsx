@@ -6,21 +6,19 @@ import React, {
   useRef,
   useState,
 } from "react";
-import {
-  getSiteSettings as getCmsSiteSettings,
-  getCMSBySection,
-  type SiteSettings as CmsSiteSettings,
-  type CMSContent,
-} from "../services/cmsService";
-import {
-  getSiteSettings as getAppSiteSettings,
-  type SiteSettings as AppSiteSettings,
-} from "../services/settingsService";
+import type { SiteSettings as CmsSiteSettings, CMSContent, FAQItem, PageContent } from "../services/cmsService";
+import type { SiteSettings as AppSiteSettings } from "../services/settingsService";
+import type { Testimonial } from "../services/testimonialService";
+import { getHomepage } from "../services/homepageService";
 
 type SiteDataContextValue = {
   cmsSettings: CmsSiteSettings | null;
   appSettings: AppSiteSettings | null;
   servicesCms: CMSContent[];
+  homePage: PageContent | null;
+  contactPage: PageContent | null;
+  faqs: FAQItem[];
+  testimonials: Testimonial[];
   ready: boolean;
   refreshSiteData: () => void;
 };
@@ -29,6 +27,10 @@ const SiteDataContext = createContext<SiteDataContextValue>({
   cmsSettings: null,
   appSettings: null,
   servicesCms: [],
+  homePage: null,
+  contactPage: null,
+  faqs: [],
+  testimonials: [],
   ready: false,
   refreshSiteData: () => {},
 });
@@ -37,6 +39,10 @@ export function SiteDataProvider({ children }: { children: React.ReactNode }) {
   const [cmsSettings, setCmsSettings] = useState<CmsSiteSettings | null>(null);
   const [appSettings, setAppSettings] = useState<AppSiteSettings | null>(null);
   const [servicesCms, setServicesCms] = useState<CMSContent[]>([]);
+  const [homePage, setHomePage] = useState<PageContent | null>(null);
+  const [contactPage, setContactPage] = useState<PageContent | null>(null);
+  const [faqs, setFaqs] = useState<FAQItem[]>([]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [ready, setReady] = useState(false);
   const mountedRef = useRef(true);
 
@@ -48,19 +54,22 @@ export function SiteDataProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const loadSiteData = useCallback(() => {
-    setReady(false);
-
-    Promise.all([
-      getCmsSiteSettings().catch(() => null),
-      getAppSiteSettings().catch(() => null),
-      getCMSBySection("services").catch(() => [] as CMSContent[]),
-    ]).then(([cms, app, services]) => {
-      if (!mountedRef.current) return;
-      if (cms) setCmsSettings(cms);
-      if (app) setAppSettings(app);
-      setServicesCms(services ?? []);
-      setReady(true);
-    });
+    getHomepage()
+      .then((data) => {
+        if (!mountedRef.current) return;
+        setCmsSettings(data.siteSettings ?? null);
+        setAppSettings(data.appSettings ?? null);
+        setServicesCms(data.services ?? []);
+        setHomePage(data.home ?? null);
+        setContactPage(data.contact ?? null);
+        setFaqs(data.faqs ?? []);
+        setTestimonials(data.testimonials ?? []);
+        setReady(true);
+      })
+      .catch(() => {
+        if (!mountedRef.current) return;
+        setReady(true);
+      });
   }, []);
 
   useEffect(() => {
@@ -83,6 +92,10 @@ export function SiteDataProvider({ children }: { children: React.ReactNode }) {
         cmsSettings,
         appSettings,
         servicesCms,
+        homePage,
+        contactPage,
+        faqs,
+        testimonials,
         ready,
         refreshSiteData: loadSiteData,
       }}

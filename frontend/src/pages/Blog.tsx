@@ -5,6 +5,7 @@ import SEO from '../components/SEO';
 import { getBlogs, type Blog as BlogType } from '../services/blogService';
 import { usePageContent, renderSplitHeroTitle } from '../hooks/usePageContent';
 import '../styles/blog.css';
+import ResponsiveImage from '../components/common/ResponsiveImage';
 
 const Blog: React.FC = () => {
   const { content, loaded } = usePageContent('blog');
@@ -159,7 +160,7 @@ const Blog: React.FC = () => {
             variants={fadeUp}
           >
             <div className="blog-featured-img">
-              <img src={featuredPost.image} alt={featuredPost.title} />
+              <ResponsiveImage src={featuredPost.image} alt={featuredPost.title} fill sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
             <div className="blog-featured-content">
               <div className="blog-meta">
@@ -186,7 +187,7 @@ const Blog: React.FC = () => {
                 transition={{ duration: 0.6, delay: i * 0.1 }}
               >
                 <div className="blog-card-img">
-                  <img src={post.image} alt={post.title} />
+                  <ResponsiveImage src={post.image} alt={post.title} fill sizes="(max-width: 768px) 100vw, 33vw" loading="lazy" decoding="async" />
                 </div>
                 <div className="blog-card-content">
                   <div className="blog-meta">
