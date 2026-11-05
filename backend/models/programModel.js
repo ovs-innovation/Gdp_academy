@@ -198,4 +198,9 @@ courseSchema.pre("save", async function (next) {
 courseSchema.index({ status: 1, createdAt: -1 });
 courseSchema.index({ "slug.en": 1 }, { unique: true, sparse: true });
 
-module.exports = mongoose.model("Program", courseSchema);
+const Program = mongoose.model("Program", courseSchema);
+if (!mongoose.models.Course) {
+  mongoose.model("Course", courseSchema);
+}
+
+module.exports = Program;
