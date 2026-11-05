@@ -1,0 +1,33 @@
+name: Deploy GDP Academy to VPS
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          password: ${{ secrets.VPS_PASSWORD }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script_stop: true
+          script: |
+            echo "Navigating to project directory..."
+            cd /var/www/Gdp_academy
+
+            echo "Pulling latest changes from main..."
+            git pull origin main
+
+            echo "Rebuilding and restarting Docker containers..."
+            docker compose up -d --build
+
+            echo "Cleaning dangling images..."
+            docker image prune -f
+
+            echo "GDP Academy deployed successfully!"
