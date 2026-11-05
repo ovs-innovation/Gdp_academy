@@ -6,12 +6,9 @@ import { sanitizeEnquiryField } from '../../utils/enquiryValidation';
 import {
   DIAL_CODES,
   ENQUIRY_COUNTRIES,
-  buildEnquiryServiceOptions,
   enquiryCopy,
   programLabel,
-  serviceOptionMatches,
   type EnquiryIntent,
-  type EnquiryServiceOption,
 } from '../../lib/trialEnquiry';
 import '../../styles/enquiry-popup.css';
 
@@ -27,30 +24,59 @@ const STATS = [
   { icon: 'ring', value: '300+', label: 'Weddings' },
 ] as const;
 
-const PROGRAM_ICON = {
-  'wedding-choreography': 'ring',
-  'online-dance-classes': 'monitor',
-  'pre-recorded-courses': 'play',
-  'pcod-wellness': 'heart',
-  'thyroid-wellness': 'heart',
-  'post-pregnancy-wellness': 'heart',
-  zumba: 'spark',
-  hiit: 'clock',
-  yoga: 'user',
-} as const;
+interface CourseOption {
+  id: string;
+  label: string;
+  icon: IconName;
+}
 
-function iconForService(option: EnquiryServiceOption): IconName {
-  const known = PROGRAM_ICON[option.id as keyof typeof PROGRAM_ICON];
-  if (known) return known;
-  const text = `${option.id} ${option.label}`.toLowerCase();
-  if (text.includes('wedding') || text.includes('sangeet')) return 'ring';
-  if (text.includes('yoga') || text.includes('custom')) return 'spark';
-  if (text.includes('recorded') || text.includes('course')) return 'play';
-  if (text.includes('combo') || text.includes('fitness') || text.includes('zumba') || text.includes('hiit') || text.includes('wellness') || text.includes('pcod') || text.includes('thyroid') || text.includes('pregnan')) {
-    return 'heart';
+const COURSES: CourseOption[] = [
+  {
+    id: 'dance-classes',
+    label: 'Dance Classes',
+    icon: 'monitor',
+  },
+  {
+    id: 'fitness-sessions',
+    label: 'Fitness Sessions for PCOD/ PCOS / Thyroid / Post Pregnancy wellness',
+    icon: 'heart',
+  },
+  {
+    id: 'wedding-choreography',
+    label: 'Wedding Choreography',
+    icon: 'ring',
+  },
+  {
+    id: 'personal-classes',
+    label: 'Personal classes',
+    icon: 'user',
+  },
+];
+
+function matchCourseWithIntent(intent: EnquiryIntent | null): string {
+  if (!intent) return '';
+  const text = `${intent.program || ''} ${intent.topic || ''}`.toLowerCase();
+  if (text.includes('wedding') || text.includes('sangeet')) return 'wedding-choreography';
+  if (
+    text.includes('pcod') ||
+    text.includes('pcos') ||
+    text.includes('thyroid') ||
+    text.includes('pregnan') ||
+    text.includes('fitness') ||
+    text.includes('wellness') ||
+    text.includes('combo') ||
+    text.includes('zumba') ||
+    text.includes('hiit')
+  ) {
+    return 'fitness-sessions';
   }
-  if (text.includes('online') || text.includes('dance')) return 'monitor';
-  return 'spark';
+  if (text.includes('personal') || text.includes('private') || text.includes('custom') || text.includes('1-on-1')) {
+    return 'personal-classes';
+  }
+  if (text.includes('dance') || text.includes('kathak') || text.includes('bollywood') || text.includes('contemporary')) {
+    return 'dance-classes';
+  }
+  return '';
 }
 
 const COUNTRY_ISO: Record<string, string> = {
@@ -120,12 +146,13 @@ function phoneError(dial: string, phone: string): string | undefined {
 }
 
 const EnquiryPopup: React.FC<Props> = ({ intent, onClose }) => {
-  const { appSettings, cmsSettings, servicesCms } = useSiteData();
+  const { appSettings, cmsSettings } = useSiteData();
   const [name, setName] = useState('');
   const [dial, setDial] = useState('+91');
   const [phone, setPhone] = useState('');
   const [program, setProgram] = useState('');
-  const [showAllServices, setShowAllServices] = useState(false);
+  const [courseMode, setCourseMode] = useState<'Online' | 'Offline' | null>(null);
+  const [pendingCourse, setPendingCourse] = useState<CourseOption | null>(null);
   const [country, setCountry] = useState('');
   const [city, setCity] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -140,24 +167,30 @@ const EnquiryPopup: React.FC<Props> = ({ intent, onClose }) => {
     setName('');
     setDial('+91');
     setPhone('');
-    setProgram('');
-    setShowAllServices(false);
     setCountry('');
     setCity('');
     setErrors({});
     setSending(false);
     setDone(false);
     setOpenMenu(null);
-  }, [intent]);
+    setPendingCourse(null);
 
-  useEffect(() => {
-    if (!intent) return;
-    const options = buildEnquiryServiceOptions(servicesCms);
-    const index = options.findIndex((item) => serviceOptionMatches(item, intent));
-    if (index < 0) return;
-    setProgram(options[index].id);
-    if (index >= 4) setShowAllServices(true);
-  }, [intent, servicesCms]);
+    const matched = matchCourseWithIntent(intent);
+    if (matched) {
+      setProgram(matched);
+      const text = `${intent.program || ''} ${intent.topic || ''}`.toLowerCase();
+      if (text.includes('offline') || text.includes('studio')) {
+        setCourseMode('Offline');
+      } else if (text.includes('online') || text.includes('zoom')) {
+        setCourseMode('Online');
+      } else {
+        setCourseMode(null);
+      }
+    } else {
+      setProgram('');
+      setCourseMode(null);
+    }
+  }, [intent]);
 
   useEffect(() => {
     if (!intent) return;
@@ -165,6 +198,10 @@ const EnquiryPopup: React.FC<Props> = ({ intent, onClose }) => {
     document.body.style.overflow = 'hidden';
     const onKey = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
+      if (pendingCourse) {
+        setPendingCourse(null);
+        return;
+      }
       if (openMenuRef.current) {
         setOpenMenu(null);
         return;
@@ -176,7 +213,7 @@ const EnquiryPopup: React.FC<Props> = ({ intent, onClose }) => {
       document.body.style.overflow = previous;
       window.removeEventListener('keydown', onKey);
     };
-  }, [intent, onClose]);
+  }, [intent, onClose, pendingCourse]);
 
   useEffect(() => {
     if (!openMenu) return;
@@ -185,21 +222,30 @@ const EnquiryPopup: React.FC<Props> = ({ intent, onClose }) => {
       if (target?.closest('.enquiry-popup__menu, .enquiry-popup__picker')) return;
       setOpenMenu(null);
     };
+    const onScroll = (event: Event) => {
+      const target = event.target as HTMLElement | null;
+      if (target?.closest('.enquiry-popup__menu')) return;
+      setOpenMenu(null);
+    };
+
     document.addEventListener('mousedown', onPointer);
-    return () => document.removeEventListener('mousedown', onPointer);
+    window.addEventListener('scroll', onScroll, true);
+    return () => {
+      document.removeEventListener('mousedown', onPointer);
+      window.removeEventListener('scroll', onScroll, true);
+    };
   }, [openMenu]);
 
   if (!intent) return null;
 
-  const serviceOptions = buildEnquiryServiceOptions(servicesCms);
-  const visibleServices = showAllServices ? serviceOptions : serviceOptions.slice(0, 4);
-  const selectedService = serviceOptions.find((item) => item.id === program);
-
+  const selectedCourse = COURSES.find((item) => item.id === program);
   const copy = enquiryCopy(intent);
 
   const whatsappHref = buildWhatsAppUrl(
     appSettings?.whatsappNumber || cmsSettings?.whatsappNumber || '917838416907',
-    `Hello! I'd like to know more about ${copy.subject}.`,
+    selectedCourse
+      ? `Hello! I'd like to enquire about ${selectedCourse.label}${courseMode ? ` (${courseMode} mode)` : ''}.`
+      : `Hello! I'd like to know more about ${copy.subject}.`,
   );
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -209,17 +255,22 @@ const EnquiryPopup: React.FC<Props> = ({ intent, onClose }) => {
     if (cleanName.length < 2) next.name = 'Enter your full name.';
     const phoneMessage = phoneError(dial, phone);
     if (phoneMessage) next.phone = phoneMessage;
-    if (!program) next.program = 'Pick a service.';
+    if (!program || !selectedCourse) {
+      next.program = 'Pick a course.';
+    } else if (!courseMode) {
+      next.program = 'Please choose Online or Offline mode.';
+    }
     if (!country) next.country = 'Select your country.';
     if (country === 'Other' && city.trim().length < 2) next.city = 'Add your city.';
     setErrors(next);
     if (Object.keys(next).length > 0) return;
 
-    const chosen = selectedService?.label || programLabel(program);
+    const chosen = selectedCourse ? `${selectedCourse.label}${courseMode ? ` (${courseMode})` : ''}` : programLabel(program);
     const place = country === 'Other' ? city.trim() : country;
     const message = [
       `${copy.purposeLabel}${intent.topic ? `: ${intent.topic}` : ''}.`,
-      chosen ? `Service: ${chosen}.` : '',
+      chosen ? `Course: ${chosen}.` : '',
+      courseMode ? `Mode: ${courseMode}.` : '',
       `WhatsApp: ${dial} ${phone}.`,
       `Country / city: ${place}.`,
     ].filter(Boolean).join(' ');
@@ -252,6 +303,12 @@ const EnquiryPopup: React.FC<Props> = ({ intent, onClose }) => {
         aria-modal="true"
         aria-labelledby="enquiry-popup-title"
         onClick={(event) => event.stopPropagation()}
+        onScroll={(event) => {
+          const target = event.target as HTMLElement | null;
+          if (!target?.closest('.enquiry-popup__menu') && openMenu) {
+            setOpenMenu(null);
+          }
+        }}
       >
         <button type="button" className="enquiry-popup__close" onClick={onClose} aria-label="Close">
           ✕
@@ -265,11 +322,11 @@ const EnquiryPopup: React.FC<Props> = ({ intent, onClose }) => {
             <br />
             <span>{copy.lines[2]}</span>
           </h2>
-          <p className="enquiry-popup__blurb">{copy.blurb}</p>
+          {copy.blurb ? <p className="enquiry-popup__blurb">{copy.blurb}</p> : null}
           <ul className="enquiry-popup__stats">
             {STATS.map((stat) => (
               <li key={stat.label}>
-                <span className="enquiry-popup__stat-icon"><Icon name={stat.icon} /></span>
+                <span className={`enquiry-popup__stat-icon enquiry-popup__stat-icon--${stat.icon}`}><Icon name={stat.icon} /></span>
                 <span>
                   <strong>{stat.value}</strong>
                   <em>{stat.label}</em>
@@ -277,10 +334,10 @@ const EnquiryPopup: React.FC<Props> = ({ intent, onClose }) => {
               </li>
             ))}
             <li className="enquiry-popup__stat-wide">
-              <span className="enquiry-popup__stat-icon"><Icon name="clock" /></span>
+              <span className="enquiry-popup__stat-icon enquiry-popup__stat-icon--clock"><Icon name="clock" /></span>
               <span>
                 <strong>Average Response Time</strong>
-                <em className="is-green">15 Minutes</em>
+                <em className="is-green">Quick Response</em>
               </span>
             </li>
           </ul>
@@ -298,18 +355,18 @@ const EnquiryPopup: React.FC<Props> = ({ intent, onClose }) => {
           ) : (
             <form onSubmit={handleSubmit} noValidate>
               <p className="enquiry-popup__welcome">
-                <Icon name="spark" />
+                <span className="enquiry-popup__spark-icon"><Icon name="spark" /></span>
                 <span>
                   Welcome to
                   <strong>Garima Dance Productions</strong>
                 </span>
               </p>
-              <p className="enquiry-popup__hint">{copy.hint}</p>
+              {copy.hint ? <p className="enquiry-popup__hint">{copy.hint}</p> : null}
 
               <label className="enquiry-popup__field">
                 <span>What's your name?</span>
                 <span className="enquiry-popup__control">
-                  <span className="enquiry-popup__glyph"><Icon name="user" /></span>
+                  <span className="enquiry-popup__glyph enquiry-popup__glyph--user"><Icon name="user" /></span>
                   <input
                     value={name}
                     onChange={(event) => setName(sanitizeEnquiryField('name', event.target.value))}
@@ -368,38 +425,45 @@ const EnquiryPopup: React.FC<Props> = ({ intent, onClose }) => {
               </label>
 
               <fieldset className="enquiry-popup__programs">
-                <legend>Which service are you interested in?</legend>
-                <div>
-                  {visibleServices.map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      className={program === item.id ? 'is-on' : ''}
-                      aria-pressed={program === item.id}
-                      onClick={() => setProgram(item.id)}
-                    >
-                      <Icon name={iconForService(item)} />
-                      <span>{item.label}</span>
-                      {program === item.id ? <Icon name="check" /> : null}
-                    </button>
-                  ))}
+                <legend>Which course are you interested in?</legend>
+                <div className="enquiry-popup__courses-grid">
+                  {COURSES.map((item) => {
+                    const isSelected = program === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        className={`enquiry-popup__program-btn enquiry-popup__program-btn--${item.icon}${isSelected ? ' is-on' : ''}`}
+                        aria-pressed={isSelected}
+                        onClick={() => setPendingCourse(item)}
+                      >
+                        <span className={`enquiry-popup__program-icon enquiry-popup__program-icon--${item.icon}`}>
+                          <Icon name={item.icon} />
+                        </span>
+                        <span className="enquiry-popup__course-details">
+                          <span className="enquiry-popup__course-title">{item.label}</span>
+                          {isSelected && courseMode ? (
+                            <span className={`enquiry-popup__course-mode-badge enquiry-popup__course-mode-badge--${courseMode.toLowerCase()}`}>
+                              {courseMode === 'Online' ? '💻 Online' : '📍 Offline (Studio)'}
+                            </span>
+                          ) : null}
+                        </span>
+                        {isSelected ? (
+                          <span className="enquiry-popup__program-check">
+                            <Icon name="check" />
+                          </span>
+                        ) : null}
+                      </button>
+                    );
+                  })}
                 </div>
-                {serviceOptions.length > 4 ? (
-                  <button
-                    type="button"
-                    className="enquiry-popup__more"
-                    onClick={() => setShowAllServices((open) => !open)}
-                  >
-                    {showAllServices ? 'View less' : 'View all'}
-                  </button>
-                ) : null}
                 {errors.program ? <em>{errors.program}</em> : null}
               </fieldset>
 
               <label className="enquiry-popup__field">
                 <span>Country / City</span>
                 <span className="enquiry-popup__control">
-                  <span className="enquiry-popup__glyph"><Icon name="pin" /></span>
+                  <span className="enquiry-popup__glyph enquiry-popup__glyph--pin"><Icon name="pin" /></span>
                   <button
                     type="button"
                     className={`enquiry-popup__picker${country ? '' : ' is-placeholder'}`}
@@ -446,13 +510,15 @@ const EnquiryPopup: React.FC<Props> = ({ intent, onClose }) => {
               <button type="submit" className="enquiry-popup__submit" disabled={sending}>
                 {sending ? 'Sending…' : copy.button} <span aria-hidden="true">→</span>
               </button>
-              <p className="enquiry-popup__secure"><Icon name="lock" /> 100% Secure. Your information is safe with us.</p>
+              <p className="enquiry-popup__secure">
+                <span className="enquiry-popup__lock-icon"><Icon name="lock" /></span> 100% Secure. Your information is safe with us.
+              </p>
               <div className="enquiry-popup__or">
                 <p>
-                  <Icon name="spark" />
+                  <span className="enquiry-popup__spark-icon"><Icon name="spark" /></span>
                   <span>
                     <strong>Awesome!</strong>
-                    Our team will contact you within 15–30 minutes.
+                    Our team will contact you shortly.
                   </span>
                 </p>
                 <span>OR</span>
@@ -467,6 +533,87 @@ const EnquiryPopup: React.FC<Props> = ({ intent, onClose }) => {
             </form>
           )}
         </div>
+
+        {pendingCourse ? (
+          <div className="enquiry-popup__mode-backdrop" role="presentation" onClick={() => setPendingCourse(null)}>
+            <div
+              className="enquiry-popup__mode-dialog"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Select Learning Mode"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="enquiry-popup__mode-close"
+                onClick={() => setPendingCourse(null)}
+                aria-label="Close mode selection"
+              >
+                ✕
+              </button>
+
+              <div className="enquiry-popup__mode-header">
+                <span className={`enquiry-popup__program-icon enquiry-popup__program-icon--${pendingCourse.icon}`}>
+                  <Icon name={pendingCourse.icon} />
+                </span>
+                <div>
+                  <h4>{pendingCourse.label}</h4>
+                  <p>How would you like to attend this course?</p>
+                </div>
+              </div>
+
+              <div className="enquiry-popup__mode-options">
+                <button
+                  type="button"
+                  className={`enquiry-popup__mode-card enquiry-popup__mode-card--online ${program === pendingCourse.id && courseMode === 'Online' ? 'is-selected' : ''}`}
+                  onClick={() => {
+                    setProgram(pendingCourse.id);
+                    setCourseMode('Online');
+                    setPendingCourse(null);
+                    setErrors((prev) => {
+                      const next = { ...prev };
+                      delete next.program;
+                      return next;
+                    });
+                  }}
+                >
+                  <div className="enquiry-popup__mode-icon-wrap">
+                    <Icon name="monitor" />
+                  </div>
+                  <div className="enquiry-popup__mode-info">
+                    <strong>Online Class</strong>
+                    <span>Live interactive classes from anywhere in the world</span>
+                  </div>
+                  <span className="enquiry-popup__mode-select-pill">Online →</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={`enquiry-popup__mode-card enquiry-popup__mode-card--offline ${program === pendingCourse.id && courseMode === 'Offline' ? 'is-selected' : ''}`}
+                  onClick={() => {
+                    setProgram(pendingCourse.id);
+                    setCourseMode('Offline');
+                    setPendingCourse(null);
+                    setErrors((prev) => {
+                      const next = { ...prev };
+                      delete next.program;
+                      return next;
+                    });
+                  }}
+                >
+                  <div className="enquiry-popup__mode-icon-wrap">
+                    <Icon name="pin" />
+                  </div>
+                  <div className="enquiry-popup__mode-info">
+                    <strong>Offline (Studio)</strong>
+                    <span>In-person sessions at GDP dance studio</span>
+                  </div>
+                  <span className="enquiry-popup__mode-select-pill">Offline →</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>
   );

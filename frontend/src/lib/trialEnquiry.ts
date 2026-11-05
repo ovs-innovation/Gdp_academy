@@ -71,7 +71,7 @@ export function serviceOptionMatches(option: EnquiryServiceOption, intent: Enqui
 }
 
 export function buildEnquiryServiceOptions(
-  cmsServices: Array<{ key?: string; title?: string | { en?: string; [key: string]: string }; isActive?: boolean }>,
+  cmsServices: Array<{ key?: string; title?: string | { en?: string;[key: string]: string }; isActive?: boolean }>,
 ): EnquiryServiceOption[] {
   const primary = cmsServices
     .filter((item) => item.isActive !== false)
@@ -141,7 +141,7 @@ export type EnquiryCopy = {
   subject: string;
 };
 
-const REACH = 'Our team will contact you within 15–30 minutes.';
+const REACH = 'Our team will contact you shortly.';
 
 function programShort(id: TrialProgram | null | undefined): string {
   return (TRIAL_PROGRAMS.find((item) => item.id === id)?.short || 'dance').toLowerCase();
@@ -151,17 +151,17 @@ export function enquiryCopy(intent: EnquiryIntent): EnquiryCopy {
   const topic = (intent.topic || '').trim();
   const programName = programLabel(intent.program);
   const subject = topic || programName;
-  const about = subject ? `This is about ${subject}. ${REACH}` : '';
+  const about = subject ? `This is about ${subject}.` : '';
 
   if (intent.purpose === 'trial') {
     return {
       eyebrow: "Let's start your dance journey",
       lines: intent.program ? ['Book your', programShort(intent.program), 'class'] : ['Book your', 'free trial', 'class'],
-      blurb: about || 'Fill this quick form and our team will contact you within 15–30 minutes to schedule your free trial class.',
-      hint: subject ? `About ${subject}.` : 'Just tell us 4 things.',
+      blurb: about || 'Fill this quick form and our team will contact you shortly to schedule your free trial class.',
+      hint: subject ? `About ${subject}.` : '',
       button: 'Book My Free Trial',
       successTitle: "You're booked in.",
-      successText: 'Our team will reach you on WhatsApp within 15–30 minutes.',
+      successText: 'Our team will reach you on WhatsApp shortly.',
       purposeLabel: 'Free trial',
       subject: subject || 'a free trial class',
     };
@@ -172,10 +172,10 @@ export function enquiryCopy(intent: EnquiryIntent): EnquiryCopy {
       eyebrow: subject || "Let's start your dance journey",
       lines: intent.program ? ['Book your', programShort(intent.program), 'class'] : ['Enquire', 'about', 'this'],
       blurb: about || `Tell us what you need. ${REACH}`,
-      hint: subject ? `About ${subject}.` : 'Just tell us 4 things.',
+      hint: subject ? `About ${subject}.` : '',
       button: 'Send my details',
       successTitle: 'Request sent.',
-      successText: 'Our team will reach you on WhatsApp within 15–30 minutes.',
+      successText: 'Our team will reach you on WhatsApp shortly.',
       purposeLabel: 'Service enquiry',
       subject: subject || 'GDP classes',
     };
@@ -185,10 +185,10 @@ export function enquiryCopy(intent: EnquiryIntent): EnquiryCopy {
     eyebrow: subject || "Let's talk",
     lines: ['Get in', 'touch', 'today'],
     blurb: about || REACH,
-    hint: subject ? `About ${subject}.` : 'Just tell us 4 things.',
+    hint: subject ? `About ${subject}.` : '',
     button: 'Send my details',
     successTitle: 'Message sent.',
-    successText: 'Our team will reach you on WhatsApp within 15–30 minutes.',
+    successText: 'Our team will reach you on WhatsApp shortly.',
     purposeLabel: 'Contact',
     subject: subject || 'GDP classes',
   };
