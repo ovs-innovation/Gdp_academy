@@ -11,6 +11,34 @@ import type { SiteSettings as AppSiteSettings } from "../services/settingsServic
 import type { Testimonial } from "../services/testimonialService";
 import { getHomepage } from "../services/homepageService";
 
+const FRONTEND_THEME_COLORS: Record<string, { hex: string; gradient: string }> = {
+  gdp: { hex: "#634BFA", gradient: "linear-gradient(135deg, #634BFA 0%, #1EFFE4 100%)" },
+  sky: { hex: "#0284c7", gradient: "linear-gradient(135deg, #0284c7 0%, #38bdf8 100%)" },
+  violet: { hex: "#8b5cf6", gradient: "linear-gradient(135deg, #8b5cf6 0%, #c084fc 100%)" },
+  emerald: { hex: "#10b981", gradient: "linear-gradient(135deg, #10b981 0%, #34d399 100%)" },
+  rose: { hex: "#f43f5e", gradient: "linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)" },
+  amber: { hex: "#f59e0b", gradient: "linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)" },
+  orange: { hex: "#f97316", gradient: "linear-gradient(135deg, #f97316 0%, #fb923c 100%)" },
+  teal: { hex: "#14b8a6", gradient: "linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%)" },
+  pink: { hex: "#ec4899", gradient: "linear-gradient(135deg, #ec4899 0%, #f472b6 100%)" },
+  indigo: { hex: "#6366f1", gradient: "linear-gradient(135deg, #6366f1 0%, #818cf8 100%)" },
+  cyan: { hex: "#06b6d4", gradient: "linear-gradient(135deg, #06b6d4 0%, #22d3ee 100%)" },
+  lime: { hex: "#84cc16", gradient: "linear-gradient(135deg, #84cc16 0%, #a3e635 100%)" },
+  red: { hex: "#ef4444", gradient: "linear-gradient(135deg, #ef4444 0%, #f87171 100%)" },
+};
+
+function applyFrontendTheme(colorInput?: string | null) {
+  if (!colorInput) return;
+  const clean = colorInput.toLowerCase().trim();
+  const found =
+    FRONTEND_THEME_COLORS[clean] ||
+    (clean.startsWith("#") ? { hex: clean, gradient: `linear-gradient(135deg, ${clean} 0%, #1EFFE4 100%)` } : null);
+  if (found) {
+    document.documentElement.style.setProperty("--primary-color", found.hex);
+    document.documentElement.style.setProperty("--gradient-primary", found.gradient);
+  }
+}
+
 type SiteDataContextValue = {
   cmsSettings: CmsSiteSettings | null;
   appSettings: AppSiteSettings | null;
@@ -85,6 +113,12 @@ export function SiteDataProvider({ children }: { children: React.ReactNode }) {
     document.addEventListener("visibilitychange", onVisible);
     return () => document.removeEventListener("visibilitychange", onVisible);
   }, [loadSiteData]);
+
+  useEffect(() => {
+    if (appSettings?.themeColor) {
+      applyFrontendTheme(appSettings.themeColor);
+    }
+  }, [appSettings?.themeColor]);
 
   return (
     <SiteDataContext.Provider

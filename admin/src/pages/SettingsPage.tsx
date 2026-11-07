@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import React from 'react';
 import { AdminLayout } from '@/components/layout/AdminLayout';
 import { PermissionGate } from '@/components/PermissionGate';
 import { Card } from '@/components/ui/card';
@@ -11,22 +10,7 @@ import { ColorPicker } from '@/components/ColorPicker';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { SettingsAPI, type ApiSettings } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
-import { useThemeColor, ThemeColor } from '@/contexts/ThemeColorContext';
-
-const ColorPickerWrapper = ({ onColorChange }: { onColorChange: (color: ThemeColor) => void }) => {
-  const { themeColor } = useThemeColor();
-  const isInitialMount = React.useRef(true);
-
-  React.useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-    onColorChange(themeColor);
-  }, [themeColor]);
-
-  return <ColorPicker />;
-};
+import { useThemeColor, ThemeColor, resolveThemeColor } from '@/contexts/ThemeColorContext';
 
 const SettingsPage = () => {
   const [settings, setSettings] = useState<ApiSettings | null>(null);
@@ -39,49 +23,12 @@ const SettingsPage = () => {
     loadSettings();
   }, []);
 
-  useEffect(() => {
-    if (settings?.themeColor && !loading) {
-      const colorMap: Record<string, ThemeColor> = {
-        sky: 'sky',
-        violet: 'violet',
-        emerald: 'emerald',
-        rose: 'rose',
-        amber: 'amber',
-        orange: 'orange',
-        teal: 'teal',
-        pink: 'pink',
-        indigo: 'indigo',
-        cyan: 'cyan',
-        lime: 'lime',
-        red: 'red',
-      };
-      const mappedColor = colorMap[settings.themeColor] || 'sky';
-      if (mappedColor !== themeColor) {
-        setThemeColor(mappedColor);
-      }
-    }
-  }, [settings?.themeColor, loading]);
-
   const loadSettings = async () => {
     try {
       const data = await SettingsAPI.get();
       setSettings(data.settings);
-      if (data.settings.themeColor) {
-        const colorMap: Record<string, ThemeColor> = {
-          sky: 'sky',
-          violet: 'violet',
-          emerald: 'emerald',
-          rose: 'rose',
-          amber: 'amber',
-          orange: 'orange',
-          teal: 'teal',
-          pink: 'pink',
-          indigo: 'indigo',
-          cyan: 'cyan',
-          lime: 'lime',
-          red: 'red',
-        };
-        const mappedColor = colorMap[data.settings.themeColor] || 'sky';
+      if (data.settings?.themeColor) {
+        const mappedColor = resolveThemeColor(data.settings.themeColor);
         setThemeColor(mappedColor);
       }
     } catch (err: any) {
@@ -101,7 +48,7 @@ const SettingsPage = () => {
       };
       const data = await SettingsAPI.update(settingsToSave);
       setSettings(data.settings);
-      toast({ title: 'Settings saved successfully' });
+      toast({ title: 'Settings saved successfully', description: 'Theme color updated across the platform.' });
     } catch (err: any) {
       toast({ title: 'Failed to save settings', description: err?.message, variant: 'destructive' });
     } finally {
@@ -145,7 +92,7 @@ const SettingsPage = () => {
             <Button
               onClick={handleSave}
               disabled={saving || !settings}
-              className="gap-2 gradient-primary text-primary-foreground hover:opacity-90"
+              className="gap-2 gradient-primary text-primary-foreground hover:opacity-90 shadow-md"
             >
               <Save className="h-4 w-4" />
               {saving ? 'Saving...' : 'Save All Changes'}
@@ -175,9 +122,9 @@ const SettingsPage = () => {
                 </div>
                 <PermissionGate
                   permission="settings.edit"
-                  fallback={<ColorPicker />}
+                  fallback={<ColorPicker disabled />}
                 >
-                  <ColorPickerWrapper onColorChange={handleThemeColorChange} />
+                  <ColorPicker value={themeColor} onChange={handleThemeColorChange} />
                 </PermissionGate>
               </div>
             </div>

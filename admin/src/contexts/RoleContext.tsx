@@ -6,7 +6,7 @@ import React, {
   useCallback,
   ReactNode,
 } from "react";
-import { useThemeColor } from "@/contexts/ThemeColorContext";
+import { useThemeColor, resolveThemeColor } from "@/contexts/ThemeColorContext";
 import { AuthAPI, ROLE_KEY, TOKEN_KEY } from "@/lib/api";
 import {
   Role,
@@ -97,27 +97,12 @@ export function RoleProvider({ children }: { children: ReactNode }) {
             m.SettingsAPI.get(),
           );
 
-          const colorMap: Record<string, string> = {
-            sky: "sky",
-            violet: "violet",
-            emerald: "emerald",
-            rose: "rose",
-            amber: "amber",
-            orange: "orange",
-            teal: "teal",
-            pink: "pink",
-            indigo: "indigo",
-            cyan: "cyan",
-            lime: "lime",
-            red: "red",
-          };
-
-          const mappedColor =
-            colorMap[settingsData.settings.themeColor] || "sky";
-
-          setThemeColor(mappedColor as any);
+          if (settingsData?.settings?.themeColor) {
+            const mappedColor = resolveThemeColor(settingsData.settings.themeColor);
+            setThemeColor(mappedColor);
+          }
         } catch {
-          setThemeColor("sky");
+          // Keep existing themeColor
         }
       } catch {
         // Keep cached role/permissions — never clear auth token here.

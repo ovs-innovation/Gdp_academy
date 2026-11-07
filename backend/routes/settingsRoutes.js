@@ -11,5 +11,6 @@ router.get('/', noStoreCache, getSettings);
 
 // Update site settings (admin only)
 router.put('/', verifyToken, isAdmin, updateSettings);
+router.patch('/', verifyToken, isAdmin, updateSettings);
 
 module.exports = router;

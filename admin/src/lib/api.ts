@@ -149,7 +149,7 @@ export const SettingsAPI = {
   get: () => apiFetch<{ settings: ApiSettings }>("/settings"),
   update: (payload: Partial<ApiSettings>) =>
     apiFetch<{ settings: ApiSettings }>("/settings", {
-      method: "PATCH",
+      method: "PUT",
       body: JSON.stringify(payload),
     }),
 };

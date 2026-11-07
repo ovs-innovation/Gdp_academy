@@ -32,6 +32,7 @@ const updateSettings = async (req, res, next) => {
 
     invalidatePublicCache("app-settings");
     invalidatePublicCache("homepage");
+    invalidatePublicCache("homepage");
     res.json({ settings });
   } catch (err) {
     next(err);
