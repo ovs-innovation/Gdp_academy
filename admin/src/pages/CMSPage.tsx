@@ -28,6 +28,7 @@ import { WebsiteStructureMap } from "@/components/cms/WebsiteStructureMap";
 import { WebsitePageNav } from "@/components/cms/WebsitePageNav";
 import { CMSPageContentEditor } from "@/components/cms/CMSPageContentEditor";
 import { CMSGlobalSettingsEditor } from "@/components/cms/CMSGlobalSettingsEditor";
+import { getLiveWebsiteUrl } from "@/lib/websiteLinks";
 import { normalizeHomeContentForSave, normalizeHomeContentFromApi } from "@/lib/homeCms";
 import { normalizeWorkshopsPageContentForSave } from "@/lib/workshopsPageCms";
 import {
@@ -247,10 +248,10 @@ const CMSPage = () => {
           </div>
           {activeNavItem?.path ? (
             <a
-              href={activeNavItem.path}
+              href={getLiveWebsiteUrl(activeNavItem.path)}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary/20"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary/20 shadow-2xs"
             >
               <Globe className="h-3.5 w-3.5" /> View Live Website ({activeNavItem.path}) <ExternalLink className="h-3 w-3" />
             </a>
@@ -318,14 +319,27 @@ const CMSPage = () => {
                     </div>
                   </div>
 
-                  <Button
-                    onClick={handlePageSave}
-                    disabled={pageSaving}
-                    className="gap-2 px-5 py-2 font-semibold shadow-md gradient-primary text-primary-foreground hover:opacity-90 transition"
-                  >
-                    <Save className="h-4 w-4" />
-                    {pageSaving ? "Saving..." : "Save Changes"}
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    {activeNavItem?.path && (
+                      <a
+                        href={getLiveWebsiteUrl(activeNavItem.path)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-background px-3 py-2 text-xs font-semibold text-foreground hover:bg-muted transition shadow-2xs"
+                        title="Open this page on live website in a new tab"
+                      >
+                        <Globe className="h-3.5 w-3.5 text-primary" /> Live Page <ExternalLink className="h-3 w-3 opacity-60" />
+                      </a>
+                    )}
+                    <Button
+                      onClick={handlePageSave}
+                      disabled={pageSaving}
+                      className="gap-2 px-5 py-2 font-semibold shadow-md gradient-primary text-primary-foreground hover:opacity-90 transition"
+                    >
+                      <Save className="h-4 w-4" />
+                      {pageSaving ? "Saving..." : "Save Changes"}
+                    </Button>
+                  </div>
                 </div>
 
                 {/* Tabs: Content vs SEO vs Connected */}

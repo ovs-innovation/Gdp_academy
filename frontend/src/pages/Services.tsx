@@ -110,7 +110,7 @@ const Services: React.FC = () => {
     <Layout>
       <SEO pageTitle="Services" />
       <div className="services-page-wrapper">
-        <section className="svc-hero-section">
+        <section className="svc-hero-section" id="hero">
           <div className="svc-hero-bg" />
           <div className="svc-hero-smoke" />
 
@@ -167,7 +167,7 @@ const Services: React.FC = () => {
           </div>
         </section>
 
-        <section className="svc-stats-strip">
+        <section className="svc-stats-strip" id="stats">
           <div className="container">
             <motion.div
               className="svc-stats-flex"

@@ -172,7 +172,7 @@ const About: React.FC = () => {
         <div className="ambient-glow-purple" style={{ bottom: '15%', left: '15%' }}></div>
 
         {/* ================= 1. HERO SECTION ================= */}
-        <section className="hero-futuristic">
+        <section className="hero-futuristic" id="hero">
           <div className="vertical-side-text">
             MORE THAN DANCE — A <span>MOVEMENT</span>
           </div>
@@ -264,7 +264,7 @@ const About: React.FC = () => {
         </section>
 
         {/* ================= 1.5 PREMIUM LAPTOP EXPERIENCE SECTION ================= */}
-        <section className="laptop-experience-section">
+        <section className="laptop-experience-section" id="story">
           {/* Cinematic Background Elements */}
           <div className="laptop-bg-grid"></div>
           <div className="laptop-bg-particles"></div>
@@ -383,7 +383,7 @@ const About: React.FC = () => {
         </section>
 
         {/* ================= 1.7 MISSION STATEMENT CALLOUT ================= */}
-        <section className="mission-statement-section section-padding" style={{ position: 'relative', zIndex: 10, background: 'rgba(5, 5, 5, 0.4)' }}>
+        <section className="mission-statement-section section-padding" id="mission" style={{ position: 'relative', zIndex: 10, background: 'rgba(5, 5, 5, 0.4)' }}>
           <div className="container" style={{ maxWidth: '900px' }}>
             <motion.div
               className="glass-card"
@@ -405,7 +405,7 @@ const About: React.FC = () => {
         </section>
 
         {/* ================= 2. QUICK INFO SECTION ================= */}
-        <section className="quick-info section-padding" style={{ position: 'relative', zIndex: 10 }}>
+        <section className="quick-info section-padding" id="stats" style={{ position: 'relative', zIndex: 10 }}>
           <div className="container">
             <motion.div
               className="premium-stats-band"
@@ -438,7 +438,7 @@ const About: React.FC = () => {
         </section>
 
         {/* ================= 3. CORE PILLARS SECTION ================= */}
-        <section className="about-pillars-section">
+        <section className="about-pillars-section" id="pillars">
           <div className="container">
             <div className="premium-section-header">
               <div className="cyber-label">THE FOUNDATION</div>
@@ -464,7 +464,7 @@ const About: React.FC = () => {
         </section>
 
         {/* ================= 5. STUDIO ECOSYSTEM SECTION ================= */}
-        <section className="about-ecosystem-section">
+        <section className="about-ecosystem-section" id="ecosystem">
           <div className="container">
             <div className="premium-section-header">
               <div className="cyber-label">THE INFRASTRUCTURE</div>
@@ -499,7 +499,7 @@ const About: React.FC = () => {
         </section>
 
         {/* ================= 6. FINAL CTA SECTION ================= */}
-        <section className="final-cta-section">
+        <section className="final-cta-section" id="cta">
           <div className="cta-glow-bg"></div>
 
           <div className="container">

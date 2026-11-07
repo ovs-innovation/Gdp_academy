@@ -565,21 +565,23 @@ const Home: React.FC = () => {
       </section>
 
       <LazySection minHeight={520} rootMargin="400px">
-      <YouTubeShortsSection
-        shorts={youtubeShorts}
-        channel={youtubeChannel}
-        channelUrl={youtubeChannelUrl}
-        channelId={homeContent.youtubeChannelId as string | undefined}
-        logoUrl={settings?.logoUrl}
-        loading={!homeCopyReady}
-        activeVideoId={activeVideoId}
-        setActiveVideoId={setActiveVideoId}
-      />
+      <div id="shorts">
+        <YouTubeShortsSection
+          shorts={youtubeShorts}
+          channel={youtubeChannel}
+          channelUrl={youtubeChannelUrl}
+          channelId={homeContent.youtubeChannelId as string | undefined}
+          logoUrl={settings?.logoUrl}
+          loading={!homeCopyReady}
+          activeVideoId={activeVideoId}
+          setActiveVideoId={setActiveVideoId}
+        />
+      </div>
       </LazySection>
 
       {/* 3. About Section */}
       <LazySection minHeight={480} rootMargin="400px">
-      <section className="about-section section-padding">
+      <section className="about-section section-padding" id="about">
         <div className="container">
           <div className="about-content-wrapper">
             <div className="about-image-container animate-fade-in" style={{ position: 'relative', aspectRatio: '16/9', background: '#000' }}>
@@ -698,14 +700,16 @@ const Home: React.FC = () => {
 
       {homeCopyReady && instagramPosts.length > 0 && (
       <LazySection minHeight={520} rootMargin="400px">
-      <InstagramReelsSection
-        reels={instagramPosts}
-        handle={instagramHandle}
-        sectionTitle={instagramSectionTitle}
-        sectionHighlight={instagramSectionHighlight}
-        activeVideoId={activeVideoId}
-        setActiveVideoId={setActiveVideoId}
-      />
+      <div id="instagram">
+        <InstagramReelsSection
+          reels={instagramPosts}
+          handle={instagramHandle}
+          sectionTitle={instagramSectionTitle}
+          sectionHighlight={instagramSectionHighlight}
+          activeVideoId={activeVideoId}
+          setActiveVideoId={setActiveVideoId}
+        />
+      </div>
       </LazySection>
       )}
       <LazySection minHeight={560} rootMargin="400px">
@@ -734,7 +738,7 @@ const Home: React.FC = () => {
 
       {/* 10. FAQ Section */}
       <LazySection minHeight={420} rootMargin="400px">
-      <section className="faq-v3 section-padding">
+      <section className="faq-v3 section-padding" id="faq">
         <div className="container">
           <div className="services-section-header faq-v3-header">
             <h2 className="section-title">

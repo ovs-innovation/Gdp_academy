@@ -69,7 +69,7 @@ const WorkshopsLanding: React.FC<Props> = ({ content }) => {
   return (
     <div className="wsh-landing">
       {content.offerBannerText && (
-        <div className="wsh-offer-bar">
+        <div className="wsh-offer-bar" id="offer">
           <span className="prog-cyber-label__dot" aria-hidden="true" />
           {content.offerBannerText}
           {countdownLabel && <span className="wsh-offer-timer">{countdownLabel}</span>}
@@ -77,7 +77,7 @@ const WorkshopsLanding: React.FC<Props> = ({ content }) => {
       )}
 
       {/* Featured workshop */}
-      <section className="wsh-featured section-padding">
+      <section className="wsh-featured section-padding" id="featured">
         <div className="container">
           <motion.div
             className="wsh-featured-card glass-card"
@@ -153,7 +153,7 @@ const WorkshopsLanding: React.FC<Props> = ({ content }) => {
       </section>
 
       {/* Value props */}
-      <section className="wsh-values section-padding">
+      <section className="wsh-values section-padding" id="why-join">
         <div className="container">
           <header className="wsh-section-head">
             <h2 className="section-title">
@@ -181,7 +181,7 @@ const WorkshopsLanding: React.FC<Props> = ({ content }) => {
       </section>
 
       {/* Reviews */}
-      <section className="wsh-reviews section-padding">
+      <section className="wsh-reviews section-padding" id="reviews">
         <div className="container">
           <header className="wsh-section-head">
             <div className="prog-cyber-label wsh-label">
@@ -208,7 +208,7 @@ const WorkshopsLanding: React.FC<Props> = ({ content }) => {
       </section>
 
       {/* About */}
-      <section className="wsh-about section-padding">
+      <section className="wsh-about section-padding" id="about-studio">
         <div className="container wsh-about-grid">
           <div className="wsh-about-copy">
             <div className="prog-cyber-label wsh-label">

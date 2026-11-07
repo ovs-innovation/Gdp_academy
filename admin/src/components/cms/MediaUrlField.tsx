@@ -3,9 +3,10 @@ import { useDropzone } from "react-dropzone";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Link2, Upload, X } from "lucide-react";
+import { ExternalLink, Link2, MapPin, Upload, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import { resolveSectionUrl } from "@/lib/websiteLinks";
 import {
   mediaAcceptFor,
   isVideoUrl,
@@ -96,7 +97,18 @@ export function MediaUrlField({
       {label && <Label>{label}</Label>}
       {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
       {websiteLocation && (
-        <p className="text-xs text-primary/80 font-medium">On website: {websiteLocation}</p>
+        <p className="text-xs font-medium">
+          <a
+            href={resolveSectionUrl(websiteLocation)}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-1 text-primary hover:underline"
+          >
+            <MapPin className="h-3 w-3" />
+            <span>On website: {websiteLocation}</span>
+            <ExternalLink className="h-2.5 w-2.5 opacity-70" />
+          </a>
+        </p>
       )}
 
       <div

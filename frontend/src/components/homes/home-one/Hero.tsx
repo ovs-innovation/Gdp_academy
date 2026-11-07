@@ -744,7 +744,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                 }
             `}</style>
 
-            <section className="hero-wrapper">
+            <section className="hero-wrapper" id="hero">
                 <div className="hero-pill-badge">
                     <span className="heart-icon">💜</span>
                     <span>INDIA'S ONLINE-FIRST DANCE & FITNESS COMPANY</span>
@@ -873,7 +873,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                     </div>
                 </div>
 
-                <div className="hero-bottom-stats">
+                <div className="hero-bottom-stats" id="stats">
                     {(homeContent?.homeStats || [
                         { value: "4.9", label: "320+ Reviews" },
                         { value: "15+", label: "Countries" },
