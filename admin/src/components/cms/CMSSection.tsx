@@ -9,6 +9,9 @@ interface CMSSectionProps {
   description: string;
   websiteLocation?: string;
   defaultOpen?: boolean;
+  isOpen?: boolean;
+  onToggle?: (open: boolean) => void;
+  id?: string;
   children: React.ReactNode;
   className?: string;
 }
@@ -18,16 +21,29 @@ export function CMSSection({
   description,
   websiteLocation,
   defaultOpen = false,
+  isOpen,
+  onToggle,
+  id,
   children,
   className,
 }: CMSSectionProps) {
-  const [open, setOpen] = useState(defaultOpen);
+  const [internalOpen, setInternalOpen] = useState(defaultOpen);
+  const open = isOpen !== undefined ? isOpen : internalOpen;
   const liveUrl = websiteLocation ? resolveSectionUrl(websiteLocation) : null;
+
+  const handleToggle = () => {
+    const next = !open;
+    if (isOpen === undefined) {
+      setInternalOpen(next);
+    }
+    onToggle?.(next);
+  };
 
   return (
     <Card
+      id={id}
       className={cn(
-        "border-border bg-card overflow-hidden transition-all duration-200",
+        "border-border bg-card overflow-hidden transition-all duration-200 scroll-mt-24",
         open && "border-primary/40 shadow-sm border-l-4 border-l-primary",
         className,
       )}
@@ -36,7 +52,7 @@ export function CMSSection({
         <div className="flex items-start gap-3.5">
           <button
             type="button"
-            onClick={() => setOpen((v) => !v)}
+            onClick={handleToggle}
             className="flex h-7 w-7 items-center justify-center rounded-lg mt-0.5 shrink-0 transition-colors cursor-pointer select-none"
             aria-label={open ? "Collapse section" : "Expand section"}
           >
@@ -56,7 +72,7 @@ export function CMSSection({
 
           <div className="flex-1 min-w-0">
             <div
-              onClick={() => setOpen((v) => !v)}
+              onClick={handleToggle}
               className="cursor-pointer select-none flex flex-wrap items-center justify-between gap-2"
             >
               <h3 className="font-semibold text-foreground text-sm sm:text-base leading-snug">
@@ -73,7 +89,7 @@ export function CMSSection({
             </div>
 
             <p
-              onClick={() => setOpen((v) => !v)}
+              onClick={handleToggle}
               className="text-xs text-muted-foreground mt-1 leading-relaxed cursor-pointer select-none"
             >
               {description}

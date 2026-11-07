@@ -117,7 +117,7 @@ const WebsiteManagementItems: NavItem[] = [
   {
     to: "/cms",
     icon: Globe,
-    label: "Pages & Banners (CMS)",
+    label: "Website Pages (CMS)",
     anyOf: ["cms.view", "pages.view", "settings.view"],
   },
   {
@@ -135,7 +135,7 @@ const WebsiteManagementItems: NavItem[] = [
   {
     to: "/workshops",
     icon: Calendar,
-    label: "Workshops",
+    label: "Upcoming Workshops",
     permission: "workshops.view",
   },
   {
@@ -159,7 +159,7 @@ const WebsiteManagementItems: NavItem[] = [
   {
     to: "/faqs",
     icon: HelpCircle,
-    label: "FAQs",
+    label: "FAQ Questions",
     permission: "faqs.view",
   },
   {
@@ -450,7 +450,7 @@ export function AdminSidebar({ mobileOpen = false, onMobileClose }: AdminSidebar
     <aside
       className={cn(
         "sticky top-0 hidden h-screen shrink-0 flex-col border-r border-sidebar-border bg-sidebar transition-all duration-300 md:flex",
-        collapsed ? "w-16" : "w-[21rem]",
+        collapsed ? "w-16" : "w-64",
       )}
     >
       {sidebarContent}

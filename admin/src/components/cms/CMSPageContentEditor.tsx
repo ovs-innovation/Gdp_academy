@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,7 +15,21 @@ import {
 import { PageHeroEditor } from "@/components/cms/PageHeroEditor";
 import type { ApiPageContent } from "@/lib/api";
 import type { PageSlug } from "@/lib/websiteControlNav";
-import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  Plus,
+  Trash2,
+  ArrowRight,
+  HelpCircle,
+  Star,
+  BookOpen,
+  Image as ImageIcon,
+  FileText,
+  CreditCard,
+  Sparkles,
+  Calendar,
+} from "lucide-react";
 
 type Props = {
   selectedSlug: PageSlug;
@@ -81,7 +96,27 @@ export function CMSPageContentEditor({
       )}
 
       {selectedSlug === "services" && (
-        <ServicesPageCMSEditor content={c} onChange={onContentChange} />
+        <>
+          <ServicesPageCMSEditor content={c} onChange={onContentChange} />
+          <Card className="p-5 border-primary/30 bg-primary/5 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h4 className="font-bold text-foreground text-sm sm:text-base flex items-center gap-2">
+                  <Sparkles className="h-5 w-5 text-primary" /> Services Cards & Offerings
+                </h4>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Manage individual service cards (Wedding Choreography, School Programs, Wellness, Corporate).
+                </p>
+              </div>
+              <Link
+                to="/services-cms"
+                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow hover:bg-primary/90 transition shrink-0"
+              >
+                Manage Services Cards <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </Card>
+        </>
       )}
 
       {selectedSlug === "workshops" && (
@@ -89,6 +124,111 @@ export function CMSPageContentEditor({
       )}
 
       {renderHero()}
+
+      {selectedSlug === "programs" && (
+        <Card className="p-5 border-primary/30 bg-primary/5 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h4 className="font-bold text-foreground text-sm sm:text-base flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-primary" /> Dance Programs & Classes Catalog
+              </h4>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Manage the actual dance curriculum, courses, age groups, batch timings, and difficulty levels.
+              </p>
+            </div>
+            <Link
+              to="/programs"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow hover:bg-primary/90 transition shrink-0"
+            >
+              Manage Dance Programs <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </Card>
+      )}
+
+      {selectedSlug === "faq" && (
+        <Card className="p-5 border-primary/30 bg-primary/5 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h4 className="font-bold text-foreground text-sm sm:text-base flex items-center gap-2">
+                <HelpCircle className="h-5 w-5 text-primary" /> FAQ Questions & Answers
+              </h4>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Manage the questions and answers shown in the accordion on the FAQ page and on the homepage.
+              </p>
+            </div>
+            <Link
+              to="/faqs"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow hover:bg-primary/90 transition shrink-0"
+            >
+              Manage FAQ Questions <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </Card>
+      )}
+
+      {selectedSlug === "testimonials" && (
+        <Card className="p-5 border-primary/30 bg-primary/5 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h4 className="font-bold text-foreground text-sm sm:text-base flex items-center gap-2">
+                <Star className="h-5 w-5 text-amber-400 fill-amber-400" /> Student Reviews & Testimonials
+              </h4>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Add, approve, or edit student written reviews, star ratings, and Google ratings.
+              </p>
+            </div>
+            <Link
+              to="/testimonials"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow hover:bg-primary/90 transition shrink-0"
+            >
+              Manage Student Reviews <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </Card>
+      )}
+
+      {selectedSlug === "blog" && (
+        <Card className="p-5 border-primary/30 bg-primary/5 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h4 className="font-bold text-foreground text-sm sm:text-base flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" /> Blog Posts & Dance Articles
+              </h4>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Publish, edit, and organize dance tutorials, health & wellness articles, and studio news.
+              </p>
+            </div>
+            <Link
+              to="/blogs"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow hover:bg-primary/90 transition shrink-0"
+            >
+              Manage Blog Posts <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </Card>
+      )}
+
+      {selectedSlug === "membership" && (
+        <Card className="p-5 border-primary/30 bg-primary/5 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div>
+              <h4 className="font-bold text-foreground text-sm sm:text-base flex items-center gap-2">
+                <CreditCard className="h-5 w-5 text-primary" /> Membership Plans & Pricing Passes
+              </h4>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Manage monthly, quarterly, and annual subscription packages, pricing, and perk bullet points.
+              </p>
+            </div>
+            <Link
+              to="/membership-plans"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow hover:bg-primary/90 transition shrink-0"
+            >
+              Manage Membership Plans <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </Card>
+      )}
 
       {selectedSlug === "about" && (
         <AboutPageCMSEditor content={c} onChange={onContentChange} />
@@ -103,25 +243,45 @@ export function CMSPageContentEditor({
       )}
 
       {selectedSlug === "gallery" && (
-        <Card className="p-6 border-border bg-card space-y-4">
-          <h4 className="font-semibold text-foreground border-b border-border pb-3">Gallery Top Banner</h4>
-          <div className="space-y-2">
-            <Label>Hero Title</Label>
-            <Input
-              value={c.heroTitle || ""}
-              onChange={(e) => onContentChange("heroTitle", e.target.value)}
-              className="bg-muted/50"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label>Hero Subtitle</Label>
-            <Textarea
-              value={c.heroSubtitle || ""}
-              onChange={(e) => onContentChange("heroSubtitle", e.target.value)}
-              className="bg-muted/50 min-h-[80px]"
-            />
-          </div>
-        </Card>
+        <>
+          <Card className="p-6 border-border bg-card space-y-4">
+            <h4 className="font-semibold text-foreground border-b border-border pb-3">Gallery Top Banner</h4>
+            <div className="space-y-2">
+              <Label>Hero Title</Label>
+              <Input
+                value={c.heroTitle || ""}
+                onChange={(e) => onContentChange("heroTitle", e.target.value)}
+                className="bg-muted/50"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Hero Subtitle</Label>
+              <Textarea
+                value={c.heroSubtitle || ""}
+                onChange={(e) => onContentChange("heroSubtitle", e.target.value)}
+                className="bg-muted/50 min-h-[80px]"
+              />
+            </div>
+          </Card>
+          <Card className="p-5 border-primary/30 bg-primary/5 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h4 className="font-bold text-foreground text-sm sm:text-base flex items-center gap-2">
+                  <ImageIcon className="h-5 w-5 text-primary" /> Photos & Videos Gallery
+                </h4>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Upload and manage stage performance videos, recital photos, and studio moments.
+                </p>
+              </div>
+              <Link
+                to="/gallery"
+                className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground shadow hover:bg-primary/90 transition shrink-0"
+              >
+                Manage Photos & Videos <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </Card>
+        </>
       )}
 
       {selectedSlug === "contact" && (

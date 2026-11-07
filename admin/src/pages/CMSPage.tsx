@@ -23,6 +23,9 @@ import {
   Layers,
   Sparkles,
   CheckCircle2,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Map,
 } from "lucide-react";
 import { WebsiteStructureMap } from "@/components/cms/WebsiteStructureMap";
 import { WebsitePageNav } from "@/components/cms/WebsitePageNav";
@@ -37,8 +40,25 @@ import {
   type WebsiteNavId,
 } from "@/lib/websiteControlNav";
 
+const QUICK_PAGES: { id: WebsiteNavId; label: string; icon: string }[] = [
+  { id: "home", label: "Homepage", icon: "🏠" },
+  { id: "about", label: "About Us", icon: "ℹ️" },
+  { id: "services", label: "Services", icon: "✨" },
+  { id: "programs", label: "Programs", icon: "📚" },
+  { id: "workshops", label: "Workshops", icon: "📅" },
+  { id: "gallery", label: "Gallery", icon: "📸" },
+  { id: "blog", label: "Blog", icon: "📝" },
+  { id: "faq", label: "FAQ", icon: "❓" },
+  { id: "testimonials", label: "Reviews", icon: "⭐" },
+  { id: "membership", label: "Membership", icon: "💳" },
+  { id: "contact", label: "Contact", icon: "📞" },
+  { id: "global", label: "Header & Footer", icon: "🌐" },
+  { id: "overview", label: "All Pages Map", icon: "🗺️" },
+];
+
 const CMSPage = () => {
   const [activeNavId, setActiveNavId] = useState<WebsiteNavId>("home");
+  const [showPageNav, setShowPageNav] = useState<boolean>(false);
   const selectedSlug: PageSlug | null =
     activeNavId !== "overview" && activeNavId !== "global" ? activeNavId : null;
 
@@ -243,27 +263,75 @@ const CMSPage = () => {
               Website Page Editor
             </h1>
             <p className="mt-0.5 text-xs text-muted-foreground">
-              Select any page from the left to edit its headlines, text, banners, and media.
+              Select any page below to edit its headlines, text, banners, and media.
             </p>
           </div>
-          {activeNavItem?.path ? (
-            <a
-              href={getLiveWebsiteUrl(activeNavItem.path)}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary/20 shadow-2xs"
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowPageNav(!showPageNav)}
+              className="h-8 gap-1.5 text-xs font-medium"
             >
-              <Globe className="h-3.5 w-3.5" /> View Live Website ({activeNavItem.path}) <ExternalLink className="h-3 w-3" />
-            </a>
-          ) : null}
+              {showPageNav ? (
+                <>
+                  <PanelLeftClose className="h-3.5 w-3.5 text-primary" />
+                  <span>Hide Page Menu</span>
+                </>
+              ) : (
+                <>
+                  <PanelLeftOpen className="h-3.5 w-3.5 text-primary" />
+                  <span>All Pages Menu</span>
+                </>
+              )}
+            </Button>
+            {activeNavItem?.path ? (
+              <a
+                href={getLiveWebsiteUrl(activeNavItem.path)}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary/20 shadow-2xs"
+              >
+                <Globe className="h-3.5 w-3.5" /> View Live ({activeNavItem.path}) <ExternalLink className="h-3 w-3" />
+              </a>
+            ) : null}
+          </div>
         </div>
 
-        {/* 2-Column Balanced Layout */}
-        <div className="grid items-start gap-5 lg:grid-cols-[250px_minmax(0,1fr)]">
-          {/* Left Column: Easy Page Switcher */}
-          <Card className="max-h-[50vh] overflow-y-auto border-border bg-card p-3 shadow-sm lg:sticky lg:top-4 lg:max-h-[calc(100dvh-7.5rem)]">
-            <WebsitePageNav activeId={activeNavId} onSelect={setActiveNavId} />
-          </Card>
+        {/* Quick Page Selector Tabs */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 pt-0.5 border-b border-border/60 scrollbar-thin">
+          {QUICK_PAGES.map((p) => {
+            const isActive = activeNavId === p.id;
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => setActiveNavId(p.id)}
+                className={cn(
+                  "inline-flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition cursor-pointer select-none",
+                  isActive
+                    ? "bg-primary text-primary-foreground shadow-sm font-semibold"
+                    : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground",
+                )}
+              >
+                <span>{p.icon}</span>
+                <span>{p.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Balanced Workspace Layout */}
+        <div className={cn(
+          "grid items-start gap-5",
+          showPageNav ? "lg:grid-cols-[240px_minmax(0,1fr)]" : "grid-cols-1",
+        )}>
+          {/* Left Column: Optional Deep Page Switcher */}
+          {showPageNav && (
+            <Card className="max-h-[50vh] overflow-y-auto border-border bg-card p-3 shadow-sm lg:sticky lg:top-4 lg:max-h-[calc(100dvh-7.5rem)]">
+              <WebsitePageNav activeId={activeNavId} onSelect={setActiveNavId} />
+            </Card>
+          )}
 
           {/* Right Column: Full-Width Clean Workspace */}
           <div className="min-w-0 space-y-4">
