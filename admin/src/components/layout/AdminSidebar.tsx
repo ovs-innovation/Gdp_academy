@@ -23,6 +23,12 @@ import {
   Image,
   HelpCircle,
   X,
+  Globe,
+  Sparkles,
+  Star,
+  Inbox,
+  Send,
+  CreditCard,
 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -110,84 +116,84 @@ const adminNavItems: NavItem[] = [
 const WebsiteManagementItems: NavItem[] = [
   {
     to: "/cms",
-    icon: FileText,
-    label: "1. Website Control (Hero/Info)",
+    icon: Globe,
+    label: "Pages & Banners (CMS)",
     anyOf: ["cms.view", "pages.view", "settings.view"],
   },
   {
     to: "/services-cms",
-    icon: FolderTree,
-    label: "2. Service Cards",
+    icon: Sparkles,
+    label: "Services Cards",
     anyOf: ["cms.view", "pages.edit", "settings.edit"],
   },
   {
     to: "/programs",
     icon: BookOpen,
-    label: "3. Programs & Classes",
+    label: "Programs & Classes",
     permission: "programs.view",
   },
   {
     to: "/workshops",
     icon: Calendar,
-    label: "4. Upcoming Workshops",
+    label: "Workshops",
     permission: "workshops.view",
-  },
-  {
-    to: "/blogs",
-    icon: FileText,
-    label: "5. Blog Posts",
-    permission: "blogs.view",
   },
   {
     to: "/gallery",
     icon: Image,
-    label: "6. Photos & Videos",
+    label: "Photos & Videos",
     permission: "gallery.view",
   },
   {
     to: "/testimonials",
-    icon: MessageSquare,
-    label: "7. Student Reviews",
+    icon: Star,
+    label: "Student Reviews",
     permission: "testimonials.view",
+  },
+  {
+    to: "/blogs",
+    icon: FileText,
+    label: "Blog Posts",
+    permission: "blogs.view",
   },
   {
     to: "/faqs",
     icon: HelpCircle,
-    label: "8. FAQ Questions",
+    label: "FAQs",
     permission: "faqs.view",
   },
   {
     to: "/membership-plans",
-    icon: DollarSign,
-    label: "9. Membership Plans",
+    icon: CreditCard,
+    label: "Membership Plans",
     permission: "membershipPlans.view",
   },
   {
     to: "/dance-styles",
     icon: FolderTree,
-    label: "10. Dance Styles (Categories)",
+    label: "Dance Styles",
     permission: "categories.view",
   },
 ];
 
 const StudentOperationsItems: NavItem[] = [
   {
-    to: "/members",
-    icon: Users,
-    label: "Students List",
-    permission: "students.view",
-  },
-  {
     to: "/enquiries",
-    icon: MessageSquare,
-    label: "Enquiries (Form)",
+    icon: Inbox,
+    label: "Student Enquiries",
     permission: "enquiries.view",
   },
   {
     to: "/contact-messages",
-    icon: MessageSquare,
+    icon: Send,
     label: "Contact Messages",
     permission: "contactMessages.view",
+  },
+  {
+    to: "/members",
+    icon: Users,
+    label: "Registered Students",
+    permission: "students.view",
   },
 ];
 
@@ -201,25 +207,25 @@ const SystemAdminItems: NavItem[] = [
   {
     to: "/analytics",
     icon: BarChart3,
-    label: "Analytics",
+    label: "Analytics & Traffic",
     permission: "analytics.view",
   },
   {
     to: "/users",
     icon: Users,
-    label: "Users List",
+    label: "Admin Staff",
     permission: "users.view",
   },
   {
     to: "/roles",
     icon: Shield,
-    label: "Role Permissions",
+    label: "Staff Roles",
     permission: "roles.view",
   },
   {
     to: "/notifications",
     icon: Bell,
-    label: "System Alerts",
+    label: "Notifications",
     permission: "notifications.view",
   },
   {
@@ -370,7 +376,7 @@ export function AdminSidebar({ mobileOpen = false, onMobileClose }: AdminSidebar
           <div className="space-y-0.5">
             {(!collapsed || isMobile) && (
               <p className="px-2.5 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-foreground">
-                Students & Enquiries
+                Leads & Students
               </p>
             )}
             {studentItems.map((item) => renderNavLink(item))}

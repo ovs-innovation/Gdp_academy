@@ -44,13 +44,13 @@ export function AboutPageCMSEditor({ content, onChange }: Props) {
   return (
     <div className="space-y-4">
       <CMSSection
-        title="1. Hero"
-        description="Intro text and chips at the top of the About page."
+        title="Top Hero Intro & Video"
+        description="Intro headline, highlight tags, and featured video at the top of the About Us page."
         websiteLocation="/about → hero"
         defaultOpen
       >
         <div className="space-y-2">
-          <Label>Hero intro text</Label>
+          <Label>Hero Intro Text</Label>
           <Textarea
             value={content.heroText || ""}
             onChange={(e) => onChange("heroText", e.target.value)}
@@ -58,7 +58,7 @@ export function AboutPageCMSEditor({ content, onChange }: Props) {
           />
         </div>
         <div className="space-y-2">
-          <Label>Hero highlight chips (one per line)</Label>
+          <Label>Highlight Tags / Chips (one per line)</Label>
           <Textarea
             value={highlights.map((h: { text?: string }) => h.text || "").join("\n")}
             onChange={(e) =>
@@ -85,12 +85,12 @@ export function AboutPageCMSEditor({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="2. Story"
-        description="Our story block on the About page."
+        title="Our Story & Background"
+        description="The story of Garima Dance Productions, how it started and evolved."
         websiteLocation="/about → story"
       >
         <div className="space-y-2">
-          <Label>Story title</Label>
+          <Label>Story Title</Label>
           <Input
             value={content.storyTitle || ""}
             onChange={(e) => onChange("storyTitle", e.target.value)}
@@ -98,7 +98,7 @@ export function AboutPageCMSEditor({ content, onChange }: Props) {
           />
         </div>
         <div className="space-y-2">
-          <Label>Story content</Label>
+          <Label>Story Content</Label>
           <Textarea
             value={content.storyText || ""}
             onChange={(e) => onChange("storyText", e.target.value)}
@@ -108,12 +108,12 @@ export function AboutPageCMSEditor({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="3. Mission"
-        description="Mission title and statement."
+        title="Mission & Vision Statement"
+        description="Our mission statement and artistic philosophy."
         websiteLocation="/about → mission"
       >
         <div className="space-y-2">
-          <Label>Mission title</Label>
+          <Label>Mission Title</Label>
           <Input
             value={content.missionTitle || ""}
             onChange={(e) => onChange("missionTitle", e.target.value)}
@@ -121,7 +121,7 @@ export function AboutPageCMSEditor({ content, onChange }: Props) {
           />
         </div>
         <div className="space-y-2">
-          <Label>Mission statement</Label>
+          <Label>Mission Statement</Label>
           <Textarea
             value={content.missionText || ""}
             onChange={(e) => onChange("missionText", e.target.value)}
@@ -131,8 +131,8 @@ export function AboutPageCMSEditor({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="4. Stats"
-        description="Numbers shown on the About page. Use a number (5000+) or leave as-is for icon stats."
+        title="Key Numbers & Achievements (Stats)"
+        description="Key statistics shown on the About page. Enter numbers (e.g. 5000+) or keep defaults."
         websiteLocation="/about → stats row"
       >
         {stats.map((stat: { number?: string; label?: string }, i: number) => (
@@ -162,8 +162,8 @@ export function AboutPageCMSEditor({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="5. Pillars"
-        description="Training pillars (usually three)."
+        title="Core Training Pillars"
+        description="The foundational pillars of the dance academy curriculum."
         websiteLocation="/about → pillars"
       >
         {pillars.map((pillar: { num?: string; title?: string; text?: string }, i: number) => (
@@ -225,8 +225,8 @@ export function AboutPageCMSEditor({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="6. Studio ecosystem"
-        description="Studio facility cards."
+        title="Studio Facilities & Infrastructure"
+        description="Highlight features like shock-absorbing floors, mirrors, audio equipment, and suites."
         websiteLocation="/about → ecosystem"
       >
         {ecosystem.map((item: { title?: string; text?: string }, i: number) => (
@@ -276,8 +276,8 @@ export function AboutPageCMSEditor({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="7. Bottom CTA"
-        description="Call-to-action at the end of the About page."
+        title="Bottom Call-to-Action Banner"
+        description="The encouragement banner and button shown at the bottom of the About page."
         websiteLocation="/about → bottom CTA"
       >
         <div className="grid gap-4 md:grid-cols-2">

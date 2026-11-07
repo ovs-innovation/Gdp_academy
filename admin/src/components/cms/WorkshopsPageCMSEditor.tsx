@@ -89,29 +89,29 @@ export function WorkshopsPageCMSEditor({ content, onChange }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm space-y-2">
-        <p className="font-semibold text-foreground">How to manage the Workshops page</p>
-        <ol className="list-decimal list-inside space-y-1 text-muted-foreground">
-          <li>
-            <strong className="text-foreground">Steps 1–5 below</strong> — landing page text, images, prices & reviews
-            (this screen).
-          </li>
-          <li>
-            <strong className="text-foreground">Step 6</strong> — heading above the workshop cards list.
-          </li>
-          <li>
-            <strong className="text-foreground">Workshop cards</strong> — add/edit live workshops in{" "}
-            <Link to="/workshops" className="text-primary underline inline-flex items-center gap-1">
-              Workshops admin <ExternalLink className="h-3 w-3" />
-            </Link>
-            (date, time, price, banner, Zoom link).
-          </li>
-        </ol>
-        <p className="text-xs text-muted-foreground">Save this page after editing. Changes appear on /workshops within a few seconds.</p>
+      <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-xs space-y-2">
+        <p className="font-semibold text-foreground text-sm flex items-center gap-2">
+          💡 Managing the Workshops Page
+        </p>
+        <div className="grid gap-2 sm:grid-cols-2 text-muted-foreground pt-1">
+          <div className="rounded-lg border border-border/60 bg-background/50 p-3">
+            <p className="font-medium text-foreground mb-1">Page Banners, Texts & Media</p>
+            <p>Edit the sections below (banner, featured card, why join, reviews, studio info) and click Save.</p>
+          </div>
+          <div className="rounded-lg border border-border/60 bg-background/50 p-3">
+            <p className="font-medium text-foreground mb-1">Live Workshop Cards</p>
+            <p>
+              To add or update workshop cards (date, time, Zoom link, fee), open{" "}
+              <Link to="/workshops" className="text-primary underline font-medium inline-flex items-center gap-1">
+                Workshops Manager <ExternalLink className="h-3 w-3" />
+              </Link>
+            </p>
+          </div>
+        </div>
       </div>
 
       <CMSSection
-        title="1. Offer banner"
+        title="Top Offer & Announcement Banner"
         description="Sticky strip at the top of the workshops page. Leave text empty to hide the banner."
         websiteLocation="/workshops → top gradient bar"
         defaultOpen
@@ -150,7 +150,7 @@ export function WorkshopsPageCMSEditor({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="2. Featured workshop"
+        title="Featured Workshop Spotlight Card"
         description="Main spotlight card — image, title, perks, price and book button."
         websiteLocation="/workshops → large featured card"
         defaultOpen
@@ -293,7 +293,7 @@ export function WorkshopsPageCMSEditor({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="3. Why join section"
+        title="Why Join GDP Workshops (Benefits Grid)"
         description="Section heading plus benefit cards shown in a grid."
         websiteLocation="/workshops → why join grid"
       >
@@ -358,7 +358,7 @@ export function WorkshopsPageCMSEditor({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="4. Student reviews"
+        title="Student Workshop Reviews & Quotes"
         description="Review section heading and individual quote cards."
         websiteLocation="/workshops → reviews grid"
       >
@@ -437,7 +437,7 @@ export function WorkshopsPageCMSEditor({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="5. About studio"
+        title="About GDP Studio & Highlights"
         description="Studio info block and stat numbers at the bottom of the landing."
         websiteLocation="/workshops → about section"
       >
@@ -532,8 +532,8 @@ export function WorkshopsPageCMSEditor({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="6. Upcoming workshops list"
-        description="Heading above the dynamic workshop cards (cards are managed in Workshops admin)."
+        title="Upcoming Workshops Section Header"
+        description="Heading and gradient highlight above the workshop schedule cards (individual cards are managed in Workshops Manager)."
         websiteLocation="/workshops → bottom grid"
       >
         <div className="grid gap-3 md:grid-cols-2">

@@ -75,11 +75,7 @@ export function CMSPageContentEditor({
   };
 
   return (
-    <Card className="space-y-4 border-border bg-card p-6">
-      <div className="mb-2 flex items-center gap-2 border-b border-border pb-3">
-        <h3 className="text-lg font-semibold capitalize text-foreground">{pageLabel} content</h3>
-      </div>
-
+    <div className="space-y-4">
       {selectedSlug === "home" && (
         <HomePageCMSEditor content={c} onChange={onContentChange} />
       )}
@@ -89,12 +85,7 @@ export function CMSPageContentEditor({
       )}
 
       {selectedSlug === "workshops" && (
-        <>
-          <p className="mb-4 -mt-2 text-sm text-muted-foreground">
-            Edit the /workshops landing in steps below. Workshop cards are managed in Workshops admin.
-          </p>
-          <WorkshopsPageCMSEditor content={c} onChange={onContentChange} />
-        </>
+        <WorkshopsPageCMSEditor content={c} onChange={onContentChange} />
       )}
 
       {renderHero()}
@@ -112,7 +103,8 @@ export function CMSPageContentEditor({
       )}
 
       {selectedSlug === "gallery" && (
-        <div className="space-y-4">
+        <Card className="p-6 border-border bg-card space-y-4">
+          <h4 className="font-semibold text-foreground border-b border-border pb-3">Gallery Top Banner</h4>
           <div className="space-y-2">
             <Label>Hero Title</Label>
             <Input
@@ -129,11 +121,11 @@ export function CMSPageContentEditor({
               className="bg-muted/50 min-h-[80px]"
             />
           </div>
-        </div>
+        </Card>
       )}
 
       {selectedSlug === "contact" && (
-        <div className="space-y-4">
+        <Card className="p-6 border-border bg-card space-y-4">
           <p className="rounded-md border border-border bg-muted/40 px-3 py-2 text-xs text-muted-foreground">
             Phone, email, and address also appear in the website footer. After saving here, refresh
             the live site to see updates.
@@ -205,11 +197,11 @@ export function CMSPageContentEditor({
                             />
                           </div>
                         </div>
-        </div>
+        </Card>
       )}
 
       {(selectedSlug === "terms" || selectedSlug === "privacy") && (
-        <div className="space-y-6">
+        <Card className="p-6 border-border bg-card space-y-6">
           <div className="flex items-center justify-between border-b border-border pb-2">
             <h4 className="font-semibold text-foreground">Document Sections</h4>
             <Button
@@ -307,8 +299,8 @@ export function CMSPageContentEditor({
               </Card>
             ))}
           </div>
-        </div>
+        </Card>
       )}
-    </Card>
+    </div>
   );
 }

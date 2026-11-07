@@ -65,14 +65,14 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
   return (
     <div className="space-y-4">
       <CMSSection
-        title="1. Hero Section - Headline & Badge"
-        description="The main headline lines, subtitle, badge and button settings shown in the centered hero area."
+        title="Top Hero Banner (Headline & Tagline)"
+        description="The main headlines, gradient highlight, subtitle, and badge shown at the top of the homepage."
         websiteLocation="Homepage top → Centered Hero intro"
         defaultOpen
       >
         <div className="space-y-2">
-          <Label>Small badge text (small label above the title)</Label>
-          <Input value={content.heroBadgeText || content.heroBadge || ""} onChange={(e) => onChange("heroBadgeText", e.target.value)} className="bg-muted/50" />
+          <Label>Top Tagline / Badge (small label above the headline)</Label>
+          <Input value={content.heroBadgeText || content.heroBadge || ""} onChange={(e) => onChange("heroBadgeText", e.target.value)} className="bg-muted/50" placeholder="Welcome to GDP" />
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           <div className="space-y-2">
@@ -80,7 +80,7 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
             <Input value={content.heroTitleLine1 || ""} onChange={(e) => onChange("heroTitleLine1", e.target.value)} className="bg-muted/50" placeholder="Welcome to" />
           </div>
           <div className="space-y-2">
-            <Label>Headline Line 2 (Highlighted Gradient)</Label>
+            <Label>Headline Line 2 (Highlighted Text)</Label>
             <Input value={content.heroTitleLine2 || content.heroTitleHighlight || ""} onChange={(e) => onChange("heroTitleLine2", e.target.value)} className="bg-muted/50" placeholder="Garima Dance" />
           </div>
           <div className="space-y-2">
@@ -89,14 +89,14 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
           </div>
         </div>
         <div className="space-y-2 mt-2">
-          <Label>Subtitle (description)</Label>
+          <Label>Subtitle / Description</Label>
           <Textarea value={content.heroSubtitle || ""} onChange={(e) => onChange("heroSubtitle", e.target.value)} className="bg-muted/50 min-h-[80px]" />
         </div>
       </CMSSection>
 
       <CMSSection
-        title="2. Hero Section - Bottom Stats Grid"
-        description="Four stats boxes below the hero video. Keep labels short (2–3 words) so they fit on mobile."
+        title="Key Highlights & Numbers (Stats Bar)"
+        description="The four highlight boxes shown below the hero banner. Keep labels short (2–3 words) so they fit nicely on mobile."
         websiteLocation="Homepage → Hero bottom stats grid"
       >
         {(content.homeStats?.length
@@ -144,7 +144,7 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="3. Hero Section - Video Collage (9 Slots)"
+        title="Visual Media Grid (9 Slots Collage)"
         description="The 3×3 grid of rotating videos and images on the left side of the homepage. Set a type and link for each slot."
         websiteLocation="Homepage top → left video/image collage"
       >
@@ -205,23 +205,23 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="4. Services Section Heading"
-        description="The title and description shown before the service circles on the homepage. Each service's photo/text is managed in the Homepage Services menu."
+        title="Services Section Intro & Heading"
+        description="The headline and intro text shown above the service circles on the homepage. Individual service cards are managed in the Services Cards menu."
         websiteLocation="Homepage → Services section header"
       >
         <div className="space-y-2">
-          <Label>Section title</Label>
+          <Label>Section Title</Label>
           <Input value={content.servicesTitle || ""} onChange={(e) => onChange("servicesTitle", e.target.value)} className="bg-muted/50" placeholder="Services" />
         </div>
         <div className="space-y-2">
-          <Label>Section description</Label>
+          <Label>Section Subtitle / Description</Label>
           <Textarea value={content.servicesSubtitle || ""} onChange={(e) => onChange("servicesSubtitle", e.target.value)} className="bg-muted/50 min-h-[60px]" placeholder="Experience the ultimate dance training ecosystem." />
         </div>
       </CMSSection>
 
       <CMSSection
-        title="5. YouTube Shorts Section"
-        description="10 YouTube shorts on the homepage (2 rows × 5). Any empty slots are filled with defaults on the site."
+        title="YouTube Shorts & Channel Videos"
+        description="YouTube shorts carousel on the homepage. Any empty slots are filled with defaults on the live site."
         websiteLocation="Homepage → YouTube Shorts"
       >
         <div className="grid gap-4 md:grid-cols-2 mb-4">
@@ -299,12 +299,12 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="6. About Section Preview"
-        description="Video + text block (About section on homepage)."
+        title="About Us (Homepage Preview & Video)"
+        description="Video + intro text block about Garima Dance Productions shown on the homepage."
         websiteLocation="Homepage → About section"
       >
         <div className="space-y-2">
-          <Label>Section title</Label>
+          <Label>Section Title</Label>
           <Input value={content.aboutShortTitle || ""} onChange={(e) => onChange("aboutShortTitle", e.target.value)} className="bg-muted/50" />
         </div>
         <div className="space-y-2">
@@ -321,8 +321,8 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="7. Instagram Reels Section"
-        description="Instagram reels on the homepage (from admin — only saved reels appear on the site)."
+        title="Instagram Reels & Social Showcase"
+        description="Instagram reels showcase on the homepage. Only reels configured here appear on the site."
         websiteLocation="Homepage → Instagram section"
       >
         <div className="grid gap-4 md:grid-cols-2 mb-4">
@@ -331,7 +331,7 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
             <Input value={content.instagramSectionTitle || "Join us"} onChange={(e) => onChange("instagramSectionTitle", e.target.value)} className="bg-muted/50" />
           </div>
           <div className="space-y-2">
-            <Label>Title line 2 (gradient)</Label>
+            <Label>Title line 2 (gradient highlight)</Label>
             <Input value={content.instagramSectionHighlight || "on Instagram"} onChange={(e) => onChange("instagramSectionHighlight", e.target.value)} className="bg-muted/50" />
           </div>
         </div>
@@ -392,8 +392,8 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="8. Reviews & Testimonials"
-        description="Google rating, section title and video review cards. Text review cards are managed in the Student Reviews menu."
+        title="Student Reviews & Video Testimonials"
+        description="Google rating, section headline, and video review cards. Written reviews are managed in the Student Reviews menu."
         websiteLocation="Homepage → Reviews section"
       >
         <div className="space-y-2 mb-4">
@@ -432,23 +432,23 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
       </CMSSection>
 
       <CMSSection
-        title="9. FAQ Section Heading"
-        description="The FAQ questions themselves are edited from the FAQ Questions menu in the sidebar."
+        title="FAQ Section Heading"
+        description="The header and intro text for FAQ. Individual FAQ questions are managed in the FAQ Questions menu in the sidebar."
         websiteLocation="Homepage → FAQ"
       >
         <div className="space-y-2">
-          <Label>FAQ title</Label>
+          <Label>FAQ Section Title</Label>
           <Input value={content.faqTitle || ""} onChange={(e) => onChange("faqTitle", e.target.value)} className="bg-muted/50" placeholder="FAQ" />
         </div>
         <div className="space-y-2">
-          <Label>FAQ subtitle</Label>
+          <Label>FAQ Section Subtitle</Label>
           <Textarea value={content.faqSubtitle || ""} onChange={(e) => onChange("faqSubtitle", e.target.value)} className="bg-muted/50 min-h-[60px]" />
         </div>
       </CMSSection>
 
       <CMSSection
-        title="10. Contact / Let's Catch Up"
-        description="The contact section at the bottom of the homepage — left-side title and right-side form heading."
+        title="Bottom Contact & Enquiry Section"
+        description="The contact section at the bottom of the homepage — left-side heading and right-side form prompt."
         websiteLocation="Homepage → bottom contact form"
       >
         <div className="grid gap-4 md:grid-cols-2">

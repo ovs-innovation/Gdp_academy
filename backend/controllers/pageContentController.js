@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const PageContent = require("../models/pageContentModel.js");
 const {
   withPublicCache,
@@ -83,10 +84,19 @@ const getPageContentBySlug = async (req, res, next) => {
   }
 };
 
-// Get page content by ID (admin)
+// Helper to resolve whether param is ObjectId or slug
+const resolvePageFilter = (identifier) => {
+  const isObjectId =
+    mongoose.Types.ObjectId.isValid(identifier) &&
+    String(new mongoose.Types.ObjectId(identifier)) === identifier;
+  return isObjectId ? { _id: identifier } : { slug: identifier };
+};
+
+// Get page content by ID or slug (admin)
 const getPageContentById = async (req, res, next) => {
   try {
-    const page = await PageContent.findById(req.params.id);
+    const filter = resolvePageFilter(req.params.id);
+    const page = await PageContent.findOne(filter);
     if (!page) return res.status(404).json({ message: "Page not found" });
     res.json({ page });
   } catch (err) {
@@ -94,14 +104,22 @@ const getPageContentById = async (req, res, next) => {
   }
 };
 
-// Update page content (admin only)
+// Update page content by ID or slug (admin only, upserts if document does not exist yet)
 const updatePageContent = async (req, res, next) => {
   try {
-    const existing = await PageContent.findById(req.params.id).select("slug").lean();
-    const updated = await PageContent.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true, runValidators: true },
+    const filter = resolvePageFilter(req.params.id);
+    const existing = await PageContent.findOne(filter).select("slug").lean();
+
+    const updateBody = { ...req.body };
+    // If updating by slug and body has no slug, ensure slug is set
+    if (!filter._id && !updateBody.slug) {
+      updateBody.slug = req.params.id;
+    }
+
+    const updated = await PageContent.findOneAndUpdate(
+      filter,
+      updateBody,
+      { new: true, runValidators: true, upsert: true, setDefaultsOnInsert: true },
     );
     if (!updated) return res.status(404).json({ message: "Page not found" });
     bustPageCache(existing?.slug);
@@ -116,7 +134,8 @@ const updatePageContent = async (req, res, next) => {
 // Delete page content (admin only)
 const deletePageContent = async (req, res, next) => {
   try {
-    const deleted = await PageContent.findByIdAndDelete(req.params.id);
+    const filter = resolvePageFilter(req.params.id);
+    const deleted = await PageContent.findOneAndDelete(filter);
     if (!deleted) return res.status(404).json({ message: "Page not found" });
     bustPageCache(deleted.slug);
     res.json({ message: "Page content deleted" });
