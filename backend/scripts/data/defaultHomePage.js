@@ -11,6 +11,8 @@ const DEFAULT_HOME_PAGE = {
     "Experience professional online & offline dance coaching with Garima Dance Productions. Explore Kathak, Bollywood, and Contemporary fusion classes.",
   status: "published",
   content: {
+    heroBadgeText: "Your Destination for Dance, Fitness & Celebrations",
+    heroBadge: "Your Destination for Dance, Fitness & Celebrations",
     heroTitleLine1: "Welcome to",
     heroTitleLine2: "Garima Dance",
     heroTitleLine3: "Productions",

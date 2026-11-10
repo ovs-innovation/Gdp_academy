@@ -36,6 +36,15 @@ function applyFrontendTheme(colorInput?: string | null) {
   if (found) {
     document.documentElement.style.setProperty("--primary-color", found.hex);
     document.documentElement.style.setProperty("--gradient-primary", found.gradient);
+    document.documentElement.style.setProperty("--highlight-gradient", found.gradient);
+    document.documentElement.style.setProperty("--theme-purple", found.hex);
+    document.documentElement.style.setProperty("--svc-purple", found.hex);
+    document.documentElement.style.setProperty("--dash-primary", found.hex);
+    document.documentElement.style.setProperty("--dash-gradient", found.gradient);
+    document.documentElement.style.setProperty("--button-primary", found.hex);
+    try {
+      localStorage.setItem("theme-color", clean);
+    } catch {}
   }
 }
 
@@ -76,6 +85,10 @@ export function SiteDataProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     mountedRef.current = true;
+    try {
+      const stored = localStorage.getItem("theme-color");
+      if (stored) applyFrontendTheme(stored);
+    } catch {}
     return () => {
       mountedRef.current = false;
     };

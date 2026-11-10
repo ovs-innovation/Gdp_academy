@@ -17,8 +17,15 @@ let inflight: Promise<HomepagePayload> | null = null;
 
 export function getHomepage(): Promise<HomepagePayload> {
   if (inflight) return inflight;
-  inflight = fetch(`${API_BASE_URL}/homepage`, {
-    headers: { Accept: "application/json" },
+  const sep = API_BASE_URL.includes("?") ? "&" : "?";
+  const url = `${API_BASE_URL}/homepage${sep}_=${Date.now()}`;
+  inflight = fetch(url, {
+    cache: "no-store",
+    headers: {
+      Accept: "application/json",
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      Pragma: "no-cache",
+    },
   })
     .then((response) => {
       if (!response.ok) throw new Error("Failed to load homepage");

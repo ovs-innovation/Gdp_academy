@@ -5,6 +5,12 @@
   --primary-color: #634BFA;
   --accent-color: #1EFFE4;
   --highlight-gradient: linear-gradient(135deg, #634BFA 0%, #1EFFE4 100%);
+  --gradient-primary: linear-gradient(135deg, #634BFA 0%, #1EFFE4 100%);
+  --theme-purple: #634bfa;
+  --svc-purple: #634bfa;
+  --dash-primary: #634BFA;
+  --dash-gradient: linear-gradient(135deg, #634BFA 0%, #1EFFE4 100%);
+  --button-primary: #634BFA;
   --text-white: #ffffff;
   --text-gray: #a0a0a0;
   --glass-bg: rgba(255, 255, 255, 0.05);

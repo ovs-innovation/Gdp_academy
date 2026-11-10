@@ -13,7 +13,7 @@ const {
 } = require("../utils/contactSync.js");
 const { withPublicCache } = require("../utils/publicCache.js");
 
-const HOMEPAGE_CACHE_TTL_MS = 5 * 60 * 1000;
+const HOMEPAGE_CACHE_TTL_MS = 30 * 1000;
 const HOMEPAGE_CACHE_KEY = "homepage";
 
 function publicDoc(doc) {
@@ -102,13 +102,19 @@ async function readHomepage() {
 }
 
 function sendHomepage(req, res, body) {
+  const isNoCache =
+    req.headers["cache-control"]?.includes("no-cache") ||
+    req.headers["pragma"] === "no-cache" ||
+    Boolean(req.query._) ||
+    process.env.NODE_ENV !== "production";
+
   const json = JSON.stringify(body);
   const etag = `"${crypto.createHash("sha1").update(json).digest("hex")}"`;
   res.setHeader("ETag", etag);
-  res.setHeader("Cache-Control", "public, max-age=300");
+  res.setHeader("Cache-Control", isNoCache ? "no-cache, no-store, must-revalidate" : "public, max-age=10");
   res.setHeader("Vary", "Accept-Encoding");
 
-  if (req.headers["if-none-match"] === etag) {
+  if (!isNoCache && req.headers["if-none-match"] === etag) {
     return res.status(304).end();
   }
 
@@ -131,7 +137,16 @@ function sendHomepage(req, res, body) {
 
 const getHomepage = async (req, res, next) => {
   try {
-    const body = await withPublicCache(HOMEPAGE_CACHE_KEY, HOMEPAGE_CACHE_TTL_MS, readHomepage);
+    const isNoCache =
+      req.headers["cache-control"]?.includes("no-cache") ||
+      req.headers["pragma"] === "no-cache" ||
+      Boolean(req.query._) ||
+      process.env.NODE_ENV !== "production";
+
+    const body = isNoCache
+      ? await readHomepage()
+      : await withPublicCache(HOMEPAGE_CACHE_KEY, HOMEPAGE_CACHE_TTL_MS, readHomepage);
+
     sendHomepage(req, res, body);
   } catch (error) {
     next(error);

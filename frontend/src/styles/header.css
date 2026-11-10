@@ -85,7 +85,7 @@ button.nav-link {
 }
 
 .contact-btn {
-  background: #634bfa; /* Solid purple as requested */
+  background: var(--primary-color, #634bfa);
   color: white !important;
   padding: 10px 24px;
   border-radius: 10px;

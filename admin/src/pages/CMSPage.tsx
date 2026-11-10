@@ -188,7 +188,7 @@ const CMSPage = () => {
       const payload = {
         title: pageData.title,
         content: contentToSave,
-        status: pageData.status,
+        status: pageData.status || "published",
         metaTitle: pageData.metaTitle,
         metaDescription: pageData.metaDescription,
         canonicalUrl: pageData.canonicalUrl,

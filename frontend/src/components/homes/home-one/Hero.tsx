@@ -123,6 +123,9 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
     const heroSubtitle = contentReady
       ? (homeContent?.heroSubtitle || propSettings?.heroSubtitle || FALLBACK_SUBTITLE)
       : '';
+    const heroBadge = contentReady
+      ? (homeContent?.heroBadgeText || homeContent?.heroBadge || 'Your Destination for Dance, Fitness & Celebrations')
+      : 'Your Destination for Dance, Fitness & Celebrations';
 
     const [singleIndex, setSingleIndex] = useState(0);
     const [leftIndex, setLeftIndex] = useState(1);
@@ -215,7 +218,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                     align-items: center;
                     gap: 8px;
                     background: rgba(99, 75, 250, 0.08);
-                    border: 1px solid rgba(99, 75, 250, 0.25);
+                    border: 1px solid var(--primary-color, rgba(99, 75, 250, 0.25));
                     padding: 8px 16px;
                     border-radius: 100px;
                     margin-bottom: 24px;
@@ -232,9 +235,8 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                     font-family: 'Montserrat', sans-serif;
                     font-size: 11px;
                     font-weight: 700;
-                    letter-spacing: 1px;
+                    letter-spacing: 0.5px;
                     color: rgba(255, 255, 255, 0.85);
-                    text-transform: uppercase;
                 }
 
                 .hero-pill-badge .heart-icon {
@@ -317,7 +319,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                     display: inline-flex;
                     align-items: center;
                     gap: 10px;
-                    background: linear-gradient(135deg, #634BFA 0%, #392D91 100%);
+                    background: var(--gradient-primary, var(--highlight-gradient, linear-gradient(135deg, #634BFA 0%, #392D91 100%)));
                     color: #FFFFFF !important;
                     font-family: 'Montserrat', sans-serif;
                     font-size: 14px;
@@ -490,7 +492,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                     height: 40px;
                     border-radius: 12px;
                     background: rgba(99, 75, 250, 0.1);
-                    color: #634BFA;
+                    color: var(--primary-color, #634BFA);
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -585,7 +587,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
                 }
 
                 .trusted-more-link {
-                    color: #634BFA;
+                    color: var(--primary-color, #634BFA);
                     font-family: 'Montserrat', sans-serif;
                     font-size: 12px;
                     font-weight: 600;
@@ -747,7 +749,7 @@ const Hero: React.FC<HeroProps> = ({ settings: propSettings, homeContent, conten
             <section className="hero-wrapper" id="hero">
                 <div className="hero-pill-badge">
                     <span className="heart-icon">💜</span>
-                    <span>INDIA'S ONLINE-FIRST DANCE & FITNESS COMPANY</span>
+                    <span>{heroBadge}</span>
                 </div>
 
                 <div className="hero-intro" aria-busy={!contentReady}>

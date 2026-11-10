@@ -526,8 +526,8 @@
 }
 
 .services-explore-btn:hover {
-  background: #634BFA;
-  border-color: #634BFA;
+  background: var(--primary-color, #634BFA);
+  border-color: var(--primary-color, #634BFA);
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(99, 75, 250, 0.35);
 }
@@ -2897,7 +2897,7 @@
   padding: 16px 24px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, #634BFA 0%, #3F2D9D 100%);
+  background: var(--gradient-primary, linear-gradient(135deg, #634BFA 0%, #3F2D9D 100%));
   color: #fff;
   font-family: var(--font-body);
   font-size: 15px;
@@ -3287,7 +3287,7 @@
   padding: 16px;
   font-weight: 700;
   margin-top: 10px;
-  background: #634BFA !important;
+  background: var(--primary-color, #634BFA) !important;
 }
 
 @media (max-width: 992px) {

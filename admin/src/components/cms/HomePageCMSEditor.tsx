@@ -157,7 +157,7 @@ function HomePageCMSEditorComponent({ content, onChange }: Props) {
       >
         <div className="space-y-2">
           <Label>Top Tagline / Badge (small label above the headline)</Label>
-          <Input value={content.heroBadgeText || content.heroBadge || ""} onChange={(e) => onChange("heroBadgeText", e.target.value)} className="bg-muted/50" placeholder="Welcome to GDP" />
+          <Input value={content.heroBadgeText || content.heroBadge || ""} onChange={(e) => onChange("heroBadgeText", e.target.value)} className="bg-muted/50" placeholder="Your Destination for Dance, Fitness & Celebrations" />
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           <div className="space-y-2">
