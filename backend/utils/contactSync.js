@@ -8,8 +8,7 @@ const CONTACT_FIELDS = ["phone", "email", "address"];
 const GDP_DEFAULTS = {
   phone: "+91 78384 16907",
   email: "Gdp.info2019@gmail.com",
-  address:
-    "K-6, near SANDISH MEDICAL, Sector-12, Block-K, Pratap Vihar, Ghaziabad, Uttar Pradesh 201009",
+  address: "Ghaziabad, Uttar Pradesh",
 };
 
 const PLACEHOLDER_PHONES = new Set(["+91 98765 43210", "9876543210", "919876543210"]);

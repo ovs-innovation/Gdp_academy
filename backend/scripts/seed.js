@@ -215,7 +215,7 @@ const seed = async () => {
         content: {
           headerTitle: "Get in Touch",
           headerSubtitle: "We love hearing from fellow dancers, prospective students, and collaborators! Reach out for general inquiries, booking details, or customized workshop sessions.",
-          address: "K-6, near SANDISH MEDICAL, Sector-12, Block-K, Pratap Vihar, Ghaziabad, Uttar Pradesh 201009",
+          address: "Ghaziabad, Uttar Pradesh",
           phone: "+91 78384 16907",
           email: "Gdp.info2019@gmail.com",
         },
