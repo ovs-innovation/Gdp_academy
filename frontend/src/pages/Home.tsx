@@ -364,23 +364,19 @@ const Home: React.FC = () => {
     ? `https://i.ytimg.com/vi/${aboutYoutubeId}/hqdefault.jpg`
     : `https://i.ytimg.com/vi/${aboutYoutubeId}/maxresdefault.jpg`;
 
-  // WhatsApp float: only visible between services section and catch-up section
+  // WhatsApp float: visible when scrolled past services section
   const [showWhatsApp, setShowWhatsApp] = useState(false);
   const servicesSectionRef = useRef<HTMLElement>(null);
-  const catchUpSectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const handleScroll = () => {
       const srv = servicesSectionRef.current;
-      const ctc = catchUpSectionRef.current;
-      if (!srv || !ctc) return;
+      if (!srv) return;
       
       const srvTop = srv.getBoundingClientRect().top + window.scrollY;
-      const ctcTop = ctc.getBoundingClientRect().top + window.scrollY;
       const scrollPosition = window.scrollY;
 
-      // Show WhatsApp button starting from Services section top to Contact section top
-      setShowWhatsApp(scrollPosition >= srvTop - 100 && scrollPosition <= ctcTop - 100);
+      setShowWhatsApp(scrollPosition >= srvTop - 100);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
@@ -810,74 +806,7 @@ const Home: React.FC = () => {
       </section>
       </LazySection>
 
-      {/* 11. Contact Section */}
-      <LazySection minHeight={480} rootMargin="400px">
-      <section id="contact" className="contact-v3 section-padding" ref={catchUpSectionRef}>
-        <div className="container">
-          <div className="contact-v3-body">
-            <div className="contact-v3-text">
-              <span className="contact-v3-badge">Get in Touch</span>
-              {!homeCopyReady ? (
-                <>
-                  <div className="home-skel" style={{ height: 40, width: '70%', marginBottom: 16 }} />
-                  <div className="home-skel" style={{ height: 14, width: '90%', marginBottom: 8 }} />
-                  <div className="home-skel" style={{ height: 14, width: '60%', marginBottom: 20 }} />
-                </>
-              ) : (
-                <>
-                  <motion.h2
-                    className="contact-v3-title"
-                    initial={{ opacity: 0, y: 24 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                  >
-                    {homeContent.contactSectionTitle || settings?.contactSectionTitle || "Let's"}{' '}
-                    <span className="gradient-text">
-                      {homeContent.contactSectionHighlight || settings?.contactSectionSubtitle || 'Catch up?'}
-                    </span>
-                  </motion.h2>
-                  <p className="contact-v3-desc">
-                    {homeContent.contactSectionText || 'We are Garima Dance Productions, helping all dance enthusiasts to live up to their dream'}
-                  </p>
-                </>
-              )}
-              <a
-                href={buildWhatsAppUrl(settings?.whatsappNumber || '7838416907')}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="contact-v3-wa-btn"
-              >
-                <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
-                  <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.185-.573c.948.517 2.031.888 3.144.889h.002c3.181 0 5.767-2.586 5.768-5.766a5.756 5.756 0 00-5.768-5.766zM12.03 16.79c-1.13 0-2.112-.34-2.956-.848l-1.266.33.336-1.228c-.51-.83-.87-1.801-.869-2.923.001-2.695 2.193-4.887 4.888-4.887 1.305 0 2.532.508 3.456 1.431a4.85 4.85 0 011.432 3.457c0 2.694-2.193 4.886-4.887 4.886z"/>
-                </svg>
-                Connect on WhatsApp
-              </a>
-            </div>
-
-            <motion.div
-              className="contact-v3-form-card"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.08 }}
-            >
-              <div className="contact-v3-form-glow" aria-hidden="true" />
-              <h3>{homeCopyReady ? (homeContent.contactFormTitle || 'Or let us reach you!') : '…'}</h3>
-              <p className="contact-v3-desc">Name, WhatsApp, program, and city. That's it.</p>
-              <button
-                type="button"
-                className="contact-v3-submit"
-                onClick={() => openEnquiry({ purpose: 'contact', topic: "Let's catch up" })}
-              >
-                Open the form
-              </button>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-      </LazySection>
-
-      {/* WhatsApp float — only between Services and Catch Up sections */}
+      {/* WhatsApp float */}
       {showWhatsApp && (
         <a
           href={buildWhatsAppUrl(settings?.whatsappNumber || '7838416907')}
