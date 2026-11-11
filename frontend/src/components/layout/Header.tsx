@@ -165,6 +165,8 @@ const Header: React.FC = () => {
     return location.pathname === path;
   };
 
+  const isHomePage = location.pathname === "/" || location.pathname === "";
+
   const navLinks = primaryNavLinks;
 
   const brandLine1 = settings?.brandLine1 || "Garima";
@@ -309,9 +311,11 @@ const Header: React.FC = () => {
         </nav>
 
         <div className="header-actions">
-          <Link to={headerCtaUrl} className="contact-btn">
-            {headerCtaLabel}
-          </Link>
+          {!isHomePage && (
+            <Link to={headerCtaUrl} className="contact-btn">
+              {headerCtaLabel}
+            </Link>
+          )}
         </div>
       </div>
 
@@ -428,13 +432,15 @@ const Header: React.FC = () => {
                 </Link>
               );
             })}
-            <Link
-              to={headerCtaUrl}
-              onClick={closeMobile}
-              className="contact-btn mobile-join-cta"
-            >
-              {headerCtaLabel}
-            </Link>
+            {!isHomePage && (
+              <Link
+                to={headerCtaUrl}
+                onClick={closeMobile}
+                className="contact-btn mobile-join-cta"
+              >
+                {headerCtaLabel}
+              </Link>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
