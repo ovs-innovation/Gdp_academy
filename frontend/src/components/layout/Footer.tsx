@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import SiteLogo from '../common/SiteLogo';
 import { useSiteData } from '../../contexts/SiteDataContext';
@@ -6,10 +6,12 @@ import { resolveContactInfo } from '../../lib/contactInfo';
 import { buildWhatsAppUrl } from '../../utils/whatsapp';
 import { useEnquiryPopup } from '../../contexts/EnquiryPopupContext';
 import { isContactHref } from '../../lib/trialEnquiry';
+import { isExcludedService } from '../../lib/defaultServices';
+import { getLocalizedValue } from '../../utils/contentHelper';
 import '../../styles/footer.css';
 
 const Footer: React.FC = () => {
-  const { cmsSettings: settings, contactPage, refreshSiteData } = useSiteData();
+  const { cmsSettings: settings, contactPage, servicesCms, refreshSiteData } = useSiteData();
   const { openEnquiry } = useEnquiryPopup();
 
   useEffect(() => {
@@ -39,10 +41,10 @@ const Footer: React.FC = () => {
     { label: 'Contact', href: '/contact' },
   ];
   const defaultServiceLinks = [
-    { label: 'Regular Dance Sessions', href: '/services' },
-    { label: 'Fitness Sessions', href: '/services' },
-    { label: 'Wedding Choreography', href: '/services' },
-    { label: 'Custom Choreography', href: '/services' },
+    { label: 'Online Dance Classes', href: '/services/1' },
+    { label: 'Online Combo Fitness Classes', href: '/services/2' },
+    { label: 'Wedding choreography', href: '/services/3' },
+    { label: 'Custom choreography', href: '/services/4' },
   ];
 
   const socialLinks =
@@ -76,10 +78,20 @@ const Footer: React.FC = () => {
     ? filteredFooterLinks
     : [...filteredFooterLinks, { label: 'Blog', href: '/blog' }];
 
-  const serviceLinks =
-    settings?.footerServiceLinks && settings.footerServiceLinks.length > 0
-      ? settings.footerServiceLinks
-      : defaultServiceLinks;
+  const serviceLinks = useMemo(() => {
+    const dynamicLinks = (servicesCms || [])
+      .filter((s) => !isExcludedService({ key: s.key, title: getLocalizedValue(s.title, '') }))
+      .map((svc) => ({
+        label: getLocalizedValue(svc.title, '').trim(),
+        href: `/services/${svc.key}`,
+      }));
+
+    if (dynamicLinks.length > 0) return dynamicLinks;
+    if (settings?.footerServiceLinks && settings.footerServiceLinks.length > 0) {
+      return settings.footerServiceLinks;
+    }
+    return defaultServiceLinks;
+  }, [servicesCms, settings?.footerServiceLinks]);
 
   const footerText =
     settings?.footerText || 'copyright@2026 Garima dance productions, All rights reserved';
